@@ -6,35 +6,48 @@ import MLoading from "../components/MLoading.vue";
 import { ref, inject } from "vue";
 import { useEmployee } from "../composable/useEmployee";
 
-const { listEmployees, searchEmployees, getAllEmployees } = useEmployee();
-const { state, setListEmployees, setTitleForm, setIsForm, setEmployeeSelected } = inject("diy");
-const debounce = ref(null);
+const { listEmployees, searchEmployees, totalPage, handleFilterPage } = useEmployee();
+const { state, setListEmployees, setTitleForm, setIsForm, setEmployeeSelected, setTotalPage } =
+    inject("diy");
 const keyword = ref("");
 const isLoading = ref(false);
 
 /**
  * Xử lý tìm kiếm nhân viên theo tên, mã nhân viên
  */
-const debounceSearch = (e) => {
-    keyword.value = e.target.value;
+const debounceSearch = (val) => {
     isLoading.value = true;
-    clearTimeout(debounce);
-    debounce = setTimeout(async () => {
-        await searchEmployees(keyword.value);
-        setListEmployees(listEmployees);
-        isLoading.value = false;
-    }, 300);
+    searchEmployees(val);
+    setListEmployees(listEmployees);
+    setTotalPage(totalPage);
+    isLoading.value = false;
 };
 
 /**
  * Xử lý khi kết thúc việc sửa nhân  viên
  * CreatedBy: NHGiang
  */
-const handleEndEditEmployee = async() => {
+const handleEndEditEmployee = async () => {
     try {
-        await getAllEmployees();
+        await handleFilterPage();
         setListEmployees(listEmployees);
         setIsForm(false);
+        isLoading.value = false;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Xử lý refresh lại bảng dữ liệu
+ * CreatedBy: NHGiang
+ */
+
+const handleRefresh = async () => {
+    try {
+        isLoading.value = true;
+        await handleFilterPage();
+        setListEmployees(listEmployees);
         isLoading.value = false;
     } catch (error) {
         console.log(error);
@@ -74,7 +87,7 @@ const handleEndEditEmployee = async() => {
                         class="textfield__input"
                         id="search-input"
                         placeholder="Tìm kiếm mã, tên nhân viên"
-                        @keyup="debounceSearch($event)"
+                        v-debounce:600="debounceSearch"
                         autocomplete="off"
                     />
                 </div>
@@ -84,6 +97,7 @@ const handleEndEditEmployee = async() => {
                         background:
                             'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -425px -201px',
                     }"
+                    @click="handleRefresh"
                 ></div>
             </div>
             <M-table />

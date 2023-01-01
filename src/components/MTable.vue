@@ -4,13 +4,14 @@ import Mrow from "./MRow.vue";
 import MLoading from "../components/MLoading.vue";
 import { useEmployee } from "../composable/useEmployee";
 
-const { listEmployees, getAllEmployees } = useEmployee();
-getAllEmployees();
+const { listEmployees, handleFilterPage, totalRecord, totalPage } = useEmployee();
+handleFilterPage();
 
 const listCheck = ref([]);
-const { state, setListEmployees } = inject("diy");
+const { state, setListEmployees, setTotalEmployee, setTotalPage } = inject("diy");
 setListEmployees(listEmployees);
-
+setTotalEmployee(totalRecord);
+setTotalPage(totalPage);
 /*
  * Xử lý set giá trị listcheck
  * CreateBy: NHGiang

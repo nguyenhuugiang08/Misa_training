@@ -6,6 +6,8 @@ const state = reactive({
     titleForm: "",
     isForm: false,
     employeeSelected: {},
+    totalEmployee: 0,
+    totalPageValue: 1,
 });
 
 const setIsSidebar = () => {
@@ -48,6 +50,22 @@ const setEmployeeSelected = (employee) => {
     }
 };
 
+const setTotalEmployee = (total) => {
+    try {
+        state.totalEmployee = total;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+const setTotalPage = (total) => {
+    try {
+        state.totalPageValue = total;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 export default {
     state: readonly(state),
     setIsSidebar,
@@ -55,4 +73,6 @@ export default {
     setTitleForm,
     setIsForm,
     setEmployeeSelected,
+    setTotalEmployee,
+    setTotalPage,
 };

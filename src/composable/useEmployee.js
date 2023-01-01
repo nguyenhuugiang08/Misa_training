@@ -10,6 +10,8 @@ export const useEmployee = () => {
         const listEmployees = ref([]);
         const newEmployeeCode = ref(null);
         const editEmployee = ref(null);
+        const totalRecord = ref(0);
+        const totalPage = ref(1);
 
         // Lấy danh sách employees
         const getAllEmployees = async () => {
@@ -85,6 +87,11 @@ export const useEmployee = () => {
                         import.meta.env.VITE_MISA_EMPLOYEE_API
                     }/filter?pageSize=${pageSize}&pageNumber=${pageNumber}`
                 );
+
+                const { Data, TotalRecord, TotalPage } = response.data;
+                listEmployees.value = [...Data];
+                totalRecord.value = TotalRecord;
+                totalPage.value = TotalPage;
             } catch (error) {
                 console.log(error);
             }
@@ -94,6 +101,8 @@ export const useEmployee = () => {
             listEmployees,
             newEmployeeCode,
             editEmployee,
+            totalRecord,
+            totalPage,
             getAllEmployees,
             getEmployeeCode,
             addNewEmloyee,

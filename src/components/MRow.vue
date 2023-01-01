@@ -39,7 +39,7 @@ const handleEditEmployee = async (employeeId) => {
 </script>
 
 <template>
-    <tr class="tbl-row">
+    <tr class="tbl-row" @dblclick="handleEditEmployee(employee.EmployeeId)">
         <td class="tbl-col tbl-col__first">
             <input
                 type="checkbox"
