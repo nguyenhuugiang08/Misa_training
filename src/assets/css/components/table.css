@@ -1,0 +1,233 @@
+.tbl {
+    width: 100%;
+    background-color: #fff;
+    border-radius: 4px;
+    border-collapse: collapse;
+    text-align: left;
+    cursor: pointer;
+    position: relative;
+    overflow: auto;
+    table-layout: fixed;
+}
+
+.tbl tbody {
+    display: block;
+    width: calc(100%);
+    overflow: auto;
+    height: calc(100vh - 48px - 71px - 68px - 68px);
+    position: relative;
+}
+
+.tbl tbody svg {
+    position: relative;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    left: 50%;
+}
+
+.tbl .tbl-row {
+    height: 44px;
+    border-bottom: 1px solid #E0E0E0;
+    position: relative;
+}
+
+.tbl .tbl-row th {
+    text-transform: uppercase;
+    font-size: 13px;
+}
+
+.tbl .tbl-col {
+    position: relative;
+    width: 150px;
+    min-width: 150px;
+    padding: 0 10px;
+    border-right: 1px solid #c7c7c7;
+    border-bottom: 1px solid #c7c7c7;
+}
+
+.tbl .tbl-col--large {
+    width: 250px;
+    min-width: 250px;
+}
+
+.tbl .tbl-col__first {
+    padding-right: 0;
+    width: 40px;
+    min-width: 40px;
+    height: 44px;
+    border-bottom: 1px solid #c7c7c7;
+    position: sticky !important;
+    z-index: 11;
+    background-color: #fff;
+    left: 0;
+    top: 0;
+}
+
+.tbl .tbl-col__first::after {
+    position: absolute;
+    content: "";
+    width: 1px;
+    background-color: #c7c7c7;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.tbl .tbl-col__last {
+    width: 110px;
+    min-width: 110px;
+    border-right: none;
+    position: sticky;
+    right: 0;
+    background-color: #fff;
+    top: 0;
+    z-index: 10;
+}
+
+.tbl .tbl-col__last::after {
+    position: absolute;
+    content: "";
+    width: 1px;
+    background-color: #c7c7c7;
+    left: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.tbl .tbl-row:first-child {
+    background-color: #e5e8ec;
+}
+
+.tbl .tbl-row:first-child:hover {
+    background-color: #e5e8ec;
+}
+
+.tbl .tbl-row:first-child:hover .tbl-col__first--bg-private{
+    background-color: #e5e8ec !important;
+}
+
+.tbl .tbl-row:first-child:hover .tbl-col__last--bg-private{
+    background-color: #e5e8ec !important;
+}
+
+
+.tbl-col__first--bg-private {
+    background-color: #e5e8ec !important;
+}
+
+.tbl-col__last--bg-private {
+    background-color: #e5e8ec !important;
+}
+
+.tbl thead,
+th {
+    background-color: #e5e8ec;
+    position: sticky !important;
+    top: 0px !important;
+    z-index: 10;
+}
+
+.tbl .tbl-row:hover {
+    background-color: var(--table-bg-color);
+}
+
+.tbl .tbl-row:hover .tbl-col__last{
+    background-color: var(--table-bg-color) !important;
+}
+
+.tbl .tbl-row:hover .tbl-col__first{
+    background-color: var(--table-bg-color) !important;
+}
+
+.tbl .tbl-col input[type="checkbox"] {
+    margin: 0 16px;
+    height: 24px;
+    width: 24px;
+    display: none;
+}
+
+.tbl-col .mask {
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    border: 1px solid #757575;
+    border-radius: 2px;
+    left: 11px;
+    top: 13px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+}
+
+.tbl-col .mask div {
+    display: none;
+}
+
+.tbl .tbl-col input[type="checkbox"]:checked+.mask div {
+    display: block;
+}
+
+.tbl .tbl-row:has([type="checkbox"]:checked) {
+    background-color: var(--table-bg-color);
+}
+.tbl .tbl-row:has([type="checkbox"]:checked) {
+    background-color: var(--table-bg-color);
+}
+
+.tbl .tbl-row:has([type="checkbox"]:checked) .tbl-col__first {
+    background-color: var(--table-bg-color) !important;
+}
+
+.tbl .tbl-row:has([type="checkbox"]:checked) .tbl-col__last {
+    background-color: var(--table-bg-color) !important;
+}
+
+.tbl .tbl-row:has([type="checkbox"]:checked):first-child {
+    background-color: #e5e8ec;
+}
+
+/* col action */
+.tbl-col__action {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.tbl-col__action .sidebar-item__icon {
+    margin: 8px 10px;
+}
+
+.tbl-col__action-item {
+    height: 36px;
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    color: #1F1F1F;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+.tbl-col__action-item:hover {
+    background-color: #ebedf0;
+    color: #2ca01c;
+}
+
+.tbl-col__action-list {
+    top: 44px;
+    bottom: unset;
+    z-index: 1;
+    right: 50%;
+}
+
+.tbl-col__action:has(.tbl-col__action-item:focus) {
+    height: 0;
+}
+
+.tbl-col__action-edit {
+    color: #0075c0;
+    font-weight: 600;
+    cursor: pointer;
+}

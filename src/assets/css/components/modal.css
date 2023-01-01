@@ -1,0 +1,349 @@
+.overlay {
+    background-color: #0000004d;
+    position: fixed;
+    z-index: 99;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal {
+    min-width: 900px;
+    max-width: 900px;
+    width: 900px;
+    background-color: #fff;
+    padding-bottom: 20px;
+    border-radius: 2px;
+    box-shadow: 0 5px 20px 0 #0000001a
+        /* display: none; */
+}
+
+.modal__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal__header-left {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 20px 32px;
+}
+
+.modal__header-left-text {
+    font-size: 24px;
+    color: #111;
+    font-weight: 700;
+}
+
+.modal__header-left-wrapper {
+    margin-left: 19.5px;
+    position: relative;
+    height: 18px;
+    width: 18px;
+    border: 1px solid #757575;
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+}
+
+.modal__header-left span {
+    padding: 0 19.5px 0 10px;
+    line-height: 32px;
+}
+
+.modal__header-left-wrapper div {
+    display: none;
+}
+
+.modal__header-left-wrapper input[type="radio"] {
+    display: none;
+}
+
+.modal__header-left-wrapper:has(input[type="radio"]:checked) div {
+    display: inline-block;
+}
+
+.modal__header-right {
+    padding: 12px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.modal-main {
+    padding: 0 22px 0 32px;
+    display: flex;
+    flex-wrap: wrap;
+    overflow-y: auto;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #b8bcc3;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #8e8d8d;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 20px 32px 0 32px;
+}
+
+.line {
+    border-top: 1px solid #c9ccd2;
+    margin: 0 32px;
+}
+
+.modal-footer__wrapper {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.modal-btn__secondary {
+    margin: 0 0.75rem;
+}
+
+.modal-textfield {
+    max-width: 388px;
+    width: 388px;
+}
+
+.modal-textfield .modal-textfield__input {
+    max-width: 388px;
+    width: 388px;
+}
+
+.modal-label {
+    font-size: 12px;
+    font-weight: 700 !important;
+    color: #212121 !important;
+    margin-bottom: 4px !important;
+}
+
+.modal-list {
+    bottom: unset;
+    top: 60px;
+    z-index: 999;
+}
+
+.modal-icon {
+    height: 36px !important;
+    width: 36px !important;
+    top: 24px !important;
+    right: 0 !important;
+}
+
+.modal__gender {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: 36px;
+}
+
+.modal__gender-item {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+}
+
+.modal__gender-item input[type="radio"] {
+    display: none;
+}
+
+.modal__gender-item div {
+    display: none;
+}
+
+.modal__gender-item:has(input[type="radio"]:checked) {
+    border: none;
+}
+
+.modal__gender-item:has(input[type="radio"]:checked) div {
+    display: block;
+}
+
+/* contact */
+.modal-contact {
+    margin-top: 20px;
+    margin-bottom: 32px;
+    width: 100%;
+}
+
+.modal__list-filter {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    list-style: none;
+}
+
+.modal__list-filter-item {
+    height: 25px;
+    padding: 0 8px;
+    border: 1px solid #c9ccd2;
+    border-bottom: none;
+    margin-right: 2px;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    line-height: 25px;
+    margin-top: 6px
+}
+
+.modal-contact__content {
+    height: 194px;
+    border: 1px solid #c9ccd2;
+    width: 100%;
+    padding: 12px 10px 0;
+}
+
+.overlay input[type="checkbox"] {
+    display: none;
+}
+
+.overlay:has(input[type="checkbox"]:checked) {
+    display: flex;
+}
+
+.overlay:has(#show-modal:checked) .modal {
+    display: block;
+}
+
+.overlay:has(#show-modal:checked) .modal-confirm {
+    display: none;
+}
+
+.overlay:has(#show-modal__confirm:checked) .modal-confirm {
+    display: block;
+}
+
+.overlay:has(#show-modal__confirm:checked) .modal {
+    display: none;
+}
+
+.modal__list-filter--active {
+    line-height: 31px;
+    background-color: var(--table-bg-color);
+    height: 31px;
+    margin-top: 0;
+}
+
+.modal__close-btn {
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 24px;
+    width: 24px;
+    border-radius: 2px;
+}
+
+.modal__close-btn:hover {
+    background-color: var(--border-color);
+}
+
+
+/* modal confirm */
+
+.modal-confirm {
+    width: 444px;
+    min-width: 444px;
+    padding: 24px;
+    background-color: #fff;
+    border-radius: 2px;
+    position: relative;
+}
+
+.modal-confirm__content {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.modal-confirm__content-text {
+    padding: 12px 0 0 16px;
+    margin-bottom: 32px;
+}
+
+.modal-confirm__line {
+    width: 100%;
+    background-color: #b8bcc3;
+    height: 1px;
+    margin-bottom: 20px;
+}
+
+.modal-confirm__footer {
+    padding: 0;
+}
+
+.modal-confirm__title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 24px;
+}
+
+.modal-confirm__close-btn {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-confirm__close-btn:hover {
+    background-color: var(--border-color);
+}
+
+.modal-confirm__content-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-footer--error {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-error {
+    background-color: #0000004d;
+    position: fixed;
+    z-index: 99;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

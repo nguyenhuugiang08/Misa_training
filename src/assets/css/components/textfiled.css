@@ -1,0 +1,289 @@
+.textfield {
+    width: max-content;
+    position: relative;
+}
+
+.textfield .textfield__label {
+    margin-bottom: 8px;
+    display: block;
+    font-weight: 500;
+    color: #000;
+    position: relative;
+}
+
+.textfield .textfield__input {
+    height: 36px;
+    padding: 0 8px 0 12px;
+    outline: none;
+    border-radius: 2px;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    background-color: #fff;
+    min-width: 260px;
+}
+
+.textfield .textfield__input::placeholder {
+    color: #a6a6a6;
+    font-style: italic;
+    font-size: 12px;
+}
+
+.textfield .textfield__input:hover {
+    background-color: #F6F6F6;
+}
+
+.textfield .textfield__input:focus {
+    border: 1px solid var(--primary-color);
+}
+
+/* field error */
+.textfield .textfield--error-input {
+    border: 1px solid var(--error-color);
+}
+
+.textfield .textfield--error-text {
+    color: var(--error-color);
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+.textfield .textfield--error-input:focus {
+    border: 1px solid var(--error-color);
+}
+
+.textfield .textfield__icon {
+    position: absolute;
+    right: 8px;
+    top: 18px;
+    height: 16px;
+    width: 20px;
+    font-size: 20px;
+    color: #666666;
+    border-left: none;
+    cursor: pointer;
+    z-index: 99;
+}
+
+.textfield__icon--add {
+    position: absolute;
+    right: 8px;
+    top: 18px;
+    height: 16px;
+    width: 20px;
+    font-size: 20px;
+    color: #666666;
+    border-left: none;
+    cursor: pointer;
+    z-index: 99;
+}
+
+.textfield .textfield__icon:focus {
+    right: 0;
+    top: 8px;
+    height: 36px;
+    width: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+}
+
+.textfield .textfield__icon--add:focus {
+    right: 0;
+    top: 8px;
+    height: 36px;
+    width: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    background-color: #EBEBEB;
+}
+
+/* input box has icon in front */
+.textfield .textfield__input--secondary {
+    padding-left: 32px;
+}
+
+.textfield .textfield__icon--secondary {
+    left: 8px;
+}
+
+.textfield .textfield__icon--secondary:focus {
+    background-color: #fff;
+    right: unset;
+    height: 16px;
+    width: 20px;
+    top: 38px;
+}
+
+/* droplist */
+.textfield-list {
+    position: absolute;
+    width: 100%;
+    list-style: none;
+    max-height: 160px;
+    border-radius: 2px;
+    background-color: #fff;
+    box-shadow: 0 4px 16px #171b2a3d;
+    height: max-content;
+    transition: height 0.2s ease-in;
+    overflow: hidden;
+    bottom: 40px;
+    overflow: auto;
+    z-index: 9990;
+}
+
+.over-list {
+    padding: 2px 0;
+}
+
+.over-list__action {
+    height: max-content;
+    width: max-content;
+    right: 80px !important;
+    transform-origin: 90% top;
+    top: 268px !important;
+    position: absolute;
+    z-index: 9999 !important;
+    display: none;
+}
+
+.textfield-item {
+    height: 36px;
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    color: #1F1F1F;
+    cursor: pointer;
+    padding: 0 14px 0 10px;
+}
+
+.textfield-item:hover {
+    background-color: #ebedf0;
+    color: #2ca01c;
+}
+
+.textfield-item--active {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.textfield-item--active:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.textfield-list::-webkit-scrollbar {
+    display: none;
+}
+
+.textfield-max-content {
+    min-width: unset !important;
+    max-width: max-content;
+    position: relative;
+    top: -4px;
+}
+
+.textfield__label input[type="checkbox"] {
+    display: none;
+}
+
+.textfield-list--show {
+    height: max-content;
+    overflow-y: auto;
+    padding: 2px 0;
+    border: 1px solid #babec5;
+    width: max-content;
+}
+
+.textfield__label:has(input[type="checkbox"]:checked)~.textfield-list.modal-list.short-list {
+    height: 112px;
+}
+
+.textfield__label:has(input[type="checkbox"]:checked)~.textfield__input {
+    border: 1px solid var(--primary-color);
+}
+
+.textfield__label:has(input[type="checkbox"]:checked)~.textfield__input.textfield--error-input {
+    border: 1px solid var(--error-color);
+}
+
+.textfield__label:has(~.textfield-max-content) .textfield__icon {
+    top: 14px;
+}
+
+.textfield__label:has(~.textfield-max-content) .textfield__icon:focus {
+    top: 4px;
+}
+
+.textfield__label:has(input[type="checkbox"]:checked) .textfield__icon {
+    border: 1px solid var(--primary-color);
+    border-left: transparent;
+    background-color: #EBEBEB;
+    right: 0;
+    top: 4px;
+    height: 36px;
+    width: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+}
+
+.textfield__label:has(input[type="checkbox"]:checked) .textfield__icon.textfield__icon--error {
+    border: 1px solid var(--error-color);
+    border-left: transparent;
+}
+
+.textfield .textfield__icon:hover {
+    background-color: #EBEBEB;
+    right: 0;
+    top: 4px;
+    height: 36px;
+    width: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+}
+
+.textfield .textfield__icon.textfield__icon--error:hover {
+    border: 1px solid var(--error-color);
+    border-left: none;
+}
+
+.text-error {
+    color: #fff;
+    font-weight: 500;
+    background-color: var(--error-color);
+    opacity: 0.6;
+    width: max-content;
+    padding: 2px 6px;
+    position: absolute;
+    border-radius: 4px;
+    top: 68px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+}
+
+.text-error::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 10px solid;
+    height: 0;
+    width: 0;
+    bottom: 20px;
+    border-color: transparent transparent var(--error-color) transparent;
+}
+
+.textfield .textfield--error-input:hover~.text-error {
+    display: block;
+}

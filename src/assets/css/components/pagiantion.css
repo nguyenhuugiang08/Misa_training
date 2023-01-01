@@ -1,0 +1,32 @@
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 16px;
+    cursor: pointer;
+}
+
+.pagination-list {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    ;
+}
+
+.pagination-prev {
+    margin-right: 13px;
+}
+
+.pagination-next {
+    margin-left: 13px;
+}
+
+.pagination-item {
+    padding: 0 0.5rem;
+}
+
+.pagination-item:first-child {
+    border: 1px solid #e0e0e0;
+    font-weight: 700;
+}
