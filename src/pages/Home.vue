@@ -7,17 +7,24 @@ import { ref, inject } from "vue";
 import { useEmployee } from "../composable/useEmployee";
 
 const { listEmployees, searchEmployees, totalPage, handleFilterPage } = useEmployee();
-const { state, setListEmployees, setTitleForm, setIsForm, setEmployeeSelected, setTotalPage } =
-    inject("diy");
+const {
+    state,
+    setListEmployees,
+    setTitleForm,
+    setIsForm,
+    setEmployeeSelected,
+    setTotalPage,
+    setIdentityForm,
+} = inject("diy");
 const keyword = ref("");
 const isLoading = ref(false);
 
 /**
  * Xử lý tìm kiếm nhân viên theo tên, mã nhân viên
  */
-const debounceSearch = (val) => {
+const debounceSearch = async (val) => {
     isLoading.value = true;
-    searchEmployees(val);
+    await searchEmployees(val);
     setListEmployees(listEmployees);
     setTotalPage(totalPage);
     isLoading.value = false;
@@ -39,10 +46,23 @@ const handleEndEditEmployee = async () => {
 };
 
 /**
+ * Xử lý khi kết thúc việc sửa nhân  viên
+ * CreatedBy: NHGiang
+ */
+ const handleEndDeleteEmployee = async () => {
+    try {
+        await handleFilterPage();
+        setListEmployees(listEmployees);
+        isLoading.value = false;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
  * Xử lý refresh lại bảng dữ liệu
  * CreatedBy: NHGiang
  */
-
 const handleRefresh = async () => {
     try {
         isLoading.value = true;
@@ -65,6 +85,7 @@ const handleRefresh = async () => {
                     setIsForm();
                     setTitleForm('Thông tin nhân viên');
                     setEmployeeSelected({});
+                    setIdentityForm(0);
                 "
             >
                 Thêm mới nhân viên
@@ -74,13 +95,16 @@ const handleRefresh = async () => {
             <div class="content-wrapper__action">
                 <div class="textfield">
                     <label for="" class="textfield__label">
-                        <div
-                            class="sidebar-item__icon textfield__icon content-icon"
-                            :style="{
-                                background:
-                                    'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -317px -148px',
-                            }"
-                        ></div>
+                        <div class="textfield__icon">
+                            <div
+                                :style="{
+                                    background:
+                                        'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -317px -148px',
+                                    width: '17px',
+                                    height: '16px',
+                                }"
+                            ></div>
+                        </div>
                     </label>
                     <input
                         type="text"
@@ -88,6 +112,7 @@ const handleRefresh = async () => {
                         id="search-input"
                         placeholder="Tìm kiếm mã, tên nhân viên"
                         v-debounce:600="debounceSearch"
+                        :debounce-events="['input', 'keyup', 'change']"
                         autocomplete="off"
                     />
                 </div>
@@ -100,7 +125,7 @@ const handleRefresh = async () => {
                     @click="handleRefresh"
                 ></div>
             </div>
-            <M-table />
+            <M-table @startDelete="isLoading = true" @endDelete="handleEndDeleteEmployee" />
             <m-pagination />
             <m-pop-up
                 v-if="state.isForm"

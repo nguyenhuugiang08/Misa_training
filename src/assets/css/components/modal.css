@@ -153,7 +153,7 @@
 .modal-icon {
     height: 36px !important;
     width: 36px !important;
-    top: 24px !important;
+    top: 22px !important;
     right: 0 !important;
 }
 
@@ -263,10 +263,56 @@
     height: 24px;
     width: 24px;
     border-radius: 2px;
+    position: relative;
 }
 
-.modal__close-btn:hover {
-    background-color: var(--border-color);
+.modal__close-btn::after {
+    position: absolute;
+    content: "Đóng (ESC)";
+    display: block;
+    background-color: #434242;
+    color: #fff;
+    top: 32px;
+    width: max-content;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: none;
+    opacity: 0;
+    animation: identifier 0.3s ease-in;
+}
+
+.modal__close-btn::before {
+    content: "";
+    position: absolute;
+    display: block;
+    height: 0;
+    width: 0;
+    border: 6px solid;
+    border-color: transparent transparent #434242 transparent;
+    top: 20px;
+    display: none;
+    opacity: 0;
+    animation: identifier 0.3s ease-in;
+}
+
+.modal__close-btn:hover::before {
+    display: block;
+    opacity: 1;
+}
+
+.modal__close-btn:hover::after {
+    display: block;
+    opacity: 1;
+}
+
+@keyframes identifier {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 
@@ -318,10 +364,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.modal-confirm__close-btn:hover {
-    background-color: var(--border-color);
 }
 
 .modal-confirm__content-icon {

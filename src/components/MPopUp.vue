@@ -46,11 +46,13 @@ const error = reactive({
 const isPopUp = reactive({
     isOpenError: false,
     isOpenInfo: false,
-    isOpenWarning: false,
 });
 const emit = defineEmits(["hideModal"]);
 
-// Ẩn modal
+/**
+ * Ẩn modal
+ * CreatedBy: NHGiang
+ */
 const hideModal = () => {
     try {
         emit("hideModal");
@@ -59,7 +61,10 @@ const hideModal = () => {
     }
 };
 
-// Xử lý hiển thị thông báo khi nhấn nút x
+/**
+ * Xử lý hiển thị thông báo khi nhấn nút x
+ * CreatedBy: NHGiang
+ */
 const handleShowPopUpInfo = () => {
     try {
         isPopUp.isOpenInfo = true;
@@ -68,19 +73,28 @@ const handleShowPopUpInfo = () => {
     }
 };
 
-// Xử lý submit form
+/**
+ *  Xử lý submit form
+ * CreatedBy: NHGiang
+ */
 const hanldeSubmitForm = async () => {
     try {
         employee.departmentId = employee.departmentId || listDepartments.value?.[0].departmentId;
 
-        if (props.title === "Sửa thông tin nhân viên") {
-            emit("startEdit");
-            await editAnEmployee({
-                ...employee,
-                employeeId: employeeSelected.EmployeeId,
-                identityDate: new Date(employee.identityDate).toJSON(),
-            });
-            emit("endEdit");
+        if (state.identityForm !== 0) {
+            if (employee.fullName) {
+                emit("startEdit");
+                await editAnEmployee({
+                    ...employee,
+                    employeeId: employeeSelected.EmployeeId,
+                    identityDate: new Date(employee.identityDate).toJSON(),
+                });
+                emit("endEdit");
+            } else {
+                error.textError = "Tên không được để trống.";
+                error.status = true;
+                isPopUp.isOpenError = true;
+            }
         } else {
             if (employee.fullName) {
                 addNewEmloyee({
@@ -120,35 +134,36 @@ const hanldeSubmitForm = async () => {
                     <label for="radio2" class="modal__header-left-wrapper">
                         <input type="radio" name="doituong" id="radio2" />
                         <div
-                            style="
-                                background: url('../../src/assets/img/Sprites.64af8f61.svg')
-                                    no-repeat -1225px -363px;
-                                width: 14px;
-                                height: 11px;
-                            "
+                            :style="{
+                                background:
+                                    'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -1225px -363px',
+                                width: '14px',
+                                height: '11px',
+                            }"
                         ></div>
                     </label>
                     <span>Là nhà cung cấp</span>
                 </div>
                 <div class="modal__header-right">
                     <div
-                        style="
-                            background: url('../../src/assets/img/Sprites.64af8f61.svg') no-repeat -732px -31px;
-                            width: 24px;
-                            height: 24px;
-                            margin-right: 6px;
-                        "
+                        :style="{
+                            background:
+                                'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -732px -31px',
+                            width: '24px',
+                            height: '24px',
+                            marginRight: '6px',
+                        }"
                     ></div>
                     <div class="modal__close-btn">
                         <label
                             for="show-modal"
-                            style="
-                                background: url('../../src/assets/img/Sprites.64af8f61.svg')
-                                    no-repeat -147px -147px;
-                                width: 18px;
-                                height: 18px;
-                                cursor: pointer;
-                            "
+                            :style="{
+                                background:
+                                    'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -147px -147px',
+                                width: '18px',
+                                height: '18px',
+                                cursor: 'pointer',
+                            }"
                             @click="handleShowPopUpInfo"
                         ></label>
                     </div>
@@ -156,22 +171,22 @@ const hanldeSubmitForm = async () => {
             </div>
             <div class="modal-main">
                 <div
-                    style="
-                        display: flex;
-                        justify-content: center;
-                        align-items: flex-start;
-                        flex-direction: column;
-                        width: 414px;
-                        padding-right: 26px;
-                    "
+                    :style="{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'flex-start',
+                        flexDirection: 'column',
+                        width: '414px',
+                        paddingRight: '26px',
+                    }"
                 >
                     <div
-                        style="
-                            display: flex;
-                            justify-content: flex-start;
-                            align-items: center;
-                            padding-bottom: 12px;
-                        "
+                        :style="{
+                            display: 'flex',
+                            justifyContent: 'flex-start',
+                            alignItems: 'center',
+                            paddingBottom: '12px',
+                        }"
                     >
                         <m-input
                             :fieldText="'Mã'"
@@ -207,21 +222,21 @@ const hanldeSubmitForm = async () => {
                     />
                 </div>
                 <div
-                    style="
-                        display: flex;
-                        justify-content: center;
-                        align-items: flex-start;
-                        flex-direction: column;
-                        width: 414px;
-                    "
+                    :style="{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'flex-start',
+                        flexDirection: 'column',
+                        width: '414px',
+                    }"
                 >
                     <div
-                        style="
-                            display: flex;
-                            justify-content: flex-start;
-                            align-items: center;
-                            padding-bottom: 12px;
-                        "
+                        :style="{
+                            display: 'flex',
+                            justifyContent: 'flex-start',
+                            alignItems: 'center',
+                            paddingBottom: '12px',
+                        }"
                     >
                         <m-date-field
                             :width="'166px'"
@@ -262,12 +277,12 @@ const hanldeSubmitForm = async () => {
                         </div>
                     </div>
                     <div
-                        style="
-                            display: flex;
-                            justify-content: flex-start;
-                            align-items: center;
-                            padding-bottom: 12px;
-                        "
+                        :style="{
+                            display: 'flex',
+                            justifyContent: 'flex-start',
+                            alignItems: 'center',
+                            paddingBottom: '12px',
+                        }"
                     >
                         <m-input
                             :fieldText="'Số CMND'"
@@ -296,7 +311,7 @@ const hanldeSubmitForm = async () => {
                 <div class="modal-contact">
                     <m-input
                         :fieldText="'Địa chỉ'"
-                        :width="'100%'"
+                        :width="'829px'"
                         style="padding-bottom: 12px"
                         :value="employee.address"
                         @inputValue="employee.address = $event"
@@ -363,10 +378,7 @@ const hanldeSubmitForm = async () => {
                 </div>
             </div>
         </form>
-        <div
-            class="modal-error"
-            v-if="isPopUp.isOpenError || isPopUp.isOpenInfo || isPopUp.isOpenWarning"
-        >
+        <div class="modal-error" v-if="isPopUp.isOpenError || isPopUp.isOpenInfo">
             <m-pop-up-error
                 v-if="isPopUp.isOpenError"
                 :title="'Lỗi'"

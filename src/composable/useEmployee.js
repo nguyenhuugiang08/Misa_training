@@ -97,6 +97,18 @@ export const useEmployee = () => {
             }
         };
 
+        // xử lý xóa nhân viên theo mẫ
+        const handleDeleteEmployee = async (employeeId) => {
+            try {
+                const response = await axios.delete(
+                    `${import.meta.env.VITE_MISA_EMPLOYEE_API}/${employeeId}`
+                );
+                console.log(response);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
         return {
             listEmployees,
             newEmployeeCode,
@@ -110,6 +122,7 @@ export const useEmployee = () => {
             getAnEmployee,
             editAnEmployee,
             handleFilterPage,
+            handleDeleteEmployee,
         };
     } catch (error) {
         console.log(error);

@@ -102,11 +102,11 @@
     background-color: #e5e8ec;
 }
 
-.tbl .tbl-row:first-child:hover .tbl-col__first--bg-private{
+.tbl .tbl-row:first-child:hover .tbl-col__first--bg-private {
     background-color: #e5e8ec !important;
 }
 
-.tbl .tbl-row:first-child:hover .tbl-col__last--bg-private{
+.tbl .tbl-row:first-child:hover .tbl-col__last--bg-private {
     background-color: #e5e8ec !important;
 }
 
@@ -131,11 +131,11 @@ th {
     background-color: var(--table-bg-color);
 }
 
-.tbl .tbl-row:hover .tbl-col__last{
+.tbl .tbl-row:hover .tbl-col__last {
     background-color: var(--table-bg-color) !important;
 }
 
-.tbl .tbl-row:hover .tbl-col__first{
+.tbl .tbl-row:hover .tbl-col__first {
     background-color: var(--table-bg-color) !important;
 }
 
@@ -172,6 +172,7 @@ th {
 .tbl .tbl-row:has([type="checkbox"]:checked) {
     background-color: var(--table-bg-color);
 }
+
 .tbl .tbl-row:has([type="checkbox"]:checked) {
     background-color: var(--table-bg-color);
 }
@@ -186,6 +187,14 @@ th {
 
 .tbl .tbl-row:has([type="checkbox"]:checked):first-child {
     background-color: #e5e8ec;
+}
+
+.tbl .tbl-row:has([type="checkbox"]:checked) .tbl-col__first--bg-private {
+    background-color: #e5e8ec !important;
+}
+
+.tbl .tbl-row:has([type="checkbox"]:checked) .tbl-col__last--bg-private {
+    background-color: #e5e8ec !important;
 }
 
 /* col action */
@@ -218,8 +227,14 @@ th {
 .tbl-col__action-list {
     top: 44px;
     bottom: unset;
-    z-index: 1;
-    right: 50%;
+    width: max-content;
+    right: 10px;
+    z-index: 98;
+}
+
+.tbl-col__action-list--above {
+    top: unset;
+    bottom: 44px;
 }
 
 .tbl-col__action:has(.tbl-col__action-item:focus) {
@@ -230,4 +245,12 @@ th {
     color: #0075c0;
     font-weight: 600;
     cursor: pointer;
+}
+
+.btn-dropdown {
+    height: 16px;
+}
+
+.btn-dropdown--active {
+    border: 1px solid #0075c0;
 }

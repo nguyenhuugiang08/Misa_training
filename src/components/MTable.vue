@@ -1,17 +1,29 @@
 <script setup>
-import { ref, inject } from "vue";
+import { ref, inject, reactive } from "vue";
 import Mrow from "./MRow.vue";
 import MLoading from "../components/MLoading.vue";
+import MPopUpWarning from "./MPopUpWarning.vue";
 import { useEmployee } from "../composable/useEmployee";
 
-const { listEmployees, handleFilterPage, totalRecord, totalPage } = useEmployee();
+const { listEmployees, handleFilterPage, totalRecord, totalPage, handleDeleteEmployee } =
+    useEmployee();
 handleFilterPage();
+
+const isPopUp = reactive({
+    isOpenWarning: false,
+});
+
+const id = ref(null);
+const code = ref(null);
 
 const listCheck = ref([]);
 const { state, setListEmployees, setTotalEmployee, setTotalPage } = inject("diy");
 setListEmployees(listEmployees);
 setTotalEmployee(totalRecord);
 setTotalPage(totalPage);
+
+const emit = defineEmits(["hideModal", "startDelete", "endDelete"]);
+
 /*
  * Xử lý set giá trị listcheck
  * CreateBy: NHGiang
@@ -42,6 +54,34 @@ const handleCheckAll = () => {
         }
     } catch (error) {
         console.log(error);
+    }
+};
+
+/**
+ * Xử lý hiển thị popup warning
+ * CreatedBy: NHGiang
+ */
+const handleShowWarning = (event) => {
+    try {
+        isPopUp.isOpenWarning = true;
+        id.value = event.id;
+        code.value = event.code;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ *  Xử lý submit form khi xóa nhân viên
+ * CreatedBy: NHGiang
+ */
+const hanldeSubmitFormDelete = async () => {
+    try {
+        emit("startDelete");
+        await handleDeleteEmployee(id.value);
+        emit("endDelete");
+    } catch (err) {
+        console.log(err);
     }
 };
 </script>
@@ -85,14 +125,29 @@ const handleCheckAll = () => {
                 </th>
             </tr>
             <mrow
-                v-for="employee in state.listEmployees"
+                v-for="(employee, index) in state.listEmployees"
                 :key="employee.EmployeeId"
                 :employee="employee"
                 :listCheck="listCheck"
                 @check="setListCheck($event)"
+                :isAbove="index >= state.listEmployees.length - 3 ? true : false"
+                @displayWarning="handleShowWarning($event)"
             />
             <div v-if="!state.listEmployees.length" class="tbl-loading">
                 <m-Loading />
+            </div>
+            <div class="modal-error" v-if="isPopUp.isOpenWarning">
+                <m-pop-up-warning
+                    v-if="isPopUp.isOpenWarning"
+                    :title="'Xác nhận xóa'"
+                    :text-info="`Bạn có thực sự muốn xóa Nhân viên ${code} không?`"
+                    @closeWarning="isPopUp.isOpenWarning = !isPopUp.isOpenWarning"
+                    @closeForm="isPopUp.isOpenWarning = !isPopUp.isOpenWarning"
+                    @submitForm="
+                        hanldeSubmitFormDelete();
+                        isPopUp.isOpenWarning = !isPopUp.isOpenWarning;
+                    "
+                />
             </div>
         </tbody>
     </table>

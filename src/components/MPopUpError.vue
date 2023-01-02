@@ -19,7 +19,7 @@ const handleClosePopUp = () => {
 <template>
     <div class="modal-confirm">
         <div class="modal-confirm__title">{{ title }}</div>
-        <div class="modal-confirm__close-btn">
+        <div class="modal-confirm__close-btn modal__close-btn">
             <div
                 :style="{
                     background:
@@ -27,6 +27,7 @@ const handleClosePopUp = () => {
                     width: '18px',
                     height: '18px',
                 }"
+                 @click="handleClosePopUp"
             ></div>
         </div>
         <div class="modal-confirm__content">

@@ -2,17 +2,19 @@
 import { formatDate } from "../utilities/formatDate";
 import { formatMoney } from "../utilities/formatMoney";
 import { useEmployee } from "../composable/useEmployee";
-import { inject } from "vue";
+import { inject, ref } from "vue";
 const props = defineProps({
     employee: Object,
     listCheck: Array,
+    isAbove: Boolean,
 });
 
 const { getAnEmployee, editEmployee } = useEmployee();
 
-const emit = defineEmits(["check"]);
+const emit = defineEmits(["check", "displayWarning"]);
+const isShowList = ref(false);
 
-const { state, setIsForm, setTitleForm, setEmployeeSelected } = inject("diy");
+const { state, setIsForm, setTitleForm, setEmployeeSelected, setIdentityForm } = inject("diy");
 
 /**
  * Xử lý check row
@@ -32,6 +34,20 @@ const handleEditEmployee = async (employeeId) => {
         setEmployeeSelected(editEmployee);
         setTitleForm("Sửa thông tin nhân viên");
         setIsForm();
+        setIdentityForm(1);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Xử lý hiển thị popup cảnh báo khi xóa
+ * CreatedBy: NHGiang
+ */
+const handleDisplayPopUpWarning = (value) => {
+    try {
+        isShowList.value = false;
+        emit("displayWarning", value);
     } catch (error) {
         console.log(error);
     }
@@ -51,11 +67,12 @@ const handleEditEmployee = async (employeeId) => {
             />
             <label :for="employee.EmployeeId" class="mask">
                 <div
-                    style="
-                        background: url('../../src/assets/img/Sprites.64af8f61.svg') no-repeat -1225px -363px;
-                        width: 14px;
-                        height: 11px;
-                    "
+                    :style="{
+                        background:
+                            'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -1225px -363px',
+                        width: '14px',
+                        height: '11px',
+                    }"
                 ></div>
             </label>
         </td>
@@ -79,21 +96,41 @@ const handleEditEmployee = async (employeeId) => {
                     >Sửa</label
                 >
                 <label
-                    class="sidebar-item__icon"
+                    class="sidebar-item__icon btn-dropdown"
+                    :class="isShowList ? 'btn-dropdown--active' : ''"
                     style="display: flex; justify-content: center; align-items: center"
-                    onclick="handleDisplayDroplist('index')"
+                    @click="isShowList = !isShowList"
                 >
                     <div
-                        class="btn-dropdown"
-                        style="
-                            background: url('../../src/assets/img/Sprites.64af8f61.svg') no-repeat -900px -365px;
-                            width: 8px;
-                            height: 5px;
-                        "
+                        :style="{
+                            background:
+                                'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -900px -365px',
+                            width: '8px',
+                            height: '5px',
+                        }"
                     ></div>
                 </label>
             </div>
         </td>
+        <ul
+            class="tbl-col__action-list textfield-list"
+            v-if="isShowList"
+            :class="isAbove ? 'tbl-col__action-list--above' : ''"
+        >
+            <li class="tbl-col__action-item" @click="isShowList = false">Nhân bản</li>
+            <li
+                class="tbl-col__action-item"
+                @click="
+                    handleDisplayPopUpWarning({
+                        id: employee.EmployeeId,
+                        code: employee.EmployeeCode,
+                    })
+                "
+            >
+                Xóa
+            </li>
+            <li class="tbl-col__action-item" @click="isShowList = false">Ngừng sử dụng</li>
+        </ul>
     </tr>
 </template>
 
