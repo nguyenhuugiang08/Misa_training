@@ -8,6 +8,7 @@ import axios from "axios";
 export const useEmployee = () => {
     try {
         const listEmployees = ref([]);
+        const listAllEmployees = ref([]);
         const newEmployeeCode = ref(null);
         const editEmployee = ref(null);
         const totalRecord = ref(0);
@@ -16,7 +17,7 @@ export const useEmployee = () => {
         // Lấy danh sách employees
         const getAllEmployees = async () => {
             const response = await axios.get(`${import.meta.env.VITE_MISA_EMPLOYEE_API}`);
-            listEmployees.value = [...response.data];
+            listAllEmployees.value = [...response.data];
         };
 
         // Lấy mã nhân viên mới khi thêm dữ liệu
@@ -112,6 +113,7 @@ export const useEmployee = () => {
         return {
             listEmployees,
             newEmployeeCode,
+            listAllEmployees,
             editEmployee,
             totalRecord,
             totalPage,

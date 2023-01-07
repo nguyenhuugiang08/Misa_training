@@ -5,8 +5,16 @@ import MPopUp from "../components/MPopUp.vue";
 import MLoading from "../components/MLoading.vue";
 import { ref, inject } from "vue";
 import { useEmployee } from "../composable/useEmployee";
+import { useRoute } from "vue-router";
 
-const { listEmployees, searchEmployees, totalPage, handleFilterPage } = useEmployee();
+const {
+    listEmployees,
+    listAllEmployees,
+    searchEmployees,
+    totalPage,
+    handleFilterPage,
+    getAllEmployees,
+} = useEmployee();
 const {
     state,
     setListEmployees,
@@ -15,9 +23,17 @@ const {
     setEmployeeSelected,
     setTotalPage,
     setIdentityForm,
+    setlistAllEmployee,
 } = inject("diy");
 const keyword = ref("");
 const isLoading = ref(false);
+const isFocus = ref(false);
+
+const route = useRoute();
+const { query } = route;
+
+getAllEmployees();
+setlistAllEmployee(listAllEmployees);
 
 /**
  * Xử lý tìm kiếm nhân viên theo tên, mã nhân viên
@@ -49,7 +65,7 @@ const handleEndEditEmployee = async () => {
  * Xử lý khi kết thúc việc sửa nhân  viên
  * CreatedBy: NHGiang
  */
- const handleEndDeleteEmployee = async () => {
+const handleEndDeleteEmployee = async () => {
     try {
         await handleFilterPage();
         setListEmployees(listEmployees);
@@ -83,7 +99,7 @@ const handleRefresh = async () => {
                 class="btn btn-primary btn-add-emp"
                 @click="
                     setIsForm();
-                    setTitleForm('Thông tin nhân viên');
+                    setTitleForm('Thêm nhân viên');
                     setEmployeeSelected({});
                     setIdentityForm(0);
                 "
@@ -95,7 +111,10 @@ const handleRefresh = async () => {
             <div class="content-wrapper__action">
                 <div class="textfield">
                     <label for="" class="textfield__label">
-                        <div class="textfield__icon">
+                        <div
+                            class="textfield__icon"
+                            :style="{ borderColor: `${isFocus ? '#50B83C' : ''}` }"
+                        >
                             <div
                                 :style="{
                                     background:
@@ -112,8 +131,9 @@ const handleRefresh = async () => {
                         id="search-input"
                         placeholder="Tìm kiếm mã, tên nhân viên"
                         v-debounce:600="debounceSearch"
-                        :debounce-events="['input', 'keyup', 'change']"
                         autocomplete="off"
+                        @focus="isFocus = true"
+                        @blur="isFocus = false"
                     />
                 </div>
                 <div

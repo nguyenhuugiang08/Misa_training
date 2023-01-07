@@ -2,6 +2,7 @@
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { ref } from "vue";
+import { formatDate } from "../utilities/formatDate";
 
 const props = defineProps({
     fieldText: String,
@@ -13,6 +14,9 @@ const props = defineProps({
 });
 
 const date = ref(new Date());
+const isFocus = ref(false);
+const datepicker = ref(null);
+const isOpenDatepicker = ref(false);
 const emit = defineEmits(["dateField"]);
 
 /**
@@ -21,6 +25,7 @@ const emit = defineEmits(["dateField"]);
  */
 const handleEmitInputValue = (value) => {
     try {
+        date.value = null;
         emit("dateField", value);
     } catch (error) {
         console.log(error);
@@ -28,12 +33,20 @@ const handleEmitInputValue = (value) => {
 };
 
 /**
- * Xử lý hiển thị datepicker
+ * Xử lý logic liên quan datepicker
  * CreatedBy: NHGiang
  */
-const handleShowDatepicker = () => {
+const handleDatepicker = () => {
     try {
-        console.log(child.value.a);
+        if (datepicker) {
+            if (!isOpenDatepicker.value) {
+                datepicker.value.openMenu();
+                isOpenDatepicker.value = true;
+            } else {
+                datepicker.value.closeMenu();
+                isOpenDatepicker.value = false;
+            }
+        }
     } catch (error) {
         console.log(error);
     }
@@ -47,14 +60,15 @@ const handleShowDatepicker = () => {
             <label
                 class="modal-icon textfield__icon"
                 style="display: flex; justify-content: center; align-items: center"
-                @click="handleShowDatepicker"
+                @click="handleDatepicker"
+                :style="{ borderColor: `${isFocus ? '#50B83C' : ''}` }"
             >
                 <div
-                    class="sidebar-item__icon"
                     :style="{
                         background:
                             'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -128px -312px',
-                        marginRight: 0,
+                        width: '16px',
+                        height: '16px',
                     }"
                 ></div>
             </label>
@@ -66,9 +80,48 @@ const handleShowDatepicker = () => {
             placeholder="DD/MM/YYYY"
             :value="value"
             @input="handleEmitInputValue($event.target.value)"
+            @focus="isFocus = true"
+            @blur="isFocus = false"
         />
-        <!-- <Datepicker v-model="date" locale="vi"></Datepicker> -->
+        <Datepicker v-model="date" ref="datepicker" auto-apply></Datepicker>
     </div>
 </template>
 
-<style scoped></style>
+<style>
+.dp__input_wrap {
+    position: absolute;
+    top: 24px;
+}
+
+.dp__button {
+    display: none;
+}
+
+.dp__action_row {
+    display: none;
+}
+
+.dp__cell_inner {
+    border-radius: 50%;
+    background-color: #fff;
+    border: none;
+}
+
+.dp__today {
+    color: #50b83c;
+}
+
+.dp__active_date {
+    background-color: #dcf1d8;
+    color: #50b83c;
+}
+
+.dp__cell_inner:hover {
+    border: 1px solid #50b83c;
+    background-color: #fff;
+}
+
+.dp__active_date:hover {
+    background-color: #dcf1d8 !important;
+}
+</style>

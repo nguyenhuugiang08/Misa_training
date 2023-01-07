@@ -43,7 +43,6 @@ const handleClosePopUp = () => {
             </div>
             <div class="modal-confirm__content-text">{{ textError }}</div>
         </div>
-        <div class="modal-confirm__line"></div>
         <div class="modal-footer modal-confirm__footer modal-footer--error">
             <button class="btn btn-primary" @click="handleClosePopUp">Đóng</button>
         </div>

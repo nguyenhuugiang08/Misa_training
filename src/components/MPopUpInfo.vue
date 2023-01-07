@@ -61,7 +61,6 @@ const handleSubmitForm = () => {
             </div>
             <div class="modal-confirm__content-text">{{ textInfo }}</div>
         </div>
-        <div class="modal-confirm__line"></div>
         <div class="modal-footer modal-confirm__footer">
             <label
                 for="show-modal"

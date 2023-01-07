@@ -6,13 +6,13 @@ import { inject, ref } from "vue";
 const props = defineProps({
     employee: Object,
     listCheck: Array,
-    isAbove: Boolean,
 });
 
 const { getAnEmployee, editEmployee } = useEmployee();
 
 const emit = defineEmits(["check", "displayWarning"]);
 const isShowList = ref(false);
+const toDropList = ref(0);
 
 const { state, setIsForm, setTitleForm, setEmployeeSelected, setIdentityForm } = inject("diy");
 
@@ -52,6 +52,20 @@ const handleDisplayPopUpWarning = (value) => {
         console.log(error);
     }
 };
+
+
+/**
+ * Xử lý hiển
+ * CreatedBy: NHGiang
+ */
+const handle = (e) => {
+    try {
+        isShowList.value = !isShowList.value;
+        toDropList.value = e.target.getBoundingClientRect().y + 32;
+    } catch (error) {
+        console.log(error);
+    }
+};
 </script>
 
 <template>
@@ -80,7 +94,7 @@ const handleDisplayPopUpWarning = (value) => {
             <span>{{ employee.EmployeeCode || "" }}</span>
         </td>
         <td class="tbl-col tbl-col--large">{{ employee.FullName || "" }}</td>
-        <td class="tbl-col">{{ employee.GenderName || "" }}</td>
+        <td class="tbl-col">{{ employee.Gender === 2 ? "Khác" : employee.GenderName }}</td>
         <td class="tbl-col" style="text-align: center">
             {{ formatDate(employee.DateOfBirth) || "" }}
         </td>
@@ -99,7 +113,7 @@ const handleDisplayPopUpWarning = (value) => {
                     class="sidebar-item__icon btn-dropdown"
                     :class="isShowList ? 'btn-dropdown--active' : ''"
                     style="display: flex; justify-content: center; align-items: center"
-                    @click="isShowList = !isShowList"
+                    @click="handle"
                 >
                     <div
                         :style="{
@@ -113,9 +127,9 @@ const handleDisplayPopUpWarning = (value) => {
             </div>
         </td>
         <ul
-            class="tbl-col__action-list textfield-list"
+            class="tbl-col__action-list textfield-list--action"
             v-if="isShowList"
-            :class="isAbove ? 'tbl-col__action-list--above' : ''"
+            :style="{ top: `${toDropList}px` }"
         >
             <li class="tbl-col__action-item" @click="isShowList = false">Nhân bản</li>
             <li

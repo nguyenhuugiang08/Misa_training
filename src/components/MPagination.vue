@@ -4,8 +4,12 @@ import MCheckbox from "./MCheckbox.vue";
 import { useEmployee } from "../composable/useEmployee";
 import MLoading from "./MLoading.vue";
 import Paginate from "vuejs-paginate/src/components/Paginate.vue";
+import { useRoute, useRouter } from "vue-router";
 
 const { state, setListEmployees, setTotalPage } = inject("diy");
+const route = useRoute();
+const { query } = route;
+const router = useRouter();
 
 const components = defineComponent({
     MCheckbox,
@@ -14,7 +18,6 @@ const components = defineComponent({
 });
 
 const isLoading = ref(false);
-const pageSize = ref(20);
 const filterOptions = ref([
     {
         optionId: 10,
@@ -44,32 +47,34 @@ const { handleFilterPage, listEmployees, totalPage } = useEmployee();
  * Xử lý thay đổi số lượng bản ghi hiển thị trên trang
  * CreatedBy: NHGiang
  */
-const handleChangePageSize = async (value) => {
-    try {
-        isLoading.value = true;
-        await handleFilterPage(value);
-        setListEmployees(listEmployees);
-        setTotalPage(totalPage);
-        pageSize.value = value;
-        isLoading.value = false;
-    } catch (error) {
-        console.log(error);
-    }
-};
+// const handleChangePageSize = async (value) => {
+//     try {
+//         isLoading.value = true;
+//         await handleFilterPage(value);
+//         setListEmployees(listEmployees);
+//         setTotalPage(totalPage);
+//         pageSize.value = value;
+//         isLoading.value = false;
+//     } catch (error) {
+//         console.log(error);
+//     }
+// };
 
 /**
  * Xử lý thay đổi trang
  * CreatedBy: NHGiang
  */
 
-const handleChangePageNumber = async (pageNumber) => {
+const handleChangePage = async (pageNumber, pageSize) => {
     try {
+        router.push({ path: "/", query: { pageSize: pageSize, pageNumber: pageNumber } });
         isLoading.value = true;
-        await handleFilterPage(pageSize.value, pageNumber);
+        await handleFilterPage(pageSize, pageNumber);
         setListEmployees(listEmployees);
         isLoading.value = false;
     } catch (error) {
         console.log(error);
+        isLoading.value = false;
     }
 };
 </script>
@@ -86,7 +91,7 @@ const handleChangePageNumber = async (pageNumber) => {
                 :is-top="true"
                 :width="'200px'"
                 style="position: relative; top: 4px"
-                @select="handleChangePageSize($event)"
+                @select="handleChangePage(query.pageNumber || 1, $event)"
             />
             <paginate
                 :page-count="state.totalPageValue"
@@ -98,7 +103,7 @@ const handleChangePageNumber = async (pageNumber) => {
                 :page-class="'page-item'"
                 :prev-class="'prev-btn'"
                 :next-class="'next-btn'"
-                :click-handler="handleChangePageNumber"
+                :click-handler="handleChangePage"
             >
                 ></paginate
             >

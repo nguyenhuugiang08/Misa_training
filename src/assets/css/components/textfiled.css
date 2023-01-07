@@ -9,6 +9,11 @@
     font-weight: 500;
     color: #000;
     position: relative;
+    cursor: grab;
+}
+
+.textfield .textfield__label:hover~.textfield-tooltip {
+    display: block;
 }
 
 .textfield .textfield__input {
@@ -20,6 +25,8 @@
     cursor: pointer;
     background-color: #fff;
     min-width: 260px;
+    position: relative;
+    z-index: 90;
 }
 
 .textfield .textfield__input::placeholder {
@@ -58,7 +65,8 @@
     font-size: 20px;
     color: #666666;
     border: 1px solid var(--border-color);
-    border-radius: 2px;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
     border-left: none;
     cursor: pointer;
     z-index: 96;
@@ -128,6 +136,22 @@
 /* droplist */
 .textfield-list {
     position: absolute;
+    width: 100%;
+    list-style: none;
+    max-height: 160px;
+    border-radius: 2px;
+    background-color: #fff;
+    box-shadow: 0 4px 16px #171b2a3d;
+    height: max-content;
+    transition: height 0.2s ease-in;
+    overflow: hidden;
+    bottom: 40px;
+    overflow: auto;
+    z-index: 9990;
+}
+
+.textfield-list--action {
+    position: fixed;
     width: 100%;
     list-style: none;
     max-height: 160px;
@@ -283,4 +307,27 @@
 
 .textfield .textfield--error-input:hover~.text-error {
     display: block;
+}
+
+.textfield-tooltip {
+    position: absolute;
+    background-color: #434242;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    top: 24px;
+    left: 16px;
+    z-index: 99;
+    animation: identifier 0.3s ease-in;
+    display: none;
+}
+
+@keyframes identifier {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }

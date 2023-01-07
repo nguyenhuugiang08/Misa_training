@@ -53,7 +53,7 @@
 }
 
 .modal__header-left span {
-    padding: 0 19.5px 0 10px;
+    padding: 0 10px;
     line-height: 32px;
 }
 
@@ -61,11 +61,11 @@
     display: none;
 }
 
-.modal__header-left-wrapper input[type="radio"] {
+.modal__header-left-wrapper input[type="checkbox"] {
     display: none;
 }
 
-.modal__header-left-wrapper:has(input[type="radio"]:checked) div {
+.modal__header-left-wrapper:has(input[type="checkbox"]:checked) div {
     display: inline-block;
 }
 
@@ -147,7 +147,7 @@
 .modal-list {
     bottom: unset;
     top: 60px;
-    z-index: 999;
+    z-index: 99;
 }
 
 .modal-icon {
@@ -194,7 +194,7 @@
 /* contact */
 .modal-contact {
     margin-top: 20px;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
     width: 100%;
 }
 
@@ -305,6 +305,54 @@
     opacity: 1;
 }
 
+.modal__help-btn {
+    position: relative;
+    cursor: pointer;
+}
+
+.modal__help-btn::after {
+    position: absolute;
+    content: "Giúp (F1)";
+    display: block;
+    background-color: #434242;
+    color: #fff;
+    top: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: none;
+    opacity: 0;
+    animation: identifier 0.3s ease-in;
+}
+
+.modal__help-btn::before {
+    content: "";
+    position: absolute;
+    display: block;
+    height: 0;
+    width: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid;
+    border-color: transparent transparent #434242 transparent;
+    top: 20px;
+    display: none;
+    opacity: 0;
+    animation: identifier 0.3s ease-in;
+}
+
+.modal__help-btn:hover::before {
+    display: block;
+    opacity: 1;
+}
+
+.modal__help-btn:hover::after {
+    display: block;
+    opacity: 1;
+}
+
 @keyframes identifier {
     from {
         opacity: 0;
@@ -334,7 +382,7 @@
 
 .modal-confirm__content-text {
     padding: 12px 0 0 16px;
-    margin-bottom: 32px;
+    margin-bottom: 36px;
 }
 
 .modal-confirm__line {
@@ -388,4 +436,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.modal-line {
+    width: 829px;
+    margin: 8px 0 0 0;
+    border-top: 1px solid #c9ccd2;
 }

@@ -9,8 +9,10 @@ const state = reactive({
     totalEmployee: 0,
     totalPageValue: 1,
     identityForm: 0,
+    listAllEmployee: [],
 });
 
+// set giá trị cho isSidebar thực hiện chức năng thu gọn/mở rộng sidebar
 const setIsSidebar = () => {
     try {
         state.isSidebar = !state.isSidebar;
@@ -19,6 +21,7 @@ const setIsSidebar = () => {
     }
 };
 
+// set danh sách các nhân viên dùng chung cho nhiều components
 const setListEmployees = (list) => {
     try {
         state.listEmployees = list;
@@ -27,6 +30,7 @@ const setListEmployees = (list) => {
     }
 };
 
+// set title cho form
 const setTitleForm = (title) => {
     try {
         state.titleForm = title;
@@ -35,6 +39,7 @@ const setTitleForm = (title) => {
     }
 };
 
+// set giá trị để đóng/ mở form
 const setIsForm = () => {
     try {
         state.isForm = !state.isForm;
@@ -43,6 +48,7 @@ const setIsForm = () => {
     }
 };
 
+// lấy ra nhân viên được chọn để update thông tin
 const setEmployeeSelected = (employee) => {
     try {
         state.employeeSelected = employee;
@@ -51,6 +57,7 @@ const setEmployeeSelected = (employee) => {
     }
 };
 
+// lấy ra tổng số bản ghi trong database
 const setTotalEmployee = (total) => {
     try {
         state.totalEmployee = total;
@@ -59,6 +66,7 @@ const setTotalEmployee = (total) => {
     }
 };
 
+// Lấy ra tổng số trang theo số bản ghi trên 1 trang
 const setTotalPage = (total) => {
     try {
         state.totalPageValue = total;
@@ -67,9 +75,19 @@ const setTotalPage = (total) => {
     }
 };
 
+// định nghĩa form theo action (0: thêm, 1: sửa)
 const setIdentityForm = (val) => {
     try {
         state.identityForm = val;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+//Lây ra danh sách nhân viên đã tồn tại
+const setlistAllEmployee = (list) => {
+    try {
+        state.listAllEmployee = list;
     } catch (error) {
         console.log(error);
     }
@@ -85,4 +103,5 @@ export default {
     setTotalEmployee,
     setTotalPage,
     setIdentityForm,
+    setlistAllEmployee,
 };

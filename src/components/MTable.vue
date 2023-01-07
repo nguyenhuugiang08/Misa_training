@@ -15,6 +15,7 @@ const isPopUp = reactive({
 
 const id = ref(null);
 const code = ref(null);
+const isShowTooltip = ref(false);
 
 const listCheck = ref([]);
 const { state, setListEmployees, setTotalEmployee, setTotalPage } = inject("diy");
@@ -115,7 +116,17 @@ const hanldeSubmitFormDelete = async () => {
                 <th class="tbl-col">giới tính</th>
                 <th class="tbl-col" style="text-align: center">ngày sinh</th>
                 <th class="tbl-col">vị trí</th>
-                <th class="tbl-col" title="Số chứng minh nhân dân">số CMND</th>
+                <th class="tbl-col">
+                    <label
+                        class="tbl-col__identity"
+                        @mouseover="isShowTooltip = true"
+                        @mouseout="isShowTooltip = false"
+                        >số CMND</label
+                    >
+                    <p v-if="isShowTooltip" class="tbl-col__identity-tooltip">
+                        Số chứng minh nhân dân
+                    </p>
+                </th>
                 <th class="tbl-col">số điện thoại</th>
                 <th class="tbl-col" style="text-align: right; width: 129px; min-width: 129px">
                     tiền lương
@@ -125,12 +136,11 @@ const hanldeSubmitFormDelete = async () => {
                 </th>
             </tr>
             <mrow
-                v-for="(employee, index) in state.listEmployees"
+                v-for="employee in state.listEmployees"
                 :key="employee.EmployeeId"
                 :employee="employee"
                 :listCheck="listCheck"
                 @check="setListCheck($event)"
-                :isAbove="index >= state.listEmployees.length - 3 ? true : false"
                 @displayWarning="handleShowWarning($event)"
             />
             <div v-if="!state.listEmployees.length" class="tbl-loading">

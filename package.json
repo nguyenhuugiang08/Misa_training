@@ -13,6 +13,7 @@
     "axios": "^1.2.2",
     "vite-svg-loader": "^4.0.0",
     "vue": "^3.2.45",
+    "vue-click-outside-element": "^3.1.2",
     "vue-debounce": "^4.0.0",
     "vue-router": "^4.1.6",
     "vuejs-paginate": "^2.1.0"

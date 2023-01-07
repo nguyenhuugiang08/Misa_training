@@ -7,6 +7,9 @@ const props = defineProps({
     value: String,
     status: Boolean,
     type: { type: String, default: "text" },
+    tooltip: String,
+    placeHolder: String,
+    autofoucus: Boolean,
 });
 
 const emit = defineEmits(["inputValue"]);
@@ -33,7 +36,11 @@ const handleEmitInputValue = (value) => {
             :style="{ minWidth: width, width: width, marginRight: marginRight }"
             :value="value"
             @input="handleEmitInputValue($event.target.value)"
+            :placeHolder="placeHolder"
         />
+        <div class="textfield-tooltip" v-if="tooltip">
+            <span>{{ tooltip }}</span>
+        </div>
     </div>
 </template>
 

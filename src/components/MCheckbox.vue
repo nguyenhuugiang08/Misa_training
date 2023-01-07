@@ -1,8 +1,11 @@
 <script setup>
-import { ref } from "vue";
+import { ref, inject } from "vue";
 
 const selected = ref(props.default ? props.default : null);
 const open = ref(false);
+const isFocus = ref(false);
+const { state } = inject("diy");
+const { employeeSelected } = state;
 
 const props = defineProps({
     options: Array,
@@ -16,11 +19,39 @@ const props = defineProps({
 
 const emit = defineEmits(["select"]);
 
+/**
+ * Xử lý lấy giá trị khi chọn
+ * CreatedBy: NHGiang
+ */
 const handleShowSelectedValue = (option) => {
     try {
         selected.value = option.optionName ? option.optionName : props.options[0].optionName;
         open.value = false;
         emit("select", option.optionId);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Xử lý default value
+ * Createdby: NHGiang
+ */
+const handleDefaultValue = (departmentId) => {
+    try {
+        const optionSelected = props.options.filter((option) => option?.optionId === departmentId);
+        return optionSelected[0]?.optionName;
+    } catch (error) {
+        console.log(error);
+    }
+};
+/**
+ * Xử lý clich outside
+ * CreatedBy: NHGiang
+ */
+const handleClickOutside = () => {
+    try {
+        open.value = false;
     } catch (error) {
         console.log(error);
     }
@@ -40,8 +71,12 @@ const handleShowSelectedValue = (option) => {
             <label
                 class="modal-icon textfield__icon drop-department"
                 style="display: flex; justify-content: center; align-items: center"
-                :style="isTop && { top: '4px !important' }"
+                :style="{
+                    top: `${isTop && '4px !important'}`,
+                    borderColor: `${isFocus ? '#50B83C' : ''}`,
+                }"
                 @click="open = !open"
+                v-click-outside-element="handleClickOutside"
             >
                 <div
                     :style="{
@@ -57,8 +92,14 @@ const handleShowSelectedValue = (option) => {
             type="text"
             class="textfield__input modal-textfield__input"
             id="employee-department"
-            :value="selected"
+            :value="
+                employeeSelected.DepartmentId
+                    ? handleDefaultValue(employeeSelected.DepartmentId)
+                    : selected
+            "
             :style="width && { minWidth: width, width: width }"
+            @focus="isFocus = true"
+            @blur="isFocus = false"
         />
         <!-- <p class="text-error">Tên không được để trống</p> -->
         <ul

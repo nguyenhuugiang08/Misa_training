@@ -151,18 +151,6 @@ const { state, setIsSidebar } = inject("diy");
                 <div class="sidebar-item__icon">
                     <div
                         style="
-                            background: url('../../src/assets/img/Sprites.ee5d4fa7.svg') no-repeat -471px -1663px;
-                            width: 17px;
-                            height: 18px;
-                        "
-                    ></div>
-                </div>
-                <p v-if="!state.isSidebar">Tiền lương</p>
-            </li>
-            <li class="sidebar-item" tabindex="0">
-                <div class="sidebar-item__icon">
-                    <div
-                        style="
                             background: url('../../src/assets/img/Sprites.ee5d4fa7.svg') no-repeat -427px -1634px;
                             width: 16px;
                             height: 16px;

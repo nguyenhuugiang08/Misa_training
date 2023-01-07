@@ -61,11 +61,10 @@ const handleSubmitForm = () => {
             </div>
             <div class="modal-confirm__content-text">{{ textInfo }}</div>
         </div>
-        <div class="modal-confirm__line"></div>
         <div class="modal-footer modal-confirm__footer">
             <button
                 type="submit"
-                class="btn btn-secondary modal-btn__secondary"
+                class="btn btn-secondary modal-btn__secondary btn-wraning"
                 tabindex="0"
                 @click="handleCloseForm"
             >
@@ -78,4 +77,8 @@ const handleSubmitForm = () => {
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.btn-wraning {
+    margin-left: 0;
+}
+</style>

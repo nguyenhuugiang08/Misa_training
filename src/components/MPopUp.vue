@@ -9,6 +9,8 @@ import { useDepartment } from "../composable/useDepartment";
 import { useEmployee } from "../composable/useEmployee";
 import { reactive, inject } from "vue";
 import { formatDate } from "../utilities/formatDate";
+import { convertDatetime } from "../utilities/convertDatetime";
+import { error, useValidate } from "../utilities/validateForm";
 
 const props = defineProps({
     title: String,
@@ -36,11 +38,6 @@ const employee = reactive({
     address: employeeSelected?.Address || "",
     phoneNumber: employeeSelected?.PhoneNumber || "",
     email: employeeSelected?.Email || "",
-});
-
-const error = reactive({
-    textError: "",
-    status: false,
 });
 
 const isPopUp = reactive({
@@ -74,36 +71,47 @@ const handleShowPopUpInfo = () => {
 };
 
 /**
+ * Xử lý validate ngày tháng
+ */
+const handleValidateDatetime = (dateTime) => {
+    return /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/.test(dateTime);
+};
+
+/**
  *  Xử lý submit form
  * CreatedBy: NHGiang
  */
 const hanldeSubmitForm = async () => {
     try {
         employee.departmentId = employee.departmentId || listDepartments.value?.[0].departmentId;
+        const status = useValidate(employee, state.listAllEmployee);
+        console.log(error.employeeNameError);
 
         if (state.identityForm !== 0) {
-            if (employee.fullName) {
-                emit("startEdit");
-                await editAnEmployee({
-                    ...employee,
-                    employeeId: employeeSelected.EmployeeId,
-                    identityDate: new Date(employee.identityDate).toJSON(),
-                });
-                emit("endEdit");
+            if (!status) {
+                // emit("startEdit");
+                // await editAnEmployee({
+                //     ...employee,
+                //     employeeId: employeeSelected.EmployeeId,
+                //     identityDate: new Date(convertDatetime(employee.identityDate, true)).toJSON(),
+                //     dateOfBirth: convertDatetime(employee.dateOfBirth, false),
+                //     positionId: null,
+                // });
+                // emit("endEdit");
             } else {
-                error.textError = "Tên không được để trống.";
-                error.status = true;
                 isPopUp.isOpenError = true;
             }
         } else {
-            if (employee.fullName) {
-                addNewEmloyee({
-                    ...employee,
-                    identityDate: new Date(employee.identityDate).toJSON(),
-                });
+            if (!status) {
+                // emit("startEdit");
+                // await addNewEmloyee({
+                //     ...employee,
+                //     identityDate: new Date(convertDatetime(employee.identityDate, true)).toJSON(),
+                //     dateOfBirth: convertDatetime(employee.dateOfBirth, false),
+                //     positionId: null,
+                // });
+                // emit("endEdit");
             } else {
-                error.textError = "Tên không được để trống.";
-                error.status = true;
                 isPopUp.isOpenError = true;
             }
         }
@@ -120,7 +128,7 @@ const hanldeSubmitForm = async () => {
                 <div class="modal__header-left">
                     <div class="modal__header-left-text">{{ title }}</div>
                     <label for="radio1" class="modal__header-left-wrapper">
-                        <input type="radio" name="doituong" checked id="radio1" />
+                        <input type="checkbox" checked id="radio1" />
                         <div
                             :style="{
                                 background:
@@ -132,7 +140,7 @@ const hanldeSubmitForm = async () => {
                     </label>
                     <span>Là khách hàng</span>
                     <label for="radio2" class="modal__header-left-wrapper">
-                        <input type="radio" name="doituong" id="radio2" />
+                        <input type="checkbox" id="radio2" />
                         <div
                             :style="{
                                 background:
@@ -153,6 +161,7 @@ const hanldeSubmitForm = async () => {
                             height: '24px',
                             marginRight: '6px',
                         }"
+                        class="modal__help-btn"
                     ></div>
                     <div class="modal__close-btn">
                         <label
@@ -194,6 +203,7 @@ const hanldeSubmitForm = async () => {
                             :width="'149px'"
                             :marginRight="'6px'"
                             :value="employee.employeeCode"
+                            :status="error.employeeCodeError.status"
                             @inputValue="employee.employeeCode = $event"
                         />
                         <m-input
@@ -201,7 +211,7 @@ const hanldeSubmitForm = async () => {
                             :required="true"
                             :width="'233px'"
                             :value="employee.fullName"
-                            :status="error.status"
+                            :status="error.employeeNameError.status"
                             @inputValue="employee.fullName = $event"
                         />
                     </div>
@@ -290,6 +300,7 @@ const hanldeSubmitForm = async () => {
                             :marginRight="'6px'"
                             :value="employee.identityNumber"
                             @inputValue="employee.identityNumber = $event"
+                            :tooltip="'Số chứng minh nhân dân'"
                         />
                         <m-date-field
                             :width="'166px'"
@@ -307,7 +318,6 @@ const hanldeSubmitForm = async () => {
                         @inputValue="employee.identityPlace = $event"
                     />
                 </div>
-
                 <div class="modal-contact">
                     <m-input
                         :fieldText="'Địa chỉ'"
@@ -318,43 +328,46 @@ const hanldeSubmitForm = async () => {
                     />
                     <m-input
                         :fieldText="'ĐT di động'"
-                        :width="'200px'"
+                        :width="'271px'"
                         style="padding-bottom: 12px; float: left"
-                        :marginRight="'6px'"
+                        :marginRight="'8px'"
                         :value="employee.phoneNumber"
                         @inputValue="employee.phoneNumber = $event"
+                        :tooltip="'Số điện thoại di động'"
                     />
                     <m-input
                         :fieldText="'ĐT cố định'"
-                        :width="'200px'"
+                        :width="'271px'"
                         style="padding-bottom: 12px; float: left"
-                        :marginRight="'6px'"
+                        :marginRight="'8px'"
+                        :tooltip="'Số điện thoại cố động'"
                     />
                     <m-input
                         :fieldText="'Email'"
-                        :width="'200px'"
+                        :width="'271px'"
                         style="padding-bottom: 12px; float: left"
-                        :marginRight="'6px'"
+                        :marginRight="'8px'"
                         :value="employee.email"
                         @inputValue="employee.email = $event"
+                        :placeHolder="'example@gmail.com'"
                     />
                     <m-input
                         :fieldText="'Tài khoản ngân hàng'"
-                        :width="'200px'"
+                        :width="'271px'"
                         style="float: left; clear: left"
-                        :marginRight="'6px'"
+                        :marginRight="'8px'"
                     />
                     <m-input
                         :fieldText="'Tên ngân hàng'"
-                        :width="'200px'"
+                        :width="'271px'"
                         style="float: left"
-                        :marginRight="'6px'"
+                        :marginRight="'8px'"
                     />
                     <m-input
                         :fieldText="'Chi nhánh'"
-                        :width="'200px'"
+                        :width="'271px'"
                         style="float: left"
-                        :marginRight="'6px'"
+                        :marginRight="'8px'"
                     />
                 </div>
             </div>
@@ -364,17 +377,18 @@ const hanldeSubmitForm = async () => {
                     for="show-modal"
                     class="btn btn-secondary modal-btn-cancel"
                     @click="hideModal"
+                    tabindex="3"
                     >Hủy</label
                 >
                 <div class="modal-footer__wrapper">
                     <button
                         type="submit"
                         class="btn btn-secondary modal-btn__secondary"
-                        tabindex="0"
+                        tabindex="1"
                     >
                         Cất
                     </button>
-                    <button type="submit" class="btn btn-primary" tabindex="0">Cất và thêm</button>
+                    <button type="submit" class="btn btn-primary" tabindex="2">Cất và thêm</button>
                 </div>
             </div>
         </form>
@@ -382,7 +396,14 @@ const hanldeSubmitForm = async () => {
             <m-pop-up-error
                 v-if="isPopUp.isOpenError"
                 :title="'Lỗi'"
-                :text-error="error.textError"
+                :text-error="
+                    error.employeeCodeError.textError ||
+                    error.employeeNameError.textError ||
+                    error.dateOfBrithError.textError ||
+                    error.identityDateError.textError ||
+                    error.phoneNumberError.textError ||
+                    error.emailError.textError
+                "
                 @closeError="isPopUp.isOpenError = !isPopUp.isOpenError"
             />
             <m-pop-up-info
