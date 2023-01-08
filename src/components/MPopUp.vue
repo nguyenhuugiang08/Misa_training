@@ -84,33 +84,36 @@ const handleValidateDatetime = (dateTime) => {
 const hanldeSubmitForm = async () => {
     try {
         employee.departmentId = employee.departmentId || listDepartments.value?.[0].departmentId;
-        const status = useValidate(employee, state.listAllEmployee);
-        console.log(error.employeeNameError);
+        const status = useValidate(
+            employee,
+            state.listAllEmployee,
+            state.identityForm,
+            employeeSelected.EmployeeCode
+        );
 
-        if (state.identityForm !== 0) {
+        if (state.identityForm === 1) {
             if (!status) {
-                // emit("startEdit");
-                // await editAnEmployee({
-                //     ...employee,
-                //     employeeId: employeeSelected.EmployeeId,
-                //     identityDate: new Date(convertDatetime(employee.identityDate, true)).toJSON(),
-                //     dateOfBirth: convertDatetime(employee.dateOfBirth, false),
-                //     positionId: null,
-                // });
-                // emit("endEdit");
+                emit("startEdit");
+                await editAnEmployee({
+                    ...employee,
+                    employeeId: employeeSelected.EmployeeId,
+                    identityDate: new Date(convertDatetime(employee.identityDate, true)).toJSON(),
+                    dateOfBirth: convertDatetime(employee.dateOfBirth, false),
+                });
+                emit("endEdit");
             } else {
                 isPopUp.isOpenError = true;
             }
-        } else {
+        }
+        if (state.identityForm === 0 || state.identityForm === 2) {
             if (!status) {
-                // emit("startEdit");
-                // await addNewEmloyee({
-                //     ...employee,
-                //     identityDate: new Date(convertDatetime(employee.identityDate, true)).toJSON(),
-                //     dateOfBirth: convertDatetime(employee.dateOfBirth, false),
-                //     positionId: null,
-                // });
-                // emit("endEdit");
+                emit("startEdit");
+                await addNewEmloyee({
+                    ...employee,
+                    identityDate: new Date(convertDatetime(employee.identityDate, true)).toJSON(),
+                    dateOfBirth: convertDatetime(employee.dateOfBirth, false),
+                });
+                emit("endEdit");
             } else {
                 isPopUp.isOpenError = true;
             }

@@ -14,6 +14,9 @@ export const MISA_RESOURCE = {
         invalid: "Ngày cấp không hợp lệ.",
     },
     phoneNumberErrorText: {
-        invalid: "Ngày cấp không hợp lệ.",
+        invalid: "Số điện thoại không hợp lệ.",
     },
+    emailErrorText: {
+        invalid: "Email không đúng định dạng."
+    }
 };

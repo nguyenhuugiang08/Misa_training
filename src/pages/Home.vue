@@ -3,9 +3,10 @@ import MTable from "../components/MTable.vue";
 import MPagination from "../components/MPagination.vue";
 import MPopUp from "../components/MPopUp.vue";
 import MLoading from "../components/MLoading.vue";
-import { ref, inject } from "vue";
+import { ref, inject, watch } from "vue";
 import { useEmployee } from "../composable/useEmployee";
 import { useRoute } from "vue-router";
+import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
 
 const {
     listEmployees,
@@ -28,9 +29,21 @@ const {
 const keyword = ref("");
 const isLoading = ref(false);
 const isFocus = ref(false);
+const pageSize = ref(20);
 
 const route = useRoute();
 const { query } = route;
+watch(
+    () => route.query.pageSize,
+    (newValue, oldValue) => {
+        console.log(oldValue);
+        pageSize.value = newValue;
+        try {
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
 
 getAllEmployees();
 setlistAllEmployee(listAllEmployees);
@@ -39,11 +52,15 @@ setlistAllEmployee(listAllEmployees);
  * Xử lý tìm kiếm nhân viên theo tên, mã nhân viên
  */
 const debounceSearch = async (val) => {
-    isLoading.value = true;
-    await searchEmployees(val);
-    setListEmployees(listEmployees);
-    setTotalPage(totalPage);
-    isLoading.value = false;
+    try {
+        isLoading.value = true;
+        await searchEmployees(val);
+        setListEmployees(listEmployees);
+        setTotalPage(totalPage);
+        isLoading.value = false;
+    } catch (error) {
+        console.log(error);
+    }
 };
 
 /**
@@ -52,9 +69,10 @@ const debounceSearch = async (val) => {
  */
 const handleEndEditEmployee = async () => {
     try {
-        await handleFilterPage();
+        await handleFilterPage(pageSize.value, 1);
         setListEmployees(listEmployees);
         setIsForm(false);
+        setTotalPage(totalPage);
         isLoading.value = false;
     } catch (error) {
         console.log(error);
@@ -67,8 +85,9 @@ const handleEndEditEmployee = async () => {
  */
 const handleEndDeleteEmployee = async () => {
     try {
-        await handleFilterPage();
+        await handleFilterPage(pageSize.value, 1);
         setListEmployees(listEmployees);
+        setTotalPage(totalPage);
         isLoading.value = false;
     } catch (error) {
         console.log(error);
@@ -82,8 +101,9 @@ const handleEndDeleteEmployee = async () => {
 const handleRefresh = async () => {
     try {
         isLoading.value = true;
-        await handleFilterPage();
+        await handleFilterPage(pageSize.value, 1);
         setListEmployees(listEmployees);
+        setTotalPage(totalPage);
         isLoading.value = false;
     } catch (error) {
         console.log(error);
@@ -102,6 +122,7 @@ const handleRefresh = async () => {
                     setTitleForm('Thêm nhân viên');
                     setEmployeeSelected({});
                     setIdentityForm(0);
+                    handleSetStatusForm();
                 "
             >
                 Thêm mới nhân viên

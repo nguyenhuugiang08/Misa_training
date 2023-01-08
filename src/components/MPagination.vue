@@ -1,15 +1,27 @@
 <script setup>
-import { defineComponent, inject, ref } from "vue";
+import { defineComponent, watch, inject, ref } from "vue";
 import MCheckbox from "./MCheckbox.vue";
 import { useEmployee } from "../composable/useEmployee";
 import MLoading from "./MLoading.vue";
 import Paginate from "vuejs-paginate/src/components/Paginate.vue";
 import { useRoute, useRouter } from "vue-router";
+import { MISA_ENUM } from "../base/enum";
 
 const { state, setListEmployees, setTotalPage } = inject("diy");
+const pageSize = ref(20);
+const router = useRouter();
 const route = useRoute();
 const { query } = route;
-const router = useRouter();
+watch(
+    () => route.query.pageSize,
+    (newValue) => {
+        pageSize.value = newValue;
+        try {
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
 
 const components = defineComponent({
     MCheckbox,
@@ -18,28 +30,6 @@ const components = defineComponent({
 });
 
 const isLoading = ref(false);
-const filterOptions = ref([
-    {
-        optionId: 10,
-        optionName: "10 bản ghi trên 1 trang",
-    },
-    {
-        optionId: 20,
-        optionName: "20 bản ghi trên 1 trang",
-    },
-    {
-        optionId: 30,
-        optionName: "30 bản ghi trên 1 trang",
-    },
-    {
-        optionId: 50,
-        optionName: "50 bản ghi trên 1 trang",
-    },
-    {
-        optionId: 100,
-        optionName: "100 bản ghi trên 1 trang",
-    },
-]);
 
 const { handleFilterPage, listEmployees, totalPage } = useEmployee();
 
@@ -47,29 +37,27 @@ const { handleFilterPage, listEmployees, totalPage } = useEmployee();
  * Xử lý thay đổi số lượng bản ghi hiển thị trên trang
  * CreatedBy: NHGiang
  */
-// const handleChangePageSize = async (value) => {
-//     try {
-//         isLoading.value = true;
-//         await handleFilterPage(value);
-//         setListEmployees(listEmployees);
-//         setTotalPage(totalPage);
-//         pageSize.value = value;
-//         isLoading.value = false;
-//     } catch (error) {
-//         console.log(error);
-//     }
-// };
+const handleChangePageSize = async (pageSize, pageNumber = 1) => {
+    try {
+        router.push({ path: "/", query: { pageSize: pageSize, pageNumber: pageNumber } });
+        isLoading.value = true;
+        await handleFilterPage(pageSize, pageNumber);
+        setListEmployees(listEmployees);
+        setTotalPage(totalPage);
+        isLoading.value = false;
+    } catch (error) {
+        console.log(error);
+    }
+};
 
 /**
  * Xử lý thay đổi trang
  * CreatedBy: NHGiang
  */
-
-const handleChangePage = async (pageNumber, pageSize) => {
+const handleChangePageNumber = async (pageNumber) => {
     try {
-        router.push({ path: "/", query: { pageSize: pageSize, pageNumber: pageNumber } });
         isLoading.value = true;
-        await handleFilterPage(pageSize, pageNumber);
+        await handleFilterPage(pageSize.value, pageNumber);
         setListEmployees(listEmployees);
         isLoading.value = false;
     } catch (error) {
@@ -86,12 +74,12 @@ const handleChangePage = async (pageNumber, pageSize) => {
         </div>
         <div style="display: flex; align-items: center">
             <m-checkbox
-                :options="filterOptions"
-                :default="filterOptions[1].optionName"
+                :options="MISA_ENUM.pageSizeOptions"
+                :default="MISA_ENUM.pageSizeOptions[1].optionName"
                 :is-top="true"
                 :width="'200px'"
                 style="position: relative; top: 4px"
-                @select="handleChangePage(query.pageNumber || 1, $event)"
+                @select="handleChangePageSize($event)"
             />
             <paginate
                 :page-count="state.totalPageValue"
@@ -103,7 +91,7 @@ const handleChangePage = async (pageNumber, pageSize) => {
                 :page-class="'page-item'"
                 :prev-class="'prev-btn'"
                 :next-class="'next-btn'"
-                :click-handler="handleChangePage"
+                :click-handler="handleChangePageNumber"
             >
                 ></paginate
             >

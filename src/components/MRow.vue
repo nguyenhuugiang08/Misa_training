@@ -3,6 +3,7 @@ import { formatDate } from "../utilities/formatDate";
 import { formatMoney } from "../utilities/formatMoney";
 import { useEmployee } from "../composable/useEmployee";
 import { inject, ref } from "vue";
+import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
 const props = defineProps({
     employee: Object,
     listCheck: Array,
@@ -35,6 +36,20 @@ const handleEditEmployee = async (employeeId) => {
         setTitleForm("Sửa thông tin nhân viên");
         setIsForm();
         setIdentityForm(1);
+        handleSetStatusForm();
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+const handleDuplicateEmployee = async (employeeId) => {
+    try {
+        await getAnEmployee(employeeId);
+        setEmployeeSelected({ ...editEmployee.value, EmployeeCode: "" });
+        setTitleForm("Nhân bản nhân viên");
+        setIsForm();
+        setIdentityForm(2);
+        handleSetStatusForm();
     } catch (error) {
         console.log(error);
     }
@@ -52,7 +67,6 @@ const handleDisplayPopUpWarning = (value) => {
         console.log(error);
     }
 };
-
 
 /**
  * Xử lý hiển
@@ -131,7 +145,15 @@ const handle = (e) => {
             v-if="isShowList"
             :style="{ top: `${toDropList}px` }"
         >
-            <li class="tbl-col__action-item" @click="isShowList = false">Nhân bản</li>
+            <li
+                class="tbl-col__action-item"
+                @click="
+                    isShowList = false;
+                    handleDuplicateEmployee(employee.EmployeeId);
+                "
+            >
+                Nhân bản
+            </li>
             <li
                 class="tbl-col__action-item"
                 @click="

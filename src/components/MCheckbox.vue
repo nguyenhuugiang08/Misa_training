@@ -4,7 +4,7 @@ import { ref, inject } from "vue";
 const selected = ref(props.default ? props.default : null);
 const open = ref(false);
 const isFocus = ref(false);
-const { state } = inject("diy");
+const { state, setEmployeeSelected } = inject("diy");
 const { employeeSelected } = state;
 
 const props = defineProps({
@@ -45,6 +45,9 @@ const handleDefaultValue = (departmentId) => {
         console.log(error);
     }
 };
+if (employeeSelected.DepartmentId) {
+    selected.value = handleDefaultValue(employeeSelected.DepartmentId);
+}
 /**
  * Xử lý clich outside
  * CreatedBy: NHGiang
@@ -92,11 +95,7 @@ const handleClickOutside = () => {
             type="text"
             class="textfield__input modal-textfield__input"
             id="employee-department"
-            :value="
-                employeeSelected.DepartmentId
-                    ? handleDefaultValue(employeeSelected.DepartmentId)
-                    : selected
-            "
+            :value="selected"
             :style="width && { minWidth: width, width: width }"
             @focus="isFocus = true"
             @blur="isFocus = false"

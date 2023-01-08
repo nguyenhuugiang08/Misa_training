@@ -4,10 +4,13 @@ import Mrow from "./MRow.vue";
 import MLoading from "../components/MLoading.vue";
 import MPopUpWarning from "./MPopUpWarning.vue";
 import { useEmployee } from "../composable/useEmployee";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
 
 const { listEmployees, handleFilterPage, totalRecord, totalPage, handleDeleteEmployee } =
     useEmployee();
-handleFilterPage();
+handleFilterPage(route.query.pageSize, 1);
 
 const isPopUp = reactive({
     isOpenWarning: false,
@@ -16,6 +19,7 @@ const isPopUp = reactive({
 const id = ref(null);
 const code = ref(null);
 const isShowTooltip = ref(false);
+const pageNumber = ref(0);
 
 const listCheck = ref([]);
 const { state, setListEmployees, setTotalEmployee, setTotalPage } = inject("diy");
@@ -45,7 +49,6 @@ const setListCheck = (e) => {
  * Xử lý check all
  * CreateBy: NHGiang
  */
-
 const handleCheckAll = () => {
     try {
         if (listCheck.value.length === 0 || listCheck.value.length < state.listEmployees.length) {

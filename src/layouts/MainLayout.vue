@@ -1,24 +1,13 @@
 <script setup>
 import TheSidebar from "../components/TheSidebar.vue";
 import TheHeader from "../components/TheHeader.vue";
-import { ref } from "vue";
-
-const isShowSidebar = ref(false);
-
-const handleChangeStatusSidebar = (e) => {
-    try {
-        isShowSidebar.value = e;
-    } catch (error) {
-        console.log(error);
-    }
-};
 </script>
 
 <template>
     <div class="container">
-        <the-sidebar :isShow="isShowSidebar" @showSidebar="handleChangeStatusSidebar($event)" />
+        <the-sidebar />
         <div class="main">
-            <the-header @hideSidebar="handleChangeStatusSidebar($event)" :isHide="isShowSidebar" />
+            <the-header />
             <router-view></router-view>
         </div>
     </div>
