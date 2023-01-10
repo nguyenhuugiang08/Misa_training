@@ -4,6 +4,8 @@ import { formatMoney } from "../utilities/formatMoney";
 import { useEmployee } from "../composable/useEmployee";
 import { inject, ref } from "vue";
 import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
+import { MISA_ENUM } from "../base/enum";
+import { MISA_RESOURCE } from "../base/resource";
 const props = defineProps({
     employee: Object,
     listCheck: Array,
@@ -33,9 +35,9 @@ const handleEditEmployee = async (employeeId) => {
     try {
         await getAnEmployee(employeeId);
         setEmployeeSelected(editEmployee);
-        setTitleForm("Sửa thông tin nhân viên");
+        setTitleForm(MISA_RESOURCE.FORM_TITLE.EDIT);
         setIsForm();
-        setIdentityForm(1);
+        setIdentityForm(MISA_ENUM.FORM_MODE.EDIT);
         handleSetStatusForm();
     } catch (error) {
         console.log(error);
@@ -46,9 +48,9 @@ const handleDuplicateEmployee = async (employeeId) => {
     try {
         await getAnEmployee(employeeId);
         setEmployeeSelected({ ...editEmployee.value, EmployeeCode: "" });
-        setTitleForm("Nhân bản nhân viên");
+        setTitleForm(MISA_RESOURCE.FORM_TITLE.DUPLICATE);
         setIsForm();
-        setIdentityForm(2);
+        setIdentityForm(MISA_ENUM.FORM_MODE.DUPLICATE);
         handleSetStatusForm();
     } catch (error) {
         console.log(error);
@@ -108,7 +110,9 @@ const handle = (e) => {
             <span>{{ employee.EmployeeCode || "" }}</span>
         </td>
         <td class="tbl-col tbl-col--large">{{ employee.FullName || "" }}</td>
-        <td class="tbl-col">{{ employee.Gender === 2 ? "Khác" : employee.GenderName }}</td>
+        <td class="tbl-col">
+            {{ employee.Gender === MISA_ENUM.GENDER.OTHER ? "Khác" : employee.GenderName }}
+        </td>
         <td class="tbl-col" style="text-align: center">
             {{ formatDate(employee.DateOfBirth) || "" }}
         </td>

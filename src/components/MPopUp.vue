@@ -11,6 +11,8 @@ import { reactive, inject } from "vue";
 import { formatDate } from "../utilities/formatDate";
 import { convertDatetime } from "../utilities/convertDatetime";
 import { error, useValidate } from "../utilities/validateForm";
+import { usePosition } from "../composable/usePosition";
+import { MISA_ENUM } from "../base/enum";
 
 const props = defineProps({
     title: String,
@@ -22,7 +24,10 @@ getAllDepartments();
 const { newEmployeeCode, getEmployeeCode, addNewEmloyee, editAnEmployee } = useEmployee();
 getEmployeeCode();
 
-const { state } = inject("diy");
+const { listPositions, getAllPositions } = usePosition();
+getAllPositions();
+
+const { state, setListToast } = inject("diy");
 const { employeeSelected } = state;
 
 const employee = reactive({
@@ -64,17 +69,11 @@ const hideModal = () => {
  */
 const handleShowPopUpInfo = () => {
     try {
+        console.log(employeeSelected);
         isPopUp.isOpenInfo = true;
     } catch (error) {
         console.log(error);
     }
-};
-
-/**
- * Xử lý validate ngày tháng
- */
-const handleValidateDatetime = (dateTime) => {
-    return /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/.test(dateTime);
 };
 
 /**
@@ -91,29 +90,40 @@ const hanldeSubmitForm = async () => {
             employeeSelected.EmployeeCode
         );
 
-        if (state.identityForm === 1) {
+        if (state.identityForm === MISA_ENUM.FORM_MODE.EDIT) {
             if (!status) {
                 emit("startEdit");
-                await editAnEmployee({
-                    ...employee,
-                    employeeId: employeeSelected.EmployeeId,
-                    identityDate: new Date(convertDatetime(employee.identityDate, true)).toJSON(),
-                    dateOfBirth: convertDatetime(employee.dateOfBirth, false),
-                });
-                emit("endEdit");
+                await editAnEmployee(
+                    {
+                        ...employee,
+                        employeeId: employeeSelected.EmployeeId,
+                        identityDate: new Date(
+                            convertDatetime(employee.identityDate, true)
+                        ).toJSON(),
+                        dateOfBirth: convertDatetime(employee.dateOfBirth, false),
+                    },
+                    emit
+                );
             } else {
                 isPopUp.isOpenError = true;
             }
         }
-        if (state.identityForm === 0 || state.identityForm === 2) {
+        if (
+            state.identityForm === MISA_ENUM.FORM_MODE.ADD ||
+            state.identityForm === MISA_ENUM.FORM_MODE.DUPLICATE
+        ) {
             if (!status) {
                 emit("startEdit");
-                await addNewEmloyee({
-                    ...employee,
-                    identityDate: new Date(convertDatetime(employee.identityDate, true)).toJSON(),
-                    dateOfBirth: convertDatetime(employee.dateOfBirth, false),
-                });
-                emit("endEdit");
+                await addNewEmloyee(
+                    {
+                        ...employee,
+                        identityDate: new Date(
+                            convertDatetime(employee.identityDate, true)
+                        ).toJSON(),
+                        dateOfBirth: convertDatetime(employee.dateOfBirth, false),
+                    },
+                    emit
+                );
             } else {
                 isPopUp.isOpenError = true;
             }
@@ -215,7 +225,9 @@ const hanldeSubmitForm = async () => {
                             :width="'233px'"
                             :value="employee.fullName"
                             :status="error.employeeNameError.status"
+                            :text-error="error.employeeNameError.textError"
                             @inputValue="employee.fullName = $event"
+                            @changeValue="error.employeeNameError.status = $event"
                         />
                     </div>
                     <m-checkbox
@@ -230,8 +242,15 @@ const hanldeSubmitForm = async () => {
                         :fieldText="'Chức danh'"
                         :width="'388px'"
                         style="padding-bottom: 12px"
-                        :value="employee.positionId"
-                        @inputValue="employee.positionId = $event"
+                        :value="
+                            listPositions?.find((emp) => emp.PositionId === employee.positionId)
+                                ?.PositionName
+                        "
+                        @inputValue="
+                            employee.positionId = listPositions?.find(
+                                (emp) => emp.PositionName === $event
+                            )?.PositionId
+                        "
                     />
                 </div>
                 <div
@@ -262,7 +281,7 @@ const hanldeSubmitForm = async () => {
                             <div class="modal__gender">
                                 <m-radio
                                     :id="'male'"
-                                    :value="0"
+                                    :value="MISA_ENUM.GENDER.MALE"
                                     :labelText="'Nam'"
                                     :marginLeft="'10px'"
                                     :marginRight="'20px'"
@@ -271,7 +290,7 @@ const hanldeSubmitForm = async () => {
                                 />
                                 <m-radio
                                     :id="'female'"
-                                    :value="1"
+                                    :value="MISA_ENUM.GENDER.FEMALE"
                                     :labelText="'Nữ'"
                                     :marginLeft="'10px'"
                                     :marginRight="'20px'"
@@ -280,7 +299,7 @@ const hanldeSubmitForm = async () => {
                                 />
                                 <m-radio
                                     :id="'other'"
-                                    :value="2"
+                                    :value="MISA_ENUM.GENDER.OTHER"
                                     :labelText="'Khác'"
                                     :marginLeft="'10px'"
                                     :defaultValue="employee.gender"
@@ -374,7 +393,6 @@ const hanldeSubmitForm = async () => {
                     />
                 </div>
             </div>
-            <div class="line"></div>
             <div class="modal-footer">
                 <label
                     for="show-modal"

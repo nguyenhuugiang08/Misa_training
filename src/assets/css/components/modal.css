@@ -109,7 +109,7 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 20px 32px 0 32px;
+    padding: 0 32px 0 32px;
 }
 
 .line {
@@ -124,7 +124,7 @@
 }
 
 .modal-btn__secondary {
-    margin: 0 0.75rem;
+    margin: 0 8px;
 }
 
 .modal-textfield {

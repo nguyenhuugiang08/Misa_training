@@ -42,7 +42,7 @@ const {
  * Xử lý validate định dạng ngày tháng
  * CreatedBy: NHGiang
  */
-const handleCheckDatetime = (dateTime) => {
+export const handleCheckDatetime = (dateTime) => {
     try {
         return /^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/.test(
             dateTime
@@ -136,6 +136,9 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
                     error.dateOfBrithError.status = false;
                 }
             }
+        } else {
+            error.dateOfBrithError.textError = "";
+            error.dateOfBrithError.status = false;
         }
 
         //Validate ngày cấp
@@ -147,6 +150,9 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
                 error.identityDateError.textError = "";
                 error.identityDateError.status = false;
             }
+        } else {
+            error.identityDateError.textError = "";
+            error.identityDateError.status = false;
         }
 
         // Validate số điện thoại
@@ -158,6 +164,9 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
                 error.phoneNumberError.textError = "";
                 error.phoneNumberError.status = false;
             }
+        } else {
+            error.phoneNumberError.textError = "";
+            error.phoneNumberError.status = false;
         }
 
         // Validate email
@@ -169,6 +178,9 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
                 error.emailError.textError = "";
                 error.emailError.status = false;
             }
+        } else {
+            error.emailError.textError = "";
+            error.emailError.status = false;
         }
 
         error.status =

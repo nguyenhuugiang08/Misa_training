@@ -18,7 +18,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["select"]);
-
 /**
  * Xử lý lấy giá trị khi chọn
  * CreatedBy: NHGiang

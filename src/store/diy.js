@@ -1,4 +1,5 @@
 import { reactive, readonly } from "vue";
+import { MISA_ENUM } from "../base/enum";
 
 const state = reactive({
     isSidebar: false,
@@ -8,8 +9,9 @@ const state = reactive({
     employeeSelected: {},
     totalEmployee: 0,
     totalPageValue: 1,
-    identityForm: 0,
+    identityForm: MISA_ENUM.FORM_MODE.ADD,
     listAllEmployee: [],
+    listToast: [],
 });
 
 // set giá trị cho isSidebar thực hiện chức năng thu gọn/mở rộng sidebar
@@ -93,6 +95,15 @@ const setlistAllEmployee = (list) => {
     }
 };
 
+// thêm toast message vào danh sách
+const setListToast = (toast) => {
+    try {
+        state.listToast.push(toast);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 export default {
     state: readonly(state),
     setIsSidebar,
@@ -104,4 +115,5 @@ export default {
     setTotalPage,
     setIdentityForm,
     setlistAllEmployee,
+    setListToast,
 };

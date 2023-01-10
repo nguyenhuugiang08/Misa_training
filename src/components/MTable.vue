@@ -79,11 +79,11 @@ const handleShowWarning = (event) => {
  *  Xử lý submit form khi xóa nhân viên
  * CreatedBy: NHGiang
  */
-const hanldeSubmitFormDelete = async () => {
+const hanldeSubmitFormDelete = async (event) => {
     try {
         emit("startDelete");
         await handleDeleteEmployee(id.value);
-        emit("endDelete");
+        emit("endDelete", event);
     } catch (err) {
         console.log(err);
     }
@@ -157,7 +157,7 @@ const hanldeSubmitFormDelete = async () => {
                     @closeWarning="isPopUp.isOpenWarning = !isPopUp.isOpenWarning"
                     @closeForm="isPopUp.isOpenWarning = !isPopUp.isOpenWarning"
                     @submitForm="
-                        hanldeSubmitFormDelete();
+                        hanldeSubmitFormDelete($event);
                         isPopUp.isOpenWarning = !isPopUp.isOpenWarning;
                     "
                 />

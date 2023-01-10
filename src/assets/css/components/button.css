@@ -17,18 +17,26 @@
     background-color: var(--secondary-color);
 }
 
-.btn:focus {
-    background-color: var(--focus-color);
-}
-
 .btn-secondary {
     background-color: #fff;
     border: 1px solid #8d9096;
     color: #212121;
 }
 
+.btn-secondary:hover {
+    background-color: #d2d3d6;
+}
+
 .btn-primary {
     background-color: var(--primary-color);
+}
+
+.btn-danger {
+    background-color: #E81E1E;
+}
+
+.btn-danger:hover {
+    background-color: #ff5353;
 }
 
 /* button has icon & content */

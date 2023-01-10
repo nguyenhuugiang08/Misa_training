@@ -7,6 +7,7 @@ const props = defineProps({
 const emit = defineEmits(["closeWarning"]);
 
 //Xử lý đóng thông báo
+//CreatedBy: NHGiang
 const handleClosePopUp = () => {
     try {
         emit("closeWarning");
@@ -16,6 +17,7 @@ const handleClosePopUp = () => {
 };
 
 // Xử lý đóng form
+//CreatedBy: NHGiang
 const handleCloseForm = () => {
     try {
         emit("closeForm");
@@ -25,9 +27,14 @@ const handleCloseForm = () => {
 };
 
 // Xử lý submit form
+//CreatedBy: NHGiang
 const handleSubmitForm = () => {
     try {
-        emit("submitForm");
+        emit("submitForm", {
+            toastMessage: " Nhân viên đã được xóa.",
+            statusMessage: "Thành công!",
+            status: 0,
+        });
     } catch (error) {
         console.log(error);
     }
@@ -61,7 +68,7 @@ const handleSubmitForm = () => {
             </div>
             <div class="modal-confirm__content-text">{{ textInfo }}</div>
         </div>
-        <div class="modal-footer modal-confirm__footer">
+        <div class="modal-footer modal-confirm__footer" style="justify-content: flex-end">
             <button
                 type="submit"
                 class="btn btn-secondary modal-btn__secondary btn-wraning"
@@ -70,8 +77,8 @@ const handleSubmitForm = () => {
             >
                 Không
             </button>
-            <button type="submit" class="btn btn-primary" tabindex="0" @click="handleSubmitForm">
-                Có
+            <button type="submit" class="btn btn-danger" tabindex="0" @click="handleSubmitForm">
+                Có, xóa nhân viên
             </button>
         </div>
     </div>

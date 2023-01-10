@@ -7,6 +7,9 @@ import { ref, inject, watch } from "vue";
 import { useEmployee } from "../composable/useEmployee";
 import { useRoute } from "vue-router";
 import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
+import MToast from "../components/MToast.vue";
+import { MISA_ENUM } from "../base/enum";
+import { MISA_RESOURCE } from "../base/resource";
 
 const {
     listEmployees,
@@ -25,6 +28,7 @@ const {
     setTotalPage,
     setIdentityForm,
     setlistAllEmployee,
+    setListToast,
 } = inject("diy");
 const keyword = ref("");
 const isLoading = ref(false);
@@ -49,6 +53,18 @@ getAllEmployees();
 setlistAllEmployee(listAllEmployees);
 
 /**
+ * Xử lý hiển thị toast message thành công
+ * CreatedBy: NHGiang
+ */
+const handleShowToast = (toast) => {
+    try {
+        setListToast(toast);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
  * Xử lý tìm kiếm nhân viên theo tên, mã nhân viên
  */
 const debounceSearch = async (val) => {
@@ -67,13 +83,15 @@ const debounceSearch = async (val) => {
  * Xử lý khi kết thúc việc sửa nhân  viên
  * CreatedBy: NHGiang
  */
-const handleEndEditEmployee = async () => {
+const handleEndEditEmployee = async (event) => {
     try {
+        console.log(event);
         await handleFilterPage(pageSize.value, 1);
         setListEmployees(listEmployees);
         setIsForm(false);
         setTotalPage(totalPage);
         isLoading.value = false;
+        handleShowToast(event);
     } catch (error) {
         console.log(error);
     }
@@ -83,12 +101,13 @@ const handleEndEditEmployee = async () => {
  * Xử lý khi kết thúc việc sửa nhân  viên
  * CreatedBy: NHGiang
  */
-const handleEndDeleteEmployee = async () => {
+const handleEndDeleteEmployee = async (event) => {
     try {
         await handleFilterPage(pageSize.value, 1);
         setListEmployees(listEmployees);
         setTotalPage(totalPage);
         isLoading.value = false;
+        handleShowToast(event);
     } catch (error) {
         console.log(error);
     }
@@ -119,15 +138,24 @@ const handleRefresh = async () => {
                 class="btn btn-primary btn-add-emp"
                 @click="
                     setIsForm();
-                    setTitleForm('Thêm nhân viên');
+                    setTitleForm(MISA_RESOURCE.FORM_TITLE.ADD);
                     setEmployeeSelected({});
-                    setIdentityForm(0);
+                    setIdentityForm(MISA_ENUM.FORM_MODE.ADD);
                     handleSetStatusForm();
                 "
             >
                 Thêm mới nhân viên
             </button>
         </div>
+        <di class="toast-container">
+            <m-toast
+                v-for="(toast, index) in state.listToast"
+                :key="index"
+                :toastMessage="toast.toastMessage"
+                :statusMessage="toast.statusMessage"
+                :status="toast.status"
+            />
+        </di>
         <div class="content-wrapper">
             <div class="content-wrapper__action">
                 <div class="textfield">
@@ -166,14 +194,14 @@ const handleRefresh = async () => {
                     @click="handleRefresh"
                 ></div>
             </div>
-            <M-table @startDelete="isLoading = true" @endDelete="handleEndDeleteEmployee" />
+            <M-table @startDelete="isLoading = true" @endDelete="handleEndDeleteEmployee($event)" />
             <m-pagination />
             <m-pop-up
                 v-if="state.isForm"
                 @hideModal="setIsForm"
                 :title="state.titleForm"
                 @startEdit="isLoading = true"
-                @endEdit="handleEndEditEmployee"
+                @endEdit="handleEndEditEmployee($event)"
             />
             <div v-if="isLoading" class="modal-loading">
                 <m-Loading />
@@ -191,5 +219,12 @@ const handleRefresh = async () => {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.toast-container {
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 999;
 }
 </style>

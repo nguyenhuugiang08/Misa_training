@@ -1,8 +1,11 @@
 <script setup>
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
-import { ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { formatDate } from "../utilities/formatDate";
+import { MISA_RESOURCE } from "../base/resource";
+import { convertDatetime } from "../utilities/convertDatetime";
+import { handleCheckDatetime } from "../utilities/validateForm";
 
 const props = defineProps({
     fieldText: String,
@@ -13,7 +16,7 @@ const props = defineProps({
     type: { type: String, default: "text" },
 });
 
-const date = ref(new Date());
+const date = ref(null);
 const isFocus = ref(false);
 const datepicker = ref(null);
 const isOpenDatepicker = ref(false);
@@ -83,7 +86,16 @@ const handleDatepicker = () => {
             @focus="isFocus = true"
             @blur="isFocus = false"
         />
-        <Datepicker v-model="date" ref="datepicker" auto-apply></Datepicker>
+        <Datepicker
+            v-model="date"
+            ref="datepicker"
+            auto-apply
+            :day-names="['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']"
+        >
+            <template #month="{ text }">
+                {{ MISA_RESOURCE.MONTH_DATEPICKER[text] }}
+            </template>
+        </Datepicker>
     </div>
 </template>
 

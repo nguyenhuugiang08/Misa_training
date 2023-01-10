@@ -10,14 +10,16 @@ const props = defineProps({
     tooltip: String,
     placeHolder: String,
     autofoucus: Boolean,
+    textError: String,
 });
 
-const emit = defineEmits(["inputValue"]);
+const emit = defineEmits(["inputValue", "change"]);
 
 // Xử lý đẩy value ô input lên component cha
 const handleEmitInputValue = (value) => {
     try {
         emit("inputValue", value);
+        emit("changeValue", false);
     } catch (error) {
         console.log(error);
     }
@@ -38,6 +40,7 @@ const handleEmitInputValue = (value) => {
             @input="handleEmitInputValue($event.target.value)"
             :placeHolder="placeHolder"
         />
+        <p>{{ textError }}</p>
         <div class="textfield-tooltip" v-if="tooltip">
             <span>{{ tooltip }}</span>
         </div>
