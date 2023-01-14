@@ -71,13 +71,25 @@ const handleDisplayPopUpWarning = (value) => {
 };
 
 /**
- * Xử lý hiển
+ * Xử lý hiển thị droplist action
  * CreatedBy: NHGiang
  */
-const handle = (e) => {
+const handleDisplayHideListAction = (e) => {
     try {
         isShowList.value = !isShowList.value;
         toDropList.value = e.target.getBoundingClientRect().y + 32;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * xử lý click outside list action
+ * CreatedBy: NHGiang
+ */
+const handleClickOutside = () => {
+    try {
+        isShowList.value = false;
     } catch (error) {
         console.log(error);
     }
@@ -117,6 +129,7 @@ const handle = (e) => {
             {{ formatDate(employee.DateOfBirth) || "" }}
         </td>
         <td class="tbl-col">{{ employee.PositionName || "" }}</td>
+        <td class="tbl-col tbl-col--large">{{ employee.DepartmentName || "" }}</td>
         <td class="tbl-col">{{ employee.IdentityNumber || "" }}</td>
         <td class="tbl-col">{{ employee.PhoneNumber || "" }}</td>
         <td class="tbl-col" style="text-align: right; width: 129px; min-width: 129px">
@@ -131,7 +144,8 @@ const handle = (e) => {
                     class="sidebar-item__icon btn-dropdown"
                     :class="isShowList ? 'btn-dropdown--active' : ''"
                     style="display: flex; justify-content: center; align-items: center"
-                    @click="handle"
+                    @click="handleDisplayHideListAction"
+                    v-click-outside-element="handleClickOutside"
                 >
                     <div
                         :style="{

@@ -21,6 +21,9 @@ export const MISA_RESOURCE = {
     emailErrorText: {
         invalid: "Email không đúng định dạng.",
     },
+    identityNumberErrorText: {
+        invalid: "Số căn cước không đúng định dạng.",
+    },
     FORM_TITLE: {
         ADD: "Thêm nhân viên", // tiêu đề form thêm
         EDIT: "Sửa thông tin nhân viên", // tiêu đề form sửa
@@ -44,7 +47,7 @@ export const MISA_RESOURCE = {
         ADD_SUCCESS: {
             TOAST_MESSAGE: "Nhân viên đã được thêm.",
             STATUS_MESSAGE: "Thành công!",
-            STATUS: MISA_ENUM.STATUS_TOAST.SUCCESS,
+            STATUS: MISA_ENUM.STATUS_TOAST.SUCCESS, // trạng thái khi thêm thành công
         },
         ADD_FAILED: {
             TOAST_MESSAGE: "Thêm nhân viên thất bại, vui lòng kiểm tra lại.",
@@ -54,12 +57,22 @@ export const MISA_RESOURCE = {
         EDIT_SUCCESS: {
             TOAST_MESSAGE: "Thông tin nhân viên đã được thay đổi.",
             STATUS_MESSAGE: "Thành công!",
-            STATUS: MISA_ENUM.STATUS_TOAST.SUCCESS,
+            STATUS: MISA_ENUM.STATUS_TOAST.SUCCESS, // trạng thái khi sửa thất bại
         },
         EDIT_FAILED: {
             TOAST_MESSAGE: "Sửa thông tin nhân viên thất bại, vui lòng kiểm tra lại.",
             STATUS_MESSAGE: "Lỗi!",
-            STATUS: MISA_ENUM.STATUS_TOAST.ERROR,
+            STATUS: MISA_ENUM.STATUS_TOAST.ERROR, // trạng thái khi sửa thất bại
+        },
+        DUPLICATE_SUCCESS: {
+            TOAST_MESSAGE: "Thông tin nhân viên đã được nhân bản.",
+            STATUS_MESSAGE: "Thành công!",
+            STATUS: MISA_ENUM.STATUS_TOAST.SUCCESS, // trạng thái khi nhân bản thành công
+        },
+        DUPLICATE_FAILED: {
+            TOAST_MESSAGE: "Nhân bản nhân viên thất bại, vui lòng kiểm tra lại.",
+            STATUS_MESSAGE: "Lỗi!",
+            STATUS: MISA_ENUM.STATUS_TOAST.ERROR, // trạng thái khi nhân bản thất bại
         },
     },
 };

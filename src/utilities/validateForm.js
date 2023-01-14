@@ -26,6 +26,10 @@ const error = reactive({
         textError: "",
         status: false,
     },
+    identityNumberError: {
+        textError: "",
+        status: false,
+    },
     status: false,
 });
 
@@ -36,6 +40,7 @@ const {
     identityDateErrorText,
     phoneNumberErrorText,
     emailErrorText,
+    identityNumberErrorText,
 } = MISA_RESOURCE;
 
 /**
@@ -69,7 +74,20 @@ const handleCheckPhonenumber = (phoneNumber) => {
  */
 const handleCheckEmail = (email) => {
     try {
-        return /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/.test(email);
+        return /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(
+            email
+        );
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Xử lý check định đạng email
+ */
+const handleCheckIndentityNumber = (identityNumber) => {
+    try {
+        return /^([0-9]{12})\b/.test(identityNumber);
     } catch (error) {
         console.log(error);
     }
@@ -82,13 +100,13 @@ const handleCheckEmail = (email) => {
 const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
     try {
         // Validate employee code
-        if (!employee.employeeCode) {
+        if (!employee.EmployeeCode) {
             error.employeeCodeError.textError = employeeCodeErrorText.blank;
             error.employeeCodeError.status = true;
         } else {
             if (identityForm === 0) {
                 const listCodes = list.map((emp) => emp.EmployeeCode);
-                if (listCodes.includes(employee.employeeCode)) {
+                if (listCodes.includes(employee.EmployeeCode)) {
                     error.employeeCodeError.textError = employeeCodeErrorText.duplicate;
                     error.employeeCodeError.status = true;
                 } else {
@@ -101,7 +119,7 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
                 const listCodes = list
                     .filter((item) => item.EmployeeCode !== employeeSelectedCode)
                     .map((emp) => emp.EmployeeCode);
-                if (listCodes.includes(employee.employeeCode)) {
+                if (listCodes.includes(employee.EmployeeCode)) {
                     error.employeeCodeError.textError = employeeCodeErrorText.duplicate;
                     error.employeeCodeError.status = true;
                 } else {
@@ -112,7 +130,7 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
         }
 
         // Valide employee name
-        if (!employee.fullName) {
+        if (!employee.FullName) {
             error.employeeNameError.textError = employeeNameErrorText.blank;
             error.employeeNameError.status = true;
         } else {
@@ -121,12 +139,13 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
         }
 
         //Validate ngày sinh
-        if (employee.dateOfBirth) {
-            if (!handleCheckDatetime(employee.dateOfBirth)) {
+        if (employee.DateOfBirth) {
+            console.log(employee.DateOfBirth);
+            if (!handleCheckDatetime(employee.DateOfBirth)) {
                 error.dateOfBrithError.textError = dateOfBirthErrorText.invalid;
                 error.dateOfBrithError.status = true;
             } else {
-                const yearOfBirth = employee.dateOfBirth.split("/")[2];
+                const yearOfBirth = employee.DateOfBirth.split("/")[2];
                 const currentYear = new Date().getFullYear();
                 if (currentYear - yearOfBirth < 18) {
                     error.dateOfBrithError.textError = dateOfBirthErrorText.over;
@@ -137,13 +156,14 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
                 }
             }
         } else {
+            console.log(employee.DateOfBirth);
             error.dateOfBrithError.textError = "";
             error.dateOfBrithError.status = false;
         }
 
         //Validate ngày cấp
-        if (employee.identityDate) {
-            if (!handleCheckDatetime(employee.identityDate)) {
+        if (employee.IdentityDate) {
+            if (!handleCheckDatetime(employee.IdentityDate)) {
                 error.identityDateError.textError = identityDateErrorText.invalid;
                 error.identityDateError.status = true;
             } else {
@@ -156,8 +176,8 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
         }
 
         // Validate số điện thoại
-        if (employee.phoneNumber) {
-            if (!handleCheckPhonenumber(employee.phoneNumber)) {
+        if (employee.PhoneNumber) {
+            if (!handleCheckPhonenumber(employee.PhoneNumber)) {
                 error.phoneNumberError.textError = phoneNumberErrorText.invalid;
                 error.phoneNumberError.status = true;
             } else {
@@ -170,8 +190,8 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
         }
 
         // Validate email
-        if (employee.email) {
-            if (!handleCheckEmail(employee.email)) {
+        if (employee.Email) {
+            if (!handleCheckEmail(employee.Email)) {
                 error.emailError.textError = emailErrorText.invalid;
                 error.emailError.status = true;
             } else {
@@ -183,13 +203,28 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
             error.emailError.status = false;
         }
 
+        // Validate số căn cước công dân
+        if (employee.IdentityNumber) {
+            if (!handleCheckIndentityNumber(employee.IdentityNumber)) {
+                error.identityNumberError.textError = identityNumberErrorText.invalid;
+                error.identityNumberError.status = true;
+            } else {
+                error.identityNumberError.textError = "";
+                error.identityNumberError.status = false;
+            }
+        } else {
+            error.identityNumberError.textError = "";
+            error.identityNumberError.status = false;
+        }
+
         error.status =
             error.employeeCodeError.status ||
             error.employeeNameError.status ||
             error.dateOfBrithError.status ||
             error.identityDateError.status ||
             error.phoneNumberError.status ||
-            error.emailError.status;
+            error.emailError.status ||
+            error.identityNumberError.status;
 
         return error.status;
     } catch (err) {

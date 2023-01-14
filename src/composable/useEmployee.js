@@ -1,6 +1,7 @@
 import { ref } from "vue";
 import axios from "axios";
 import { MISA_RESOURCE } from "../base/resource";
+import { MISA_ENUM } from "../base/enum";
 
 /**
  * Xử lý dữ liệu liên quan đến employee
@@ -40,24 +41,41 @@ export const useEmployee = () => {
         };
 
         // Thêm nhân viên mới
-        const addNewEmloyee = async (employee, emit) => {
+        const addNewEmloyee = async (employee, emit, formMode) => {
             try {
                 const response = await axios.post(
                     `${import.meta.env.VITE_MISA_EMPLOYEE_API}`,
                     employee
                 );
                 console.log(response);
-                emit("endEdit", {
-                    toastMessage: MISA_RESOURCE.TOAST.ADD_SUCCESS.TOAST_MESSAGE,
-                    statusMessage: MISA_RESOURCE.TOAST.ADD_SUCCESS.STATUS_MESSAGE,
-                    status: MISA_RESOURCE.TOAST.ADD_SUCCESS.STATUS,
-                });
+
+                if (formMode !== MISA_ENUM.FORM_MODE.DUPLICATE) {
+                    emit("endAdd", {
+                        toastMessage: MISA_RESOURCE.TOAST.ADD_SUCCESS.TOAST_MESSAGE,
+                        statusMessage: MISA_RESOURCE.TOAST.ADD_SUCCESS.STATUS_MESSAGE,
+                        status: MISA_RESOURCE.TOAST.ADD_SUCCESS.STATUS,
+                    });
+                } else {
+                    emit("endAdd", {
+                        toastMessage: MISA_RESOURCE.TOAST.DUPLICATE_SUCCESS.TOAST_MESSAGE,
+                        statusMessage: MISA_RESOURCE.TOAST.DUPLICATE_SUCCESS.STATUS_MESSAGE,
+                        status: MISA_RESOURCE.TOAST.DUPLICATE_SUCCESS.STATUS,
+                    });
+                }
             } catch (error) {
-                emit("endEdit", {
-                    toastMessage: MISA_RESOURCE.TOAST.ADD_FAILED.TOAST_MESSAGE,
-                    statusMessage: MISA_RESOURCE.TOAST.ADD_FAILED.STATUS_MESSAGE,
-                    status: MISA_RESOURCE.TOAST.ADD_FAILED.STATUS,
-                });
+                if (formMode !== MISA_ENUM.FORM_MODE.DUPLICATE) {
+                    emit("endAdd", {
+                        toastMessage: MISA_RESOURCE.TOAST.ADD_FAILED.TOAST_MESSAGE,
+                        statusMessage: MISA_RESOURCE.TOAST.ADD_FAILED.STATUS_MESSAGE,
+                        status: MISA_RESOURCE.TOAST.ADD_FAILED.STATUS,
+                    });
+                } else {
+                    emit("endAdd", {
+                        toastMessage: MISA_RESOURCE.TOAST.DUPLICATE_FAILED.TOAST_MESSAGE,
+                        statusMessage: MISA_RESOURCE.TOAST.DUPLICATE_FAILED.STATUS_MESSAGE,
+                        status: MISA_RESOURCE.TOAST.DUPLICATE_FAILED.STATUS,
+                    });
+                }
                 console.log(error);
             }
         };
@@ -93,7 +111,7 @@ export const useEmployee = () => {
         const editAnEmployee = async (employee, emit) => {
             try {
                 const response = await axios.put(
-                    `${import.meta.env.VITE_MISA_EMPLOYEE_API}/${employee.employeeId}`,
+                    `${import.meta.env.VITE_MISA_EMPLOYEE_API}/${employee.EmployeeId}`,
                     employee
                 );
                 console.log(response);
@@ -104,9 +122,9 @@ export const useEmployee = () => {
                 });
             } catch (error) {
                 emit("endEdit", {
-                    toastMessage: MISA_RESOURCE.TOAST.EDIT_FAILED.TOAST_MESSAGE,
-                    statusMessage: MISA_RESOURCE.TOAST.EDIT_FAILED.STATUS_MESSAGE,
-                    status: MISA_RESOURCE.TOAST.EDIT_FAILED.STATUS,
+                    toastMessage: MISA_RESOURCE.TOAST.EDIT_SUCCESS.TOAST_MESSAGE,
+                    statusMessage: MISA_RESOURCE.TOAST.EDIT_SUCCESS.STATUS_MESSAGE,
+                    status: MISA_RESOURCE.TOAST.EDIT_SUCCESS.STATUS,
                 });
                 console.log(error);
             }

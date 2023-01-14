@@ -56,6 +56,7 @@ const handleChangePageSize = async (pageSize, pageNumber = 1) => {
  */
 const handleChangePageNumber = async (pageNumber) => {
     try {
+        router.push({ path: "/", query: { pageSize: pageSize.value, pageNumber: pageNumber } });
         isLoading.value = true;
         await handleFilterPage(pageSize.value, pageNumber);
         setListEmployees(listEmployees);

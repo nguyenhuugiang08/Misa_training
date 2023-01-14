@@ -8,8 +8,12 @@ export const routes = [
                 component: () => import("../pages/Home.vue"),
             },
             {
-                path: "/about",
-                component: () => import("../pages/About.vue"),
+                path: "/cash",
+                component: () => import("../pages/Cash.vue"),
+            },
+            {
+                path: "/deposits",
+                component: () => import("../pages/DepositsPage.vue"),
             },
         ],
     },

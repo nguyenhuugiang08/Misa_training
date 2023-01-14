@@ -38,7 +38,7 @@ const { state, setIsSidebar } = inject("diy");
             </div>
         </div>
         <ul class="sidebar-list" :style="{ width: state.isSidebar ? '52px' : '178px' }">
-            <li class="sidebar-item" tabindex="0">
+            <router-link to="/" class="sidebar-item" tabindex="0">
                 <div class="sidebar-item__icon">
                     <div
                         :style="{
@@ -50,8 +50,8 @@ const { state, setIsSidebar } = inject("diy");
                     ></div>
                 </div>
                 <p v-if="!state.isSidebar">Tổng quan</p>
-            </li>
-            <li class="sidebar-item" tabindex="0">
+            </router-link>
+            <router-link to="/cash" class="sidebar-item" tabindex="0">
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -62,8 +62,8 @@ const { state, setIsSidebar } = inject("diy");
                     ></div>
                 </div>
                 <p v-if="!state.isSidebar">Tiền mặt</p>
-            </li>
-            <li class="sidebar-item" tabindex="0">
+            </router-link>
+            <router-link to="/deposits" class="sidebar-item" tabindex="0">
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -74,8 +74,8 @@ const { state, setIsSidebar } = inject("diy");
                     ></div>
                 </div>
                 <p v-if="!state.isSidebar">Tiền gửi</p>
-            </li>
-            <li class="sidebar-item" tabindex="0">
+            </router-link>
+            <router-link to="/" class="sidebar-item" tabindex="0">
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -86,8 +86,8 @@ const { state, setIsSidebar } = inject("diy");
                     ></div>
                 </div>
                 <p v-if="!state.isSidebar">Mua hàng</p>
-            </li>
-            <li class="sidebar-item" tabindex="0">
+            </router-link>
+            <router-link to="/" class="sidebar-item" tabindex="0">
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -98,8 +98,8 @@ const { state, setIsSidebar } = inject("diy");
                     ></div>
                 </div>
                 <p v-if="!state.isSidebar">Bán hàng</p>
-            </li>
-            <li class="sidebar-item" tabindex="0">
+            </router-link>
+            <router-link to="/" class="sidebar-item" tabindex="0">
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -110,8 +110,8 @@ const { state, setIsSidebar } = inject("diy");
                     ></div>
                 </div>
                 <p v-if="!state.isSidebar">Quản lý đơn hàng</p>
-            </li>
-            <li class="sidebar-item" tabindex="0">
+            </router-link>
+            <router-link to="/" class="sidebar-item" tabindex="0">
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -122,8 +122,8 @@ const { state, setIsSidebar } = inject("diy");
                     ></div>
                 </div>
                 <p v-if="!state.isSidebar">Kho</p>
-            </li>
-            <li class="sidebar-item" tabindex="0">
+            </router-link>
+            <router-link to="/" class="sidebar-item" tabindex="0">
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -134,8 +134,8 @@ const { state, setIsSidebar } = inject("diy");
                     ></div>
                 </div>
                 <p v-if="!state.isSidebar">Công cụ dụng cụ</p>
-            </li>
-            <li class="sidebar-item" tabindex="0">
+            </router-link>
+            <router-link to="/" class="sidebar-item" tabindex="0">
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -146,8 +146,8 @@ const { state, setIsSidebar } = inject("diy");
                     ></div>
                 </div>
                 <p v-if="!state.isSidebar">Tài sản cố định</p>
-            </li>
-            <li class="sidebar-item" tabindex="0">
+            </router-link>
+            <router-link to="/" class="sidebar-item" tabindex="0">
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -158,8 +158,8 @@ const { state, setIsSidebar } = inject("diy");
                     ></div>
                 </div>
                 <p v-if="!state.isSidebar">Thuế</p>
-            </li>
-            <li class="sidebar-item" tabindex="0">
+            </router-link>
+            <router-link to="/" class="sidebar-item" tabindex="0">
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -170,8 +170,8 @@ const { state, setIsSidebar } = inject("diy");
                     ></div>
                 </div>
                 <p v-if="!state.isSidebar">Giá thành</p>
-            </li>
-            <li class="sidebar-item" tabindex="0">
+            </router-link>
+            <router-link to="/" class="sidebar-item" tabindex="0">
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -182,8 +182,8 @@ const { state, setIsSidebar } = inject("diy");
                     ></div>
                 </div>
                 <p v-if="!state.isSidebar">Tổng hợp</p>
-            </li>
-            <li class="sidebar-item" tabindex="0">
+            </router-link>
+            <router-link to="/" class="sidebar-item" tabindex="0">
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -194,8 +194,8 @@ const { state, setIsSidebar } = inject("diy");
                     ></div>
                 </div>
                 <p v-if="!state.isSidebar">Ngân sách</p>
-            </li>
-            <li class="sidebar-item" tabindex="0">
+            </router-link>
+            <router-link to="/" class="sidebar-item" tabindex="0">
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -206,8 +206,8 @@ const { state, setIsSidebar } = inject("diy");
                     ></div>
                 </div>
                 <p v-if="!state.isSidebar">Báo cáo</p>
-            </li>
-            <li class="sidebar-item" tabindex="0">
+            </router-link>
+            <router-link to="/" class="sidebar-item" tabindex="0">
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -218,9 +218,9 @@ const { state, setIsSidebar } = inject("diy");
                     ></div>
                 </div>
                 <p v-if="!state.isSidebar">Phân tích tài chính</p>
-            </li>
-            <li class="sidebar__line"></li>
-            <li class="sidebar-item" tabindex="0">
+            </router-link>
+            <router-link to="/" class="sidebar__line"></router-link>
+            <router-link to="/" class="sidebar-item" tabindex="0">
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -231,7 +231,7 @@ const { state, setIsSidebar } = inject("diy");
                     ></div>
                 </div>
                 <p v-if="!state.isSidebar">Kiến thức</p>
-            </li>
+            </router-link>
         </ul>
     </div>
 </template>

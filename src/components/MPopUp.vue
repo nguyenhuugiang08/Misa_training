@@ -31,18 +31,18 @@ const { state, setListToast } = inject("diy");
 const { employeeSelected } = state;
 
 const employee = reactive({
-    employeeCode: employeeSelected?.EmployeeCode || newEmployeeCode,
-    fullName: employeeSelected?.FullName || "",
-    gender: employeeSelected?.Gender || 0,
-    dateOfBirth: employeeSelected?.DateOfBirth ? formatDate(employeeSelected?.DateOfBirth) : "",
-    identityNumber: employeeSelected?.IdentityNumber || "",
-    departmentId: employeeSelected?.DepartmentId || "",
-    identityDate: employeeSelected?.IdentityDate ? formatDate(employeeSelected?.IdentityDate) : "",
-    positionId: employeeSelected?.PositionId || "",
-    identityPlace: employeeSelected?.IdentityPlace || "",
-    address: employeeSelected?.Address || "",
-    phoneNumber: employeeSelected?.PhoneNumber || "",
-    email: employeeSelected?.Email || "",
+    EmployeeCode: employeeSelected?.EmployeeCode || newEmployeeCode,
+    FullName: employeeSelected?.FullName || "",
+    Gender: employeeSelected?.Gender || 0,
+    DateOfBirth: employeeSelected?.DateOfBirth ? formatDate(employeeSelected?.DateOfBirth) : "",
+    IdentityNumber: employeeSelected?.IdentityNumber || "",
+    DepartmentId: employeeSelected?.DepartmentId || "",
+    IdentityDate: employeeSelected?.IdentityDate ? formatDate(employeeSelected?.IdentityDate) : "",
+    PositionId: employeeSelected?.PositionId || "",
+    IdentityPlace: employeeSelected?.IdentityPlace || "",
+    Address: employeeSelected?.Address || "",
+    PhoneNumber: employeeSelected?.PhoneNumber || "",
+    Email: employeeSelected?.Email || "",
 });
 
 const isPopUp = reactive({
@@ -82,7 +82,7 @@ const handleShowPopUpInfo = () => {
  */
 const hanldeSubmitForm = async () => {
     try {
-        employee.departmentId = employee.departmentId || listDepartments.value?.[0].departmentId;
+        employee.DepartmentId = employee.DepartmentId || listDepartments.value?.[0].departmentId;
         const status = useValidate(
             employee,
             state.listAllEmployee,
@@ -96,11 +96,11 @@ const hanldeSubmitForm = async () => {
                 await editAnEmployee(
                     {
                         ...employee,
-                        employeeId: employeeSelected.EmployeeId,
-                        identityDate: new Date(
-                            convertDatetime(employee.identityDate, true)
+                        EmployeeId: employeeSelected.EmployeeId,
+                        IdentityDate: new Date(
+                            convertDatetime(employee.IdentityDate, true)
                         ).toJSON(),
-                        dateOfBirth: convertDatetime(employee.dateOfBirth, false),
+                        DateOfBirth: convertDatetime(employee.DateOfBirth, false),
                     },
                     emit
                 );
@@ -117,12 +117,13 @@ const hanldeSubmitForm = async () => {
                 await addNewEmloyee(
                     {
                         ...employee,
-                        identityDate: new Date(
-                            convertDatetime(employee.identityDate, true)
+                        IdentityDate: new Date(
+                            convertDatetime(employee.IdentityDate, true)
                         ).toJSON(),
-                        dateOfBirth: convertDatetime(employee.dateOfBirth, false),
+                        DateOfBirth: convertDatetime(employee.DateOfBirth, false),
                     },
-                    emit
+                    emit,
+                    state.identityForm
                 );
             } else {
                 isPopUp.isOpenError = true;
@@ -141,7 +142,7 @@ const hanldeSubmitForm = async () => {
                 <div class="modal__header-left">
                     <div class="modal__header-left-text">{{ title }}</div>
                     <label for="radio1" class="modal__header-left-wrapper">
-                        <input type="checkbox" checked id="radio1" />
+                        <input type="checkbox" id="radio1" />
                         <div
                             :style="{
                                 background:
@@ -215,26 +216,28 @@ const hanldeSubmitForm = async () => {
                             :required="true"
                             :width="'149px'"
                             :marginRight="'6px'"
-                            :value="employee.employeeCode"
+                            :value="employee.EmployeeCode"
                             :status="error.employeeCodeError.status"
-                            @inputValue="employee.employeeCode = $event"
+                            @inputValue="employee.EmployeeCode = $event"
+                            :text-error="error.employeeCodeError.textError"
+                            @changeValue="error.employeeCodeError.status = $event"
                         />
                         <m-input
                             :fieldText="'Tên'"
                             :required="true"
                             :width="'233px'"
-                            :value="employee.fullName"
+                            :value="employee.FullName"
                             :status="error.employeeNameError.status"
                             :text-error="error.employeeNameError.textError"
-                            @inputValue="employee.fullName = $event"
+                            @inputValue="employee.FullName = $event"
                             @changeValue="error.employeeNameError.status = $event"
                         />
                     </div>
                     <m-checkbox
                         v-if="listDepartments.length"
                         :options="listDepartments"
-                        :default="listDepartments[0].optionName"
-                        @select="employee.departmentId = $event"
+                        default=""
+                        @select="employee.DepartmentId = $event"
                         :text-label="'Đơn vị'"
                         :required="true"
                     />
@@ -243,11 +246,11 @@ const hanldeSubmitForm = async () => {
                         :width="'388px'"
                         style="padding-bottom: 12px"
                         :value="
-                            listPositions?.find((emp) => emp.PositionId === employee.positionId)
+                            listPositions?.find((emp) => emp.PositionId === employee.PositionId)
                                 ?.PositionName
                         "
                         @inputValue="
-                            employee.positionId = listPositions?.find(
+                            employee.PositionId = listPositions?.find(
                                 (emp) => emp.PositionName === $event
                             )?.PositionId
                         "
@@ -273,8 +276,8 @@ const hanldeSubmitForm = async () => {
                         <m-date-field
                             :width="'166px'"
                             :fieldText="'Ngày sinh'"
-                            :value="employee.dateOfBirth"
-                            @dateField="employee.dateOfBirth = $event"
+                            :value="employee.DateOfBirth"
+                            @dateField="employee.DateOfBirth = $event"
                         />
                         <div style="padding-left: 10px; margin-left: 6px">
                             <label class="textfield__label modal-label"> Giới tính </label>
@@ -285,8 +288,8 @@ const hanldeSubmitForm = async () => {
                                     :labelText="'Nam'"
                                     :marginLeft="'10px'"
                                     :marginRight="'20px'"
-                                    :defaultValue="employee.gender"
-                                    @radio="employee.gender = $event"
+                                    :defaultValue="employee.Gender"
+                                    @radio="employee.Gender = $event"
                                 />
                                 <m-radio
                                     :id="'female'"
@@ -294,18 +297,19 @@ const hanldeSubmitForm = async () => {
                                     :labelText="'Nữ'"
                                     :marginLeft="'10px'"
                                     :marginRight="'20px'"
-                                    :defaultValue="employee.gender"
-                                    @radio="employee.gender = $event"
+                                    :defaultValue="employee.Gender"
+                                    @radio="employee.Gender = $event"
                                 />
                                 <m-radio
                                     :id="'other'"
                                     :value="MISA_ENUM.GENDER.OTHER"
                                     :labelText="'Khác'"
                                     :marginLeft="'10px'"
-                                    :defaultValue="employee.gender"
-                                    @radio="employee.gender = $event"
+                                    :defaultValue="employee.Gender"
+                                    @radio="employee.Gender = $event"
                                 />
                             </div>
+                            <!-- <p class="textfield-error">{{ textError }}</p> -->
                         </div>
                     </div>
                     <div
@@ -320,15 +324,17 @@ const hanldeSubmitForm = async () => {
                             :fieldText="'Số CMND'"
                             :width="'242px'"
                             :marginRight="'6px'"
-                            :value="employee.identityNumber"
-                            @inputValue="employee.identityNumber = $event"
+                            :value="employee.IdentityNumber"
+                            :status="error.identityNumberError.status"
+                            @inputValue="employee.IdentityNumber = $event"
+                            @changeValue="error.identityNumberError.status = $event"
                             :tooltip="'Số chứng minh nhân dân'"
                         />
                         <m-date-field
                             :width="'166px'"
                             :fieldText="'Ngày cấp'"
-                            :value="employee.identityDate"
-                            @dateField="employee.identityDate = $event"
+                            :value="employee.IdentityDate"
+                            @dateField="employee.IdentityDate = $event"
                         />
                     </div>
 
@@ -336,8 +342,8 @@ const hanldeSubmitForm = async () => {
                         :fieldText="'Nơi cấp'"
                         :width="'414px'"
                         style="padding-bottom: 12px"
-                        :value="employee.identityPlace"
-                        @inputValue="employee.identityPlace = $event"
+                        :value="employee.IdentityPlace"
+                        @inputValue="employee.IdentityPlace = $event"
                     />
                 </div>
                 <div class="modal-contact">
@@ -345,16 +351,17 @@ const hanldeSubmitForm = async () => {
                         :fieldText="'Địa chỉ'"
                         :width="'829px'"
                         style="padding-bottom: 12px"
-                        :value="employee.address"
-                        @inputValue="employee.address = $event"
+                        :value="employee.Address"
+                        @inputValue="employee.Address = $event"
                     />
                     <m-input
                         :fieldText="'ĐT di động'"
                         :width="'271px'"
                         style="padding-bottom: 12px; float: left"
                         :marginRight="'8px'"
-                        :value="employee.phoneNumber"
-                        @inputValue="employee.phoneNumber = $event"
+                        :value="employee.PhoneNumber"
+                        :status="error.phoneNumberError.status"
+                        @inputValue="employee.PhoneNumber = $event"
                         :tooltip="'Số điện thoại di động'"
                     />
                     <m-input
@@ -369,8 +376,8 @@ const hanldeSubmitForm = async () => {
                         :width="'271px'"
                         style="padding-bottom: 12px; float: left"
                         :marginRight="'8px'"
-                        :value="employee.email"
-                        @inputValue="employee.email = $event"
+                        :value="employee.Email"
+                        @inputValue="employee.Email = $event"
                         :placeHolder="'example@gmail.com'"
                     />
                     <m-input
@@ -394,23 +401,23 @@ const hanldeSubmitForm = async () => {
                 </div>
             </div>
             <div class="modal-footer">
-                <label
-                    for="show-modal"
-                    class="btn btn-secondary modal-btn-cancel"
-                    @click="hideModal"
-                    tabindex="3"
-                    >Hủy</label
-                >
                 <div class="modal-footer__wrapper">
                     <button
                         type="submit"
                         class="btn btn-secondary modal-btn__secondary"
-                        tabindex="1"
+                        tabindex="0"
                     >
                         Cất
                     </button>
-                    <button type="submit" class="btn btn-primary" tabindex="2">Cất và thêm</button>
+                    <button type="submit" class="btn btn-primary" tabindex="0">Cất và thêm</button>
                 </div>
+                <label
+                    for="show-modal"
+                    class="btn btn-secondary modal-btn-cancel"
+                    @click="hideModal"
+                    tabindex="0"
+                    >Hủy</label
+                >
             </div>
         </form>
         <div class="modal-error" v-if="isPopUp.isOpenError || isPopUp.isOpenInfo">
@@ -423,7 +430,8 @@ const hanldeSubmitForm = async () => {
                     error.dateOfBrithError.textError ||
                     error.identityDateError.textError ||
                     error.phoneNumberError.textError ||
-                    error.emailError.textError
+                    error.emailError.textError ||
+                    error.identityNumberError.textError
                 "
                 @closeError="isPopUp.isOpenError = !isPopUp.isOpenError"
             />

@@ -61,13 +61,7 @@ const handleSubmitForm = () => {
             </div>
             <div class="modal-confirm__content-text">{{ textInfo }}</div>
         </div>
-        <div class="modal-footer modal-confirm__footer">
-            <label
-                for="show-modal"
-                class="btn btn-secondary modal-btn-cancel"
-                @click="handleClosePopUp"
-                >Hủy</label
-            >
+        <div class="modal-footer modal-confirm__footer modal-confirm__footer--info">
             <div class="modal-footer__wrapper">
                 <button
                     type="submit"
@@ -86,8 +80,18 @@ const handleSubmitForm = () => {
                     Có
                 </button>
             </div>
+            <label
+                for="show-modal"
+                class="btn btn-secondary modal-btn-cancel"
+                @click="handleClosePopUp"
+                >Hủy</label
+            >
         </div>
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.modal-confirm__footer--info {
+    flex-direction: row-reverse;
+}
+</style>

@@ -16,6 +16,7 @@ const {
     listAllEmployees,
     searchEmployees,
     totalPage,
+    totalRecord,
     handleFilterPage,
     getAllEmployees,
 } = useEmployee();
@@ -26,6 +27,7 @@ const {
     setIsForm,
     setEmployeeSelected,
     setTotalPage,
+    setTotalEmployee,
     setIdentityForm,
     setlistAllEmployee,
     setListToast,
@@ -36,11 +38,9 @@ const isFocus = ref(false);
 const pageSize = ref(20);
 
 const route = useRoute();
-const { query } = route;
 watch(
     () => route.query.pageSize,
-    (newValue, oldValue) => {
-        console.log(oldValue);
+    (newValue) => {
         pageSize.value = newValue;
         try {
         } catch (error) {
@@ -51,6 +51,11 @@ watch(
 
 getAllEmployees();
 setlistAllEmployee(listAllEmployees);
+
+handleFilterPage(route.query.pageSize, 1);
+setListEmployees(listEmployees);
+setTotalEmployee(totalRecord);
+setTotalPage(totalPage);
 
 /**
  * Xử lý hiển thị toast message thành công
@@ -85,7 +90,6 @@ const debounceSearch = async (val) => {
  */
 const handleEndEditEmployee = async (event) => {
     try {
-        console.log(event);
         await handleFilterPage(pageSize.value, 1);
         setListEmployees(listEmployees);
         setIsForm(false);
@@ -98,14 +102,33 @@ const handleEndEditEmployee = async (event) => {
 };
 
 /**
- * Xử lý khi kết thúc việc sửa nhân  viên
+ * Xử lý khi kết thúc việc thêm nhân  viên
  * CreatedBy: NHGiang
  */
-const handleEndDeleteEmployee = async (event) => {
+const handleEndAddEmployee = async (event) => {
     try {
         await handleFilterPage(pageSize.value, 1);
         setListEmployees(listEmployees);
+        setIsForm(false);
         setTotalPage(totalPage);
+        isLoading.value = false;
+        handleShowToast(event);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Xử lý khi kết thúc việc xóa nhân  viên
+ * CreatedBy: NHGiang
+ */
+const handleEndDeleteEmployee = async ({ event, id }) => {
+    try {
+        // await handleFilterPage(pageSize.value, 1);
+        console.log(listEmployees);
+        const newListEmpolyees = listEmployees.value.filter((emp) => emp.EmployeeId !== id);
+        setListEmployees(newListEmpolyees);
+        // setTotalPage(totalPage);
         isLoading.value = false;
         handleShowToast(event);
     } catch (error) {
@@ -202,6 +225,7 @@ const handleRefresh = async () => {
                 :title="state.titleForm"
                 @startEdit="isLoading = true"
                 @endEdit="handleEndEditEmployee($event)"
+                @endAdd="handleEndAddEmployee($event)"
             />
             <div v-if="isLoading" class="modal-loading">
                 <m-Loading />

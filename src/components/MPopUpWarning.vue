@@ -78,7 +78,7 @@ const handleSubmitForm = () => {
                 Không
             </button>
             <button type="submit" class="btn btn-danger" tabindex="0" @click="handleSubmitForm">
-                Có, xóa nhân viên
+                Có
             </button>
         </div>
     </div>

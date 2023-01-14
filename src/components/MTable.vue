@@ -1,32 +1,41 @@
 <script setup>
-import { ref, inject, reactive } from "vue";
+import { ref, inject, reactive, watch } from "vue";
 import Mrow from "./MRow.vue";
 import MLoading from "../components/MLoading.vue";
 import MPopUpWarning from "./MPopUpWarning.vue";
 import { useEmployee } from "../composable/useEmployee";
 import { useRoute } from "vue-router";
 
-const route = useRoute();
-
-const { listEmployees, handleFilterPage, totalRecord, totalPage, handleDeleteEmployee } =
-    useEmployee();
-handleFilterPage(route.query.pageSize, 1);
+const { listEmployees, handleDeleteEmployee } = useEmployee();
+const { state } = inject("diy");
 
 const isPopUp = reactive({
     isOpenWarning: false,
 });
 
+const route = useRoute();
+const pageNumber = ref(1);
+const totalItemChecked = ref(0);
+watch(
+    () => route.query.pageNumber,
+    (newValue) => {
+        try {
+            pageNumber.value = Number(newValue);
+            totalItemChecked.value = state.listEmployees.length * pageNumber.value;
+            console.log(listCheck.value.length === totalItemChecked.value);
+            console.log(totalItemChecked.value);
+            console.log(listCheck.value.length);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
+
 const id = ref(null);
 const code = ref(null);
 const isShowTooltip = ref(false);
-const pageNumber = ref(0);
 
 const listCheck = ref([]);
-const { state, setListEmployees, setTotalEmployee, setTotalPage } = inject("diy");
-setListEmployees(listEmployees);
-setTotalEmployee(totalRecord);
-setTotalPage(totalPage);
-
 const emit = defineEmits(["hideModal", "startDelete", "endDelete"]);
 
 /*
@@ -51,8 +60,11 @@ const setListCheck = (e) => {
  */
 const handleCheckAll = () => {
     try {
-        if (listCheck.value.length === 0 || listCheck.value.length < state.listEmployees.length) {
-            listCheck.value = [...state.listEmployees.map((employee) => employee.EmployeeId)];
+        if (listCheck.value.length === 0 || listCheck.value.length < totalItemChecked.value) {
+            listCheck.value = [
+                ...listCheck.value,
+                ...state.listEmployees.map((employee) => employee.EmployeeId),
+            ];
         } else {
             listCheck.value = [];
         }
@@ -83,7 +95,7 @@ const hanldeSubmitFormDelete = async (event) => {
     try {
         emit("startDelete");
         await handleDeleteEmployee(id.value);
-        emit("endDelete", event);
+        emit("endDelete", { event: event, id: id.value });
     } catch (err) {
         console.log(err);
     }
@@ -99,9 +111,7 @@ const hanldeSubmitFormDelete = async (event) => {
                         type="checkbox"
                         id="toggle"
                         @change="handleCheckAll"
-                        :checked="
-                            listCheck.length > 0 && listCheck.length === state.listEmployees.length
-                        "
+                        :checked="listCheck.length > 0 && listCheck.length === totalItemChecked"
                     />
                     <label for="toggle" class="mask">
                         <div
@@ -119,6 +129,7 @@ const hanldeSubmitFormDelete = async (event) => {
                 <th class="tbl-col">giới tính</th>
                 <th class="tbl-col" style="text-align: center">ngày sinh</th>
                 <th class="tbl-col">vị trí</th>
+                <th class="tbl-col tbl-col--large">đơn vị</th>
                 <th class="tbl-col">
                     <label
                         class="tbl-col__identity"

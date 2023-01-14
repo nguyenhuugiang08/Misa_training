@@ -1,11 +1,14 @@
 <script setup>
-import { ref, inject } from "vue";
+import { ref, inject, watch } from "vue";
+import { MISA_ENUM } from "../base/enum";
 
 const selected = ref(props.default ? props.default : null);
 const open = ref(false);
 const isFocus = ref(false);
 const { state, setEmployeeSelected } = inject("diy");
 const { employeeSelected } = state;
+const optionSearch = ref([]);
+const indexOptionSelected = ref(0);
 
 const props = defineProps({
     options: Array,
@@ -17,14 +20,17 @@ const props = defineProps({
     width: String,
 });
 
+optionSearch.value = [...props.options];
+
 const emit = defineEmits(["select"]);
 /**
  * Xử lý lấy giá trị khi chọn
  * CreatedBy: NHGiang
  */
-const handleShowSelectedValue = (option) => {
+const handleShowSelectedValue = (option, index) => {
     try {
-        selected.value = option.optionName ? option.optionName : props.options[0].optionName;
+        selected.value = option.optionName ? option.optionName : optionSearch.value[0].optionName;
+        indexOptionSelected.value = index;
         open.value = false;
         emit("select", option.optionId);
     } catch (error) {
@@ -38,7 +44,9 @@ const handleShowSelectedValue = (option) => {
  */
 const handleDefaultValue = (departmentId) => {
     try {
-        const optionSelected = props.options.filter((option) => option?.optionId === departmentId);
+        const optionSelected = optionSearch.value.filter(
+            (option) => option?.optionId === departmentId
+        );
         return optionSelected[0]?.optionName;
     } catch (error) {
         console.log(error);
@@ -46,6 +54,9 @@ const handleDefaultValue = (departmentId) => {
 };
 if (employeeSelected.DepartmentId) {
     selected.value = handleDefaultValue(employeeSelected.DepartmentId);
+    indexOptionSelected.value = optionSearch.value.findIndex(
+        (option) => option?.optionId === employeeSelected.DepartmentId
+    );
 }
 /**
  * Xử lý clich outside
@@ -54,6 +65,67 @@ if (employeeSelected.DepartmentId) {
 const handleClickOutside = () => {
     try {
         open.value = false;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Xử lý tìm kiếm lựa chọn
+ */
+const handleSearchOption = (keyword) => {
+    try {
+        indexOptionSelected.value = 0;
+        open.value = true;
+        selected.value = keyword;
+    } catch (error) {
+        console.log(error);
+    }
+};
+watch(
+    () => selected.value,
+    (newValue) => {
+        try {
+            optionSearch.value = props.options.filter((option) =>
+                option.optionName.toLowerCase().includes(newValue.toLowerCase())
+            );
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
+
+/**
+ * Xử lý chọn option khi sử dụng keyboard
+ * CreatedBy: NHGiang
+ */
+const handleInputKeydown = (event) => {
+    try {
+        const maxLength = optionSearch.value.length;
+        switch (event.keyCode) {
+            case MISA_ENUM.KEY_CODE.DOWN_ARROW:
+                if (indexOptionSelected.value < maxLength - 1) {
+                    indexOptionSelected.value++;
+                } else {
+                    indexOptionSelected.value = 0;
+                }
+                break;
+            case MISA_ENUM.KEY_CODE.UP_ARROW:
+                if (indexOptionSelected.value > 0) {
+                    indexOptionSelected.value--;
+                } else {
+                    indexOptionSelected.value = maxLength - 1;
+                }
+                break;
+            case MISA_ENUM.KEY_CODE.ENTER:
+                handleShowSelectedValue(
+                    optionSearch.value[indexOptionSelected.value],
+                    indexOptionSelected.value
+                );
+                break;
+            default:
+                break;
+        }
     } catch (error) {
         console.log(error);
     }
@@ -70,14 +142,19 @@ const handleClickOutside = () => {
     >
         <label for="" class="textfield__label modal-label">
             {{ textLabel }} <span v-if="required" class="required">*</span>
-            <label
+            <div
                 class="modal-icon textfield__icon drop-department"
                 style="display: flex; justify-content: center; align-items: center"
                 :style="{
                     top: `${isTop && '4px !important'}`,
                     borderColor: `${isFocus ? '#50B83C' : ''}`,
                 }"
-                @click="open = !open"
+                @click="
+                    open = !open;
+                    optionSearch = [...options];
+                "
+                @keydown="handleInputKeydown"
+                tabindex="0"
                 v-click-outside-element="handleClickOutside"
             >
                 <div
@@ -88,7 +165,7 @@ const handleClickOutside = () => {
                         height: '5px',
                     }"
                 ></div>
-            </label>
+            </div>
         </label>
         <input
             type="text"
@@ -98,6 +175,9 @@ const handleClickOutside = () => {
             :style="width && { minWidth: width, width: width }"
             @focus="isFocus = true"
             @blur="isFocus = false"
+            @input="handleSearchOption($event.target.value)"
+            autocomplete="off"
+            @keydown="handleInputKeydown"
         />
         <!-- <p class="text-error">Tên không được để trống</p> -->
         <ul
@@ -106,15 +186,16 @@ const handleClickOutside = () => {
             v-if="open"
         >
             <li
-                v-for="(option, index) of options"
+                v-for="(option, index) of optionSearch"
                 :key="index"
-                @click="handleShowSelectedValue(option)"
+                @click="handleShowSelectedValue(option, index)"
                 class="textfield-item"
-                :class="selected === option.optionName ? 'textfield-item--active' : ''"
+                :class="indexOptionSelected === index ? 'textfield-item--active' : ''"
             >
                 {{ option.optionName }}
             </li>
         </ul>
+        <!-- <p class="textfield-error">{{ textError }}</p> -->
     </div>
 </template>
 

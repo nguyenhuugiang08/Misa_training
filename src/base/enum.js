@@ -36,5 +36,10 @@ export const MISA_ENUM = {
         ERROR: 1, // lỗi
         WARNING: 2, // cảnh báo
         INFO: 3, // thông báo
-    }
+    },
+    KEY_CODE: {
+        ENTER: 13, // phím enter
+        DOWN_ARROW: 40, // phím mũi tên xuống
+        UP_ARROW: 38, // phím mũi tên lên
+    },
 };

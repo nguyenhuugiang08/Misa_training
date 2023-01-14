@@ -64,6 +64,7 @@
     color: var(--secondary-color);
     background-color: var(--primary-bg-color);
     cursor: pointer;
+
 }
 
 .btn-icon .btn-icon__item {

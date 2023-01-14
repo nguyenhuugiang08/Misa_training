@@ -37,6 +37,8 @@
     border-left: 6px solid transparent;
     position: relative;
     cursor: pointer;
+    text-decoration: none;
+    color: #fff;
 }
 
 .sidebar-item:first-child {
