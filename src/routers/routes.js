@@ -9,7 +9,7 @@ export const routes = [
             },
             {
                 path: "/cash",
-                component: () => import("../pages/Cash.vue"),
+                component: () => import("../pages/CashPage.vue"),
             },
             {
                 path: "/deposits",

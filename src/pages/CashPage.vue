@@ -1,7 +1,11 @@
 <script setup>
-import { ref, inject } from "vue";
+import { ref, inject, watch } from "vue";
 import MToast from "../components/MToast.vue";
+import MInputMoney from "../components/MInputMoney.vue";
+
 const { state, setListToast } = inject("diy");
+
+const salary = ref(10000);
 
 const handleShowToast = () => {
     try {
@@ -16,6 +20,17 @@ const handleShowToast = () => {
         console.log(error);
     }
 };
+
+watch(
+    () => salary.value,
+    (newValue) => {
+        try {
+            console.log(newValue);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
 </script>
 
 <template>
@@ -30,6 +45,7 @@ const handleShowToast = () => {
             :statusMessage="toast.statusMessage"
             :status="toast.status"
         />
+        <m-input-money v-model="salary" fieldText="Lương" @update:modelValue="salary = $event" />
     </div>
 </template>
 
