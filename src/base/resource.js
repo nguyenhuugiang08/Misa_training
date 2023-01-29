@@ -24,6 +24,9 @@ export const MISA_RESOURCE = {
     identityNumberErrorText: {
         invalid: "Số căn cước không đúng định dạng.",
     },
+    departmentErrorText: {
+        blank: "Đơn vị không được để trống.",
+    },
     FORM_TITLE: {
         ADD: "Thêm nhân viên", // tiêu đề form thêm
         EDIT: "Sửa thông tin nhân viên", // tiêu đề form sửa

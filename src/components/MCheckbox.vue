@@ -18,6 +18,7 @@ const props = defineProps({
     required: Boolean,
     isTop: Boolean,
     width: String,
+    status: Boolean,
 });
 
 optionSearch.value = [...props.options];
@@ -56,6 +57,10 @@ if (employeeSelected.DepartmentId) {
     selected.value = handleDefaultValue(employeeSelected.DepartmentId);
     indexOptionSelected.value = optionSearch.value.findIndex(
         (option) => option?.optionId === employeeSelected.DepartmentId
+    );
+} else {
+    indexOptionSelected.value = optionSearch.value.findIndex(
+        (option) => option?.optionName === selected.value
     );
 }
 /**
@@ -147,7 +152,9 @@ const handleInputKeydown = (event) => {
                 style="display: flex; justify-content: center; align-items: center"
                 :style="{
                     top: `${isTop && '4px !important'}`,
-                    borderColor: `${isFocus ? '#50B83C' : ''}`,
+                    borderColor: `${
+                        status ? 'var(--error-color)' : isFocus ? 'var(--primary-color)' : ''
+                    }`,
                 }"
                 @click="
                     open = !open;
@@ -170,16 +177,16 @@ const handleInputKeydown = (event) => {
         <input
             type="text"
             class="textfield__input modal-textfield__input"
+            :class="status ? 'textfield--error-input' : ''"
             id="employee-department"
             :value="selected"
             :style="width && { minWidth: width, width: width }"
-            @focus="isFocus = true"
+            @focus="isFocus = status ? false : true"
             @blur="isFocus = false"
             @input="handleSearchOption($event.target.value)"
             autocomplete="off"
             @keydown="handleInputKeydown"
         />
-        <!-- <p class="text-error">Tên không được để trống</p> -->
         <ul
             class="textfield-list modal-list list-departments"
             :style="isTop && { top: 'unset', bottom: '48px' }"
@@ -195,7 +202,6 @@ const handleInputKeydown = (event) => {
                 {{ option.optionName }}
             </li>
         </ul>
-        <!-- <p class="textfield-error">{{ textError }}</p> -->
     </div>
 </template>
 

@@ -15,27 +15,27 @@ const isPopUp = reactive({
 
 const route = useRoute();
 const pageNumber = ref(1);
-const totalItemChecked = ref(0);
+const listPageChecked = ref([]);
+const id = ref(null);
+const code = ref(null);
+const isShowTooltip = ref(false);
+const listCheck = ref([]);
+const listTemporary = ref([]);
+
 watch(
     () => route.query.pageNumber,
     (newValue) => {
         try {
+            if (listTemporary.value.length === state.listEmployees.length) {
+                listTemporary.value = [];
+            }
             pageNumber.value = Number(newValue);
-            totalItemChecked.value = state.listEmployees.length * pageNumber.value;
-            console.log(listCheck.value.length === totalItemChecked.value);
-            console.log(totalItemChecked.value);
-            console.log(listCheck.value.length);
         } catch (error) {
             console.log(error);
         }
     }
 );
 
-const id = ref(null);
-const code = ref(null);
-const isShowTooltip = ref(false);
-
-const listCheck = ref([]);
 const emit = defineEmits(["hideModal", "startDelete", "endDelete"]);
 
 /*
@@ -46,8 +46,16 @@ const setListCheck = (e) => {
     try {
         if (listCheck.value.includes(e)) {
             listCheck.value.splice(listCheck.value.indexOf(e), 1);
+            listTemporary.value.splice(listCheck.value.indexOf(e), 1);
         } else {
             listCheck.value.push(e);
+            listTemporary.value.push(e);
+        }
+
+        if (listTemporary.value.length === state.listEmployees.length) {
+            listPageChecked.value.push(pageNumber.value);
+        } else {
+            listPageChecked.value = listPageChecked.value.filter((num) => num !== pageNumber.value);
         }
     } catch (error) {
         console.log(error);
@@ -60,13 +68,24 @@ const setListCheck = (e) => {
  */
 const handleCheckAll = () => {
     try {
-        if (listCheck.value.length === 0 || listCheck.value.length < totalItemChecked.value) {
-            listCheck.value = [
-                ...listCheck.value,
-                ...state.listEmployees.map((employee) => employee.EmployeeId),
-            ];
+        const currentListEmployees = state.listEmployees.map((employee) => employee.EmployeeId);
+        if (!listPageChecked.value.includes(pageNumber.value)) {
+            listCheck.value = [...listCheck.value, ...currentListEmployees];
+            listTemporary.value = [...currentListEmployees];
+            listPageChecked.value.push(pageNumber.value);
         } else {
-            listCheck.value = [];
+            listPageChecked.value = listPageChecked.value.filter((num) => num !== pageNumber.value);
+            listTemporary.value = [];
+            listCheck.value = listCheck.value.reduce((result, cur) => {
+                try {
+                    if (!currentListEmployees.includes(cur)) {
+                        result.push(cur);
+                    }
+                    return result;
+                } catch (error) {
+                    console.log(error);
+                }
+            }, []);
         }
     } catch (error) {
         console.log(error);
@@ -111,8 +130,9 @@ const hanldeSubmitFormDelete = async (event) => {
                         type="checkbox"
                         id="toggle"
                         @change="handleCheckAll"
-                        :checked="listCheck.length > 0 && listCheck.length === totalItemChecked"
+                        :checked="listCheck.length > 0 && listPageChecked.includes(pageNumber)"
                     />
+
                     <label for="toggle" class="mask">
                         <div
                             style="

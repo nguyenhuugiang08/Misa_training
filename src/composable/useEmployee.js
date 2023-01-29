@@ -41,7 +41,7 @@ export const useEmployee = () => {
         };
 
         // Thêm nhân viên mới
-        const addNewEmloyee = async (employee, emit, formMode) => {
+        const addNewEmloyee = async (employee, emit, formMode, isCloseForm) => {
             try {
                 const response = await axios.post(
                     `${import.meta.env.VITE_MISA_EMPLOYEE_API}`,
@@ -54,12 +54,14 @@ export const useEmployee = () => {
                         toastMessage: MISA_RESOURCE.TOAST.ADD_SUCCESS.TOAST_MESSAGE,
                         statusMessage: MISA_RESOURCE.TOAST.ADD_SUCCESS.STATUS_MESSAGE,
                         status: MISA_RESOURCE.TOAST.ADD_SUCCESS.STATUS,
+                        isCloseForm,
                     });
                 } else {
                     emit("endAdd", {
                         toastMessage: MISA_RESOURCE.TOAST.DUPLICATE_SUCCESS.TOAST_MESSAGE,
                         statusMessage: MISA_RESOURCE.TOAST.DUPLICATE_SUCCESS.STATUS_MESSAGE,
                         status: MISA_RESOURCE.TOAST.DUPLICATE_SUCCESS.STATUS,
+                        isCloseForm,
                     });
                 }
             } catch (error) {
@@ -108,7 +110,7 @@ export const useEmployee = () => {
         };
 
         // Sửa thông tin của nhân viên
-        const editAnEmployee = async (employee, emit) => {
+        const editAnEmployee = async (employee, emit, isCloseForm) => {
             try {
                 const response = await axios.put(
                     `${import.meta.env.VITE_MISA_EMPLOYEE_API}/${employee.EmployeeId}`,
@@ -119,12 +121,13 @@ export const useEmployee = () => {
                     toastMessage: MISA_RESOURCE.TOAST.EDIT_SUCCESS.TOAST_MESSAGE,
                     statusMessage: MISA_RESOURCE.TOAST.EDIT_SUCCESS.STATUS_MESSAGE,
                     status: MISA_RESOURCE.TOAST.EDIT_SUCCESS.STATUS,
+                    isCloseForm,
                 });
             } catch (error) {
                 emit("endEdit", {
-                    toastMessage: MISA_RESOURCE.TOAST.EDIT_SUCCESS.TOAST_MESSAGE,
-                    statusMessage: MISA_RESOURCE.TOAST.EDIT_SUCCESS.STATUS_MESSAGE,
-                    status: MISA_RESOURCE.TOAST.EDIT_SUCCESS.STATUS,
+                    toastMessage: MISA_RESOURCE.TOAST.EDIT_FAILED.TOAST_MESSAGE,
+                    statusMessage: MISA_RESOURCE.TOAST.EDIT_FAILED.STATUS_MESSAGE,
+                    status: MISA_RESOURCE.TOAST.EDIT_FAILED.STATUS,
                 });
                 console.log(error);
             }

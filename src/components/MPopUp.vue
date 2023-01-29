@@ -80,7 +80,7 @@ const handleShowPopUpInfo = () => {
  *  Xử lý submit form
  * CreatedBy: NHGiang
  */
-const hanldeSubmitForm = async () => {
+const hanldeSubmitForm = async (isCloseForm = true) => {
     try {
         employee.DepartmentId = employee.DepartmentId || listDepartments.value?.[0].departmentId;
         const status = useValidate(
@@ -92,18 +92,7 @@ const hanldeSubmitForm = async () => {
 
         if (state.identityForm === MISA_ENUM.FORM_MODE.EDIT) {
             if (!status) {
-                emit("startEdit");
-                await editAnEmployee(
-                    {
-                        ...employee,
-                        EmployeeId: employeeSelected.EmployeeId,
-                        IdentityDate: new Date(
-                            convertDatetime(employee.IdentityDate, true)
-                        ).toJSON(),
-                        DateOfBirth: convertDatetime(employee.DateOfBirth, false),
-                    },
-                    emit
-                );
+                await handleEditEmployee(isCloseForm);
             } else {
                 isPopUp.isOpenError = true;
             }
@@ -113,18 +102,7 @@ const hanldeSubmitForm = async () => {
             state.identityForm === MISA_ENUM.FORM_MODE.DUPLICATE
         ) {
             if (!status) {
-                emit("startEdit");
-                await addNewEmloyee(
-                    {
-                        ...employee,
-                        IdentityDate: new Date(
-                            convertDatetime(employee.IdentityDate, true)
-                        ).toJSON(),
-                        DateOfBirth: convertDatetime(employee.DateOfBirth, false),
-                    },
-                    emit,
-                    state.identityForm
-                );
+                await handleAddAndDuplicateEmployee(isCloseForm);
             } else {
                 isPopUp.isOpenError = true;
             }
@@ -133,11 +111,55 @@ const hanldeSubmitForm = async () => {
         console.log(err);
     }
 };
+
+/**
+ * Xử lý Thêm 1 nhân viên mới và nhân bản
+ * Created by: NHGiang (17/01/2023)
+ */
+const handleAddAndDuplicateEmployee = async (isCloseForm) => {
+    try {
+        emit("startEdit");
+        await addNewEmloyee(
+            {
+                ...employee,
+                IdentityDate: new Date(convertDatetime(employee.IdentityDate, true)).toJSON(),
+                DateOfBirth: convertDatetime(employee.DateOfBirth, false),
+            },
+            emit,
+            state.identityForm,
+            isCloseForm
+        );
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Xử lý sửa thông tin nhân viên
+ * Created by: NHGiang (17/01/2023)
+ */
+const handleEditEmployee = async (isCloseForm) => {
+    try {
+        emit("startEdit");
+        await editAnEmployee(
+            {
+                ...employee,
+                EmployeeId: employeeSelected.EmployeeId,
+                IdentityDate: new Date(convertDatetime(employee.IdentityDate, true)).toJSON(),
+                DateOfBirth: convertDatetime(employee.DateOfBirth, false),
+            },
+            emit,
+            isCloseForm
+        );
+    } catch (error) {
+        console.log(error);
+    }
+};
 </script>
 
 <template>
     <div class="overlay">
-        <form class="modal" @submit.prevent="hanldeSubmitForm">
+        <div class="modal">
             <div class="modal__header">
                 <div class="modal__header-left">
                     <div class="modal__header-left-text">{{ title }}</div>
@@ -239,6 +261,7 @@ const hanldeSubmitForm = async () => {
                         default=""
                         @select="employee.DepartmentId = $event"
                         :text-label="'Đơn vị'"
+                        :status="error.departmentError.status"
                         :required="true"
                     />
                     <m-input
@@ -277,6 +300,7 @@ const hanldeSubmitForm = async () => {
                             :width="'166px'"
                             :fieldText="'Ngày sinh'"
                             :value="employee.DateOfBirth"
+                            :status="error.dateOfBrithError.status"
                             @dateField="employee.DateOfBirth = $event"
                         />
                         <div style="padding-left: 10px; margin-left: 6px">
@@ -309,7 +333,6 @@ const hanldeSubmitForm = async () => {
                                     @radio="employee.Gender = $event"
                                 />
                             </div>
-                            <!-- <p class="textfield-error">{{ textError }}</p> -->
                         </div>
                     </div>
                     <div
@@ -406,10 +429,13 @@ const hanldeSubmitForm = async () => {
                         type="submit"
                         class="btn btn-secondary modal-btn__secondary"
                         tabindex="0"
+                        @click="hanldeSubmitForm(true)"
                     >
                         Cất
                     </button>
-                    <button type="submit" class="btn btn-primary" tabindex="0">Cất và thêm</button>
+                    <button @click="hanldeSubmitForm(false)" class="btn btn-primary" tabindex="0">
+                        Cất và thêm
+                    </button>
                 </div>
                 <label
                     for="show-modal"
@@ -419,7 +445,7 @@ const hanldeSubmitForm = async () => {
                     >Hủy</label
                 >
             </div>
-        </form>
+        </div>
         <div class="modal-error" v-if="isPopUp.isOpenError || isPopUp.isOpenInfo">
             <m-pop-up-error
                 v-if="isPopUp.isOpenError"
@@ -431,7 +457,8 @@ const hanldeSubmitForm = async () => {
                     error.identityDateError.textError ||
                     error.phoneNumberError.textError ||
                     error.emailError.textError ||
-                    error.identityNumberError.textError
+                    error.identityNumberError.textError ||
+                    error.departmentError.textError
                 "
                 @closeError="isPopUp.isOpenError = !isPopUp.isOpenError"
             />

@@ -13,6 +13,7 @@ const props = defineProps({
     width: String,
     marginRight: String,
     value: String,
+    status: Boolean,
     type: { type: String, default: "text" },
 });
 
@@ -31,6 +32,8 @@ const handleEmitInputValue = (value) => {
         if (value.length === 10) {
             if (handleCheckDatetime(value)) {
                 date.value = convertDatetime(value);
+            } else {
+                date.value = convertDatetime(formatDate(new Date()));
             }
             emit("dateField", value);
         }
@@ -46,14 +49,6 @@ const handleEmitInputValue = (value) => {
 const handleDatepicker = () => {
     try {
         if (datepicker) {
-            // if (!isOpenDatepicker.value) {
-            //     datepicker.value.openMenu();
-            //     isOpenDatepicker.value = true;
-            // } else {
-            //     datepicker.value.closeMenu();
-            //     isOpenDatepicker.value = false;
-            // }
-
             isOpenDatepicker.value = !isOpenDatepicker.value;
             if (!isOpenDatepicker.value) {
                 datepicker.value.openMenu();
@@ -69,7 +64,7 @@ watch(
     () => date.value,
     (newValue) => {
         try {
-            emit("dateField", formatDate(date.value));
+            emit("dateField", formatDate(newValue));
         } catch (error) {
             console.log(error);
         }
@@ -79,39 +74,12 @@ watch(
 
 <template>
     <div class="textfield modal-textfield" :style="{ minWidth: '166px', width: '166px' }">
-        <!-- <label for="" class="textfield__label modal-label">
-            {{ fieldText }}
-            <label
-                class="modal-icon textfield__icon"
-                style="display: flex; justify-content: center; align-items: center"
-                @click="handleDatepicker"
-                :style="{ borderColor: `${isFocus ? '#50B83C' : ''}` }"
-            >
-                <div
-                    :style="{
-                        background:
-                            'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -128px -312px',
-                        width: '16px',
-                        height: '16px',
-                    }"
-                ></div>
-            </label>
-        </label>
-        <input
-            :type="type"
-            class="textfield__input"
-            :style="{ minWidth: width, width: width, marginRight: marginRight }"
-            placeholder="DD/MM/YYYY"
-            :value="value"
-            @input="handleEmitInputValue($event.target.value)"
-            @focus="isFocus = true"
-            @blur="isFocus = false"
-        /> -->
         <Datepicker
             v-model="date"
             ref="datepicker"
             auto-apply
             format="dd/MM/yyyy"
+            text-input
             show-now-button=""
             :day-names="['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']"
         >
@@ -119,29 +87,30 @@ watch(
                 <label for="" class="textfield__label modal-label">
                     {{ fieldText }}
                     <label
-                        class="modal-icon textfield__icon"
-                        style="display: flex; justify-content: center; align-items: center"
-                        @click="handleDatepicker"
-                        :style="{ borderColor: `${isFocus ? '#50B83C' : ''}` }"
+                        class="modal-icon textfield__icon datepicker__wrapper"
+                        @click.self="handleDatepicker"
+                        :style="{
+                            borderColor: `${
+                                status
+                                    ? 'var(--error-color)'
+                                    : isFocus
+                                    ? 'var(--primary-color)'
+                                    : ''
+                            }`,
+                        }"
                     >
-                        <div
-                            :style="{
-                                background:
-                                    'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -128px -312px',
-                                width: '16px',
-                                height: '16px',
-                            }"
-                        ></div>
+                        <div class="datepicker__wrapper-icon"></div>
                     </label>
                 </label>
                 <input
                     :type="type"
                     class="textfield__input"
+                    :class="status ? 'textfield--error-input' : ''"
                     :style="{ minWidth: width, width: width, marginRight: marginRight }"
                     placeholder="DD/MM/YYYY"
                     :value="value"
                     @input="handleEmitInputValue($event.target.value)"
-                    @focus="isFocus = true"
+                    @focus="isFocus = status ? false : true"
                     @blur="isFocus = false"
                 />
             </template>
@@ -156,10 +125,17 @@ watch(
 </template>
 
 <style>
-/* .dp__input_wrap {
-    position: absolute;
-    top: 24px;
-} */
+.datepicker__wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.datepicker__wrapper-icon {
+    background: url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -128px -312px;
+    width: 16px;
+    height: 16px;
+}
 
 .dp__button {
     display: none;

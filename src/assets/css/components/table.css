@@ -127,18 +127,6 @@ th {
     z-index: 10;
 }
 
-.tbl .tbl-row:hover {
-    background-color: var(--table-bg-color);
-}
-
-.tbl .tbl-row:hover .tbl-col__last {
-    background-color: var(--table-bg-color) !important;
-}
-
-.tbl .tbl-row:hover .tbl-col__first {
-    background-color: var(--table-bg-color) !important;
-}
-
 .tbl .tbl-col input[type="checkbox"] {
     margin: 0 16px;
     height: 24px;
@@ -173,16 +161,12 @@ th {
     background-color: var(--table-bg-color);
 }
 
-.tbl .tbl-row:has([type="checkbox"]:checked) {
-    background-color: var(--table-bg-color);
-}
-
 .tbl .tbl-row:has([type="checkbox"]:checked) .tbl-col__first {
-    background-color: var(--table-bg-color) !important;
+    background-color: var(--table-bg-color) ;
 }
 
 .tbl .tbl-row:has([type="checkbox"]:checked) .tbl-col__last {
-    background-color: var(--table-bg-color) !important;
+    background-color: var(--table-bg-color) ;
 }
 
 .tbl .tbl-row:has([type="checkbox"]:checked):first-child {
@@ -195,6 +179,18 @@ th {
 
 .tbl .tbl-row:has([type="checkbox"]:checked) .tbl-col__last--bg-private {
     background-color: #e5e8ec !important;
+}
+
+.tbl .tbl-row:hover {
+    background-color: var(--table-bg-color-hover) !important;
+}
+
+.tbl .tbl-row:hover .tbl-col__last {
+    background-color: var(--table-bg-color-hover) !important;
+}
+
+.tbl .tbl-row:hover .tbl-col__first {
+    background-color: var(--table-bg-color-hover) !important;
 }
 
 /* col action */

@@ -7,7 +7,7 @@ const props = defineProps({
     width: String,
     marginRight: String,
     status: Boolean,
-    modelValue: String,
+    modelValue: [String, Number],
     type: { type: String, default: "text" },
     tooltip: String,
     placeHolder: String,
@@ -22,8 +22,10 @@ const emit = defineEmits(["update:modelValue"]);
  */
 const formatInputMoney = (money) => {
     try {
-        money = new Intl.NumberFormat().format(money);
-        return money;
+        if (money) {
+            money = new Intl.NumberFormat().format(money);
+            return money;
+        }
     } catch (error) {
         return "";
     }
@@ -31,16 +33,6 @@ const formatInputMoney = (money) => {
 const val = ref(props.modelValue);
 const valueForDisplay = ref(formatInputMoney(val.value));
 
-/**
- * xử lý update lại salary
- * CreatedBy: NHGiang
- */
-const handleUpdateSalary = () => {
-    try {
-    } catch (error) {
-        console.log(error);
-    }
-};
 watch(
     () => val.value,
     (newValue) => {
@@ -55,14 +47,36 @@ watch(
     () => valueForDisplay.value,
     (newValue) => {
         try {
-            val.value = Number(newValue.replaceAll(".", ""));
-
+            if (newValue) {
+                val.value = Number(newValue.replaceAll(".", ""));
+            } else {
+                val.value = 0;
+            }
             emit("update:modelValue", val.value);
         } catch (error) {
             console.log(error);
         }
     }
 );
+
+/**
+ * Xử lý chỉ cho nhập số
+ * CreatedBy: NHGiang
+ */
+const handleCheckIsNumber = (e) => {
+    try {
+        if (
+            (e.keyCode < 48 || e.keyCode > 57) &&
+            (e.keycode < 96 || e.keyCode > 105) &&
+            e.keyCode !== 8 &&
+            e.keyCode !== 144
+        ) {
+            e.preventDefault();
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
 </script>
 
 <template>
@@ -75,8 +89,8 @@ watch(
             class="textfield__input"
             :class="status ? 'textfield--error-input' : ''"
             :style="{ minWidth: width, width: width, marginRight: marginRight }"
-            :placeHolder="placeHolder"
             v-model="valueForDisplay"
+            @keydown="handleCheckIsNumber"
         />
         <div class="textfield-tooltip" v-if="tooltip">
             <span>{{ tooltip }}</span>

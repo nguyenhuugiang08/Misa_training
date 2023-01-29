@@ -5,7 +5,7 @@ import MPopUp from "../components/MPopUp.vue";
 import MLoading from "../components/MLoading.vue";
 import { ref, inject, watch } from "vue";
 import { useEmployee } from "../composable/useEmployee";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
 import MToast from "../components/MToast.vue";
 import { MISA_ENUM } from "../base/enum";
@@ -56,6 +56,8 @@ handleFilterPage(route.query.pageSize, 1);
 setListEmployees(listEmployees);
 setTotalEmployee(totalRecord);
 setTotalPage(totalPage);
+const router = useRouter();
+router.push({ path: "/", query: { pageSize: pageSize.value, pageNumber: 1 } });
 
 /**
  * Xử lý hiển thị toast message thành công
@@ -90,12 +92,20 @@ const debounceSearch = async (val) => {
  */
 const handleEndEditEmployee = async (event) => {
     try {
+        const { isCloseForm, ...toastInfo } = event;
         await handleFilterPage(pageSize.value, 1);
         setListEmployees(listEmployees);
-        setIsForm(false);
+        if (isCloseForm) {
+            setIsForm();
+        } else {
+            if (toastInfo.status === MISA_ENUM.STATUS_TOAST.SUCCESS) {
+                await setIsForm();
+                handleHideFormAdd();
+            }
+        }
         setTotalPage(totalPage);
         isLoading.value = false;
-        handleShowToast(event);
+        handleShowToast(toastInfo);
     } catch (error) {
         console.log(error);
     }
@@ -107,12 +117,20 @@ const handleEndEditEmployee = async (event) => {
  */
 const handleEndAddEmployee = async (event) => {
     try {
+        const { isCloseForm, ...toastInfo } = event;
         await handleFilterPage(pageSize.value, 1);
         setListEmployees(listEmployees);
-        setIsForm(false);
+        if (isCloseForm) {
+            setIsForm();
+        } else {
+            if (toastInfo.status === MISA_ENUM.STATUS_TOAST.SUCCESS) {
+                await setIsForm();
+                handleHideFormAdd();
+            }
+        }
         setTotalPage(totalPage);
         isLoading.value = false;
-        handleShowToast(event);
+        handleShowToast(toastInfo);
     } catch (error) {
         console.log(error);
     }
@@ -124,11 +142,8 @@ const handleEndAddEmployee = async (event) => {
  */
 const handleEndDeleteEmployee = async ({ event, id }) => {
     try {
-        // await handleFilterPage(pageSize.value, 1);
-        console.log(listEmployees);
         const newListEmpolyees = listEmployees.value.filter((emp) => emp.EmployeeId !== id);
         setListEmployees(newListEmpolyees);
-        // setTotalPage(totalPage);
         isLoading.value = false;
         handleShowToast(event);
     } catch (error) {
@@ -151,22 +166,29 @@ const handleRefresh = async () => {
         console.log(error);
     }
 };
+
+/**
+ * Xử lý mở form thêm mới
+ * Created by: NHGiang
+ */
+const handleHideFormAdd = () => {
+    try {
+        setIsForm();
+        setTitleForm(MISA_RESOURCE.FORM_TITLE.ADD);
+        setEmployeeSelected({});
+        setIdentityForm(MISA_ENUM.FORM_MODE.ADD);
+        handleSetStatusForm();
+    } catch (error) {
+        console.log(error);
+    }
+};
 </script>
 
 <template>
     <div class="content">
         <div class="content__header">
             <div class="content__header-text">Nhân viên</div>
-            <button
-                class="btn btn-primary btn-add-emp"
-                @click="
-                    setIsForm();
-                    setTitleForm(MISA_RESOURCE.FORM_TITLE.ADD);
-                    setEmployeeSelected({});
-                    setIdentityForm(MISA_ENUM.FORM_MODE.ADD);
-                    handleSetStatusForm();
-                "
-            >
+            <button class="btn btn-primary btn-add-emp" @click="handleHideFormAdd">
                 Thêm mới nhân viên
             </button>
         </div>
@@ -217,7 +239,7 @@ const handleRefresh = async () => {
                     @click="handleRefresh"
                 ></div>
             </div>
-            <M-table @startDelete="isLoading = true" @endDelete="handleEndDeleteEmployee($event)" />
+            <m-table @startDelete="isLoading = true" @endDelete="handleEndDeleteEmployee($event)" />
             <m-pagination />
             <m-pop-up
                 v-if="state.isForm"

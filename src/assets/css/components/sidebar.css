@@ -41,19 +41,7 @@
     color: #fff;
 }
 
-.sidebar-item:first-child {
-    border-left: 6px solid var(--primary-color);
-}
-
-.sidebar-item:focus {
-    border-left: 6px solid var(--primary-color);
-}
-
-.sidebar-list:has(.sidebar-item:focus) .sidebar-item:first-child {
-    border-left: 6px solid transparent;
-}
-
-.sidebar-list:has(.sidebar-item:first-child:focus) .sidebar-item:first-child {
+.sidebar-item--active {
     border-left: 6px solid var(--primary-color);
 }
 

@@ -23,11 +23,11 @@ const handleClosePopUp = () => {
             <div
                 :style="{
                     background:
-                        'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -147px -147px',
-                    width: '18px',
-                    height: '18px',
+                        'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -1178px -362px',
+                    width: '12px',
+                    height: '12px',
                 }"
-                 @click="handleClosePopUp"
+                @click="handleClosePopUp"
             ></div>
         </div>
         <div class="modal-confirm__content">

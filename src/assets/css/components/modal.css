@@ -385,7 +385,7 @@
 }
 
 .modal-confirm__content-text {
-    padding: 12px 0 0 16px;
+    padding: 12px 0 0 12px;
     margin-bottom: 24px;
 }
 
@@ -402,15 +402,15 @@
 }
 
 .modal-confirm__title {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
     margin-bottom: 24px;
 }
 
 .modal-confirm__close-btn {
     position: absolute;
-    top: 24px;
-    right: 24px;
+    top: 18px;
+    right: 18px;
     width: 24px;
     height: 24px;
     cursor: pointer;
@@ -420,8 +420,8 @@
 }
 
 .modal-confirm__content-icon {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -429,7 +429,7 @@
 
 .modal-footer--error {
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
 }
 

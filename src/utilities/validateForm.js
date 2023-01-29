@@ -30,6 +30,10 @@ const error = reactive({
         textError: "",
         status: false,
     },
+    departmentError: {
+        textError: "",
+        status: false,
+    },
     status: false,
 });
 
@@ -41,6 +45,7 @@ const {
     phoneNumberErrorText,
     emailErrorText,
     identityNumberErrorText,
+    departmentErrorText,
 } = MISA_RESOURCE;
 
 /**
@@ -140,23 +145,23 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
 
         //Validate ngày sinh
         if (employee.DateOfBirth) {
-            console.log(employee.DateOfBirth);
             if (!handleCheckDatetime(employee.DateOfBirth)) {
                 error.dateOfBrithError.textError = dateOfBirthErrorText.invalid;
                 error.dateOfBrithError.status = true;
             } else {
-                const yearOfBirth = employee.DateOfBirth.split("/")[2];
-                const currentYear = new Date().getFullYear();
-                if (currentYear - yearOfBirth < 18) {
-                    error.dateOfBrithError.textError = dateOfBirthErrorText.over;
-                    error.dateOfBrithError.status = true;
-                } else {
+                const yearOfBirth = Number(employee.DateOfBirth.split("/")[2]);
+                const dayOfBirth = Number(employee.DateOfBirth.split("/")[0]);
+                const monthOfBirth = Number(employee.DateOfBirth.split("/")[1]);
+
+                if (new Date(yearOfBirth + 18, monthOfBirth - 1, dayOfBirth) <= new Date()) {
                     error.dateOfBrithError.textError = "";
                     error.dateOfBrithError.status = false;
+                } else {
+                    error.dateOfBrithError.textError = dateOfBirthErrorText.over;
+                    error.dateOfBrithError.status = true;
                 }
             }
         } else {
-            console.log(employee.DateOfBirth);
             error.dateOfBrithError.textError = "";
             error.dateOfBrithError.status = false;
         }
@@ -217,6 +222,16 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
             error.identityNumberError.status = false;
         }
 
+        // Validate đơn vị
+        if (!employee.DepartmentId) {
+            console.log(employee.PositionId);
+            error.departmentError.textError = departmentErrorText.blank;
+            error.departmentError.status = true;
+        } else {
+            error.departmentError.textError = "";
+            error.departmentError.status = false;
+        }
+
         error.status =
             error.employeeCodeError.status ||
             error.employeeNameError.status ||
@@ -224,6 +239,7 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
             error.identityDateError.status ||
             error.phoneNumberError.status ||
             error.emailError.status ||
+            error.departmentError.status ||
             error.identityNumberError.status;
 
         return error.status;

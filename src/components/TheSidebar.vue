@@ -1,6 +1,7 @@
 <script setup>
-import { inject } from "vue";
+import { inject, ref } from "vue";
 const { state, setIsSidebar } = inject("diy");
+const index = ref(1);
 </script>
 
 <template>
@@ -38,7 +39,12 @@ const { state, setIsSidebar } = inject("diy");
             </div>
         </div>
         <ul class="sidebar-list" :style="{ width: state.isSidebar ? '52px' : '178px' }">
-            <router-link to="/" class="sidebar-item" tabindex="0">
+            <router-link
+                to="/"
+                :class="{ 'sidebar-item--active': index === 1 }"
+                @click="index = 1"
+                class="sidebar-item"
+            >
                 <div class="sidebar-item__icon">
                     <div
                         :style="{
@@ -51,7 +57,12 @@ const { state, setIsSidebar } = inject("diy");
                 </div>
                 <p v-if="!state.isSidebar">Tổng quan</p>
             </router-link>
-            <router-link to="/cash" class="sidebar-item" tabindex="0">
+            <router-link
+                to="/cash"
+                @click="index = 2"
+                :class="{ 'sidebar-item--active': index === 2 }"
+                class="sidebar-item"
+            >
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -63,7 +74,12 @@ const { state, setIsSidebar } = inject("diy");
                 </div>
                 <p v-if="!state.isSidebar">Tiền mặt</p>
             </router-link>
-            <router-link to="/deposits" class="sidebar-item" tabindex="0">
+            <router-link
+                to="/deposits"
+                :class="{ 'sidebar-item--active': index === 3 }"
+                @click="index = 3"
+                class="sidebar-item"
+            >
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -75,7 +91,12 @@ const { state, setIsSidebar } = inject("diy");
                 </div>
                 <p v-if="!state.isSidebar">Tiền gửi</p>
             </router-link>
-            <router-link to="/" class="sidebar-item" tabindex="0">
+            <router-link
+                to="/"
+                :class="{ 'sidebar-item--active': index === 4 }"
+                @click="index = 4"
+                class="sidebar-item"
+            >
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -87,7 +108,12 @@ const { state, setIsSidebar } = inject("diy");
                 </div>
                 <p v-if="!state.isSidebar">Mua hàng</p>
             </router-link>
-            <router-link to="/" class="sidebar-item" tabindex="0">
+            <router-link
+                to="/"
+                :class="{ 'sidebar-item--active': index === 5 }"
+                @click="index = 5"
+                class="sidebar-item"
+            >
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -99,7 +125,12 @@ const { state, setIsSidebar } = inject("diy");
                 </div>
                 <p v-if="!state.isSidebar">Bán hàng</p>
             </router-link>
-            <router-link to="/" class="sidebar-item" tabindex="0">
+            <router-link
+                to="/"
+                :class="{ 'sidebar-item--active': index === 6 }"
+                @click="index = 6"
+                class="sidebar-item"
+            >
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -111,7 +142,12 @@ const { state, setIsSidebar } = inject("diy");
                 </div>
                 <p v-if="!state.isSidebar">Quản lý đơn hàng</p>
             </router-link>
-            <router-link to="/" class="sidebar-item" tabindex="0">
+            <router-link
+                to="/"
+                :class="{ 'sidebar-item--active': index === 7 }"
+                @click="index = 7"
+                class="sidebar-item"
+            >
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -123,7 +159,12 @@ const { state, setIsSidebar } = inject("diy");
                 </div>
                 <p v-if="!state.isSidebar">Kho</p>
             </router-link>
-            <router-link to="/" class="sidebar-item" tabindex="0">
+            <router-link
+                to="/"
+                :class="{ 'sidebar-item--active': index === 8 }"
+                @click="index = 8"
+                class="sidebar-item"
+            >
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -135,7 +176,12 @@ const { state, setIsSidebar } = inject("diy");
                 </div>
                 <p v-if="!state.isSidebar">Công cụ dụng cụ</p>
             </router-link>
-            <router-link to="/" class="sidebar-item" tabindex="0">
+            <router-link
+                to="/"
+                :class="{ 'sidebar-item--active': index === 9 }"
+                @click="index = 9"
+                class="sidebar-item"
+            >
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -147,7 +193,12 @@ const { state, setIsSidebar } = inject("diy");
                 </div>
                 <p v-if="!state.isSidebar">Tài sản cố định</p>
             </router-link>
-            <router-link to="/" class="sidebar-item" tabindex="0">
+            <router-link
+                to="/"
+                :class="{ 'sidebar-item--active': index === 10 }"
+                @click="index = 10"
+                class="sidebar-item"
+            >
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -159,7 +210,12 @@ const { state, setIsSidebar } = inject("diy");
                 </div>
                 <p v-if="!state.isSidebar">Thuế</p>
             </router-link>
-            <router-link to="/" class="sidebar-item" tabindex="0">
+            <router-link
+                to="/"
+                :class="{ 'sidebar-item--active': index === 11 }"
+                @click="index = 11"
+                class="sidebar-item"
+            >
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -171,7 +227,12 @@ const { state, setIsSidebar } = inject("diy");
                 </div>
                 <p v-if="!state.isSidebar">Giá thành</p>
             </router-link>
-            <router-link to="/" class="sidebar-item" tabindex="0">
+            <router-link
+                to="/"
+                :class="{ 'sidebar-item--active': index === 12 }"
+                @click="index = 12"
+                class="sidebar-item"
+            >
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -183,7 +244,12 @@ const { state, setIsSidebar } = inject("diy");
                 </div>
                 <p v-if="!state.isSidebar">Tổng hợp</p>
             </router-link>
-            <router-link to="/" class="sidebar-item" tabindex="0">
+            <router-link
+                to="/"
+                :class="{ 'sidebar-item--active': index === 13 }"
+                @click="index = 13"
+                class="sidebar-item"
+            >
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -195,7 +261,12 @@ const { state, setIsSidebar } = inject("diy");
                 </div>
                 <p v-if="!state.isSidebar">Ngân sách</p>
             </router-link>
-            <router-link to="/" class="sidebar-item" tabindex="0">
+            <router-link
+                to="/"
+                :class="{ 'sidebar-item--active': index === 14 }"
+                @click="index = 14"
+                class="sidebar-item"
+            >
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -207,7 +278,12 @@ const { state, setIsSidebar } = inject("diy");
                 </div>
                 <p v-if="!state.isSidebar">Báo cáo</p>
             </router-link>
-            <router-link to="/" class="sidebar-item" tabindex="0">
+            <router-link
+                to="/"
+                :class="{ 'sidebar-item--active': index === 15 }"
+                @click="index = 15"
+                class="sidebar-item"
+            >
                 <div class="sidebar-item__icon">
                     <div
                         style="
@@ -219,8 +295,12 @@ const { state, setIsSidebar } = inject("diy");
                 </div>
                 <p v-if="!state.isSidebar">Phân tích tài chính</p>
             </router-link>
-            <router-link to="/" class="sidebar__line"></router-link>
-            <router-link to="/" class="sidebar-item" tabindex="0">
+            <router-link
+                to="/"
+                :class="{ 'sidebar-item--active': index === 16 }"
+                @click="index = 16"
+                class="sidebar-item"
+            >
                 <div class="sidebar-item__icon">
                     <div
                         style="
