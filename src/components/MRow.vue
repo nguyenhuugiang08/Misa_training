@@ -128,10 +128,13 @@ const handleClickOutside = () => {
         <td class="tbl-col" style="text-align: center">
             {{ formatDate(employee.DateOfBirth) || "" }}
         </td>
-        <td class="tbl-col">{{ employee.PositionName || "" }}</td>
+        <td class="tbl-col">{{ employee.Position || "" }}</td>
         <td class="tbl-col tbl-col--large">{{ employee.DepartmentName || "" }}</td>
         <td class="tbl-col">{{ employee.IdentityNumber || "" }}</td>
         <td class="tbl-col">{{ employee.PhoneNumber || "" }}</td>
+        <td class="tbl-col">{{ employee.BankAccount || "" }}</td>
+        <td class="tbl-col">{{ employee.BankName || "" }}</td>
+        <td class="tbl-col">{{ employee.BankBranch || "" }}</td>
         <td class="tbl-col" style="text-align: right; width: 129px; min-width: 129px">
             {{ formatMoney(employee.Salary) || "" }}
         </td>

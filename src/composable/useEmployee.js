@@ -10,14 +10,14 @@ import { MISA_ENUM } from "../base/enum";
 export const useEmployee = () => {
     try {
         const listEmployees = ref([]);
-        const listAllEmployees = ref([]);
         const newEmployeeCode = ref(null);
+        const listAllEmployees = ref([]);
         const editEmployee = ref(null);
         const totalRecord = ref(0);
         const totalPage = ref(1);
 
-        // Lấy danh sách employees
-        const getAllEmployees = async () => {
+         // Lấy danh sách employees
+         const getAllEmployees = async () => {
             try {
                 const response = await axios.get(`${import.meta.env.VITE_MISA_EMPLOYEE_API}`);
                 listAllEmployees.value = [...response.data];
@@ -47,7 +47,6 @@ export const useEmployee = () => {
                     `${import.meta.env.VITE_MISA_EMPLOYEE_API}`,
                     employee
                 );
-                console.log(response);
 
                 if (formMode !== MISA_ENUM.FORM_MODE.DUPLICATE) {
                     emit("endAdd", {
@@ -86,7 +85,7 @@ export const useEmployee = () => {
         const searchEmployees = async (keyword) => {
             try {
                 const response = await axios.get(
-                    `${import.meta.env.VITE_MISA_EMPLOYEE_API}/filter?employeeFilter=${keyword}`
+                    `${import.meta.env.VITE_MISA_EMPLOYEE_API}/filter?entityFilter=${keyword}`
                 );
                 const { Data } = response.data;
                 listEmployees.value = [...Data];
@@ -116,7 +115,6 @@ export const useEmployee = () => {
                     `${import.meta.env.VITE_MISA_EMPLOYEE_API}/${employee.EmployeeId}`,
                     employee
                 );
-                console.log(response);
                 emit("endEdit", {
                     toastMessage: MISA_RESOURCE.TOAST.EDIT_SUCCESS.TOAST_MESSAGE,
                     statusMessage: MISA_RESOURCE.TOAST.EDIT_SUCCESS.STATUS_MESSAGE,
@@ -157,7 +155,55 @@ export const useEmployee = () => {
                 const response = await axios.delete(
                     `${import.meta.env.VITE_MISA_EMPLOYEE_API}/${employeeId}`
                 );
-                console.log(response);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        // Xuất ra Excel
+        const handlExportExcel = async ({ keyword, dataCount, pageNumber }) => {
+            try {
+                const outputFilename = MISA_RESOURCE.FILE_EXCEL_NAME;
+
+                const headers = {
+                    "Content-Disposition": `attachment; filename=${outputFilename}`,
+                    "Content-Type":
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                };
+                const config = {
+                    method: "GET",
+                    url: URL,
+                    responseType: "arraybuffer",
+                    headers,
+                };
+
+                const response = await axios.get(
+                    `${
+                        import.meta.env.VITE_MISA_EMPLOYEE_API
+                    }/export?keyword=${keyword}&dataCount=${dataCount}&pageNumber=${pageNumber}`,
+                    config
+                );
+
+                const url = URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", outputFilename);
+                document.body.appendChild(link);
+                link.click();
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        // Thực hiện xóa nhiều bản ghi
+        const handleBulkDelete = async (employeeIds) => {
+            try {
+                const response = await axios.delete(
+                    `${import.meta.env.VITE_MISA_EMPLOYEE_API}/deleteMultipleEmployee`,
+                    {
+                        data: employeeIds,
+                    }
+                );
             } catch (error) {
                 console.log(error);
             }
@@ -170,14 +216,16 @@ export const useEmployee = () => {
             editEmployee,
             totalRecord,
             totalPage,
-            getAllEmployees,
             getEmployeeCode,
             addNewEmloyee,
             searchEmployees,
             getAnEmployee,
+            getAllEmployees,
             editAnEmployee,
             handleFilterPage,
             handleDeleteEmployee,
+            handlExportExcel,
+            handleBulkDelete,
         };
     } catch (error) {
         console.log(error);

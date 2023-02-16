@@ -12,6 +12,7 @@ const state = reactive({
     identityForm: MISA_ENUM.FORM_MODE.ADD,
     listAllEmployee: [],
     listToast: [],
+    listItemChecked: [],
 });
 
 // set giá trị cho isSidebar thực hiện chức năng thu gọn/mở rộng sidebar
@@ -104,6 +105,15 @@ const setListToast = (toast) => {
     }
 };
 
+// Lấy ra danh sách các item được check
+const setListItemChecked = (list) => {
+    try {
+        state.listItemChecked = list;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 export default {
     state: readonly(state),
     setIsSidebar,
@@ -116,4 +126,5 @@ export default {
     setIdentityForm,
     setlistAllEmployee,
     setListToast,
+    setListItemChecked,
 };

@@ -33,7 +33,7 @@ const handleShowSelectedValue = (option, index) => {
         selected.value = option.optionName ? option.optionName : optionSearch.value[0].optionName;
         indexOptionSelected.value = index;
         open.value = false;
-        emit("select", option.optionId);
+        emit("select", { optionId: option.optionId, optionName: selected.value });
     } catch (error) {
         console.log(error);
     }
@@ -77,6 +77,7 @@ const handleClickOutside = () => {
 
 /**
  * Xử lý tìm kiếm lựa chọn
+ * Created By: NHGiang
  */
 const handleSearchOption = (keyword) => {
     try {
@@ -94,6 +95,15 @@ watch(
             optionSearch.value = props.options.filter((option) =>
                 option.optionName.toLowerCase().includes(newValue.toLowerCase())
             );
+
+            if (optionSearch.value.length === 1) {
+                const newOptionId = props.options.find(
+                    (option) => option.optionName === newValue
+                )?.optionId;
+                emit("select", { optionId: newOptionId, optionName: newValue });
+            }else {
+                emit("select", { optionId: props.options[indexOptionSelected.value].optionId, optionName: newValue });
+            }
         } catch (error) {
             console.log(error);
         }

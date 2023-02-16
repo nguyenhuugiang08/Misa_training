@@ -15,6 +15,9 @@
     font-family: notosans-regular;
     font-size: 13px;
     line-height: 18px;
+    user-select: none;
+    outline-color: #666;
+    outline-width: 3px;
 }
 
 :root {
@@ -61,8 +64,8 @@ body {
 }
 
 .main {
-   /* width: calc(100% - 178px); */
-   overflow: auto;
+    /* width: calc(100% - 178px); */
+    overflow: auto;
 }
 
 .header {

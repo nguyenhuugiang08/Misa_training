@@ -29,6 +29,18 @@ export const handleSetStatusForm = () => {
             textError: "",
             status: false,
         };
+        error.landlineNumberError = {
+            textError: "",
+            status: false,
+        };
+        error.departmentError = {
+            textError: "",
+            status: false,
+        };
+        error.identityNumberError = {
+            textError: "",
+            status: false,
+        };
         error.status = false;
     } catch (error) {
         console.log(error);

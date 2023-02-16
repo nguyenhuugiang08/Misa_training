@@ -5,7 +5,7 @@ import { computed, ref, watch } from "vue";
 import { formatDate } from "../utilities/formatDate";
 import { MISA_RESOURCE } from "../base/resource";
 import { convertDatetime } from "../utilities/convertDatetime";
-import { handleCheckDatetime } from "../utilities/validateForm";
+import { handleCheckFormat } from "../utilities/validateForm";
 
 const props = defineProps({
     fieldText: String,
@@ -30,7 +30,7 @@ const emit = defineEmits(["dateField"]);
 const handleEmitInputValue = (value) => {
     try {
         if (value.length === 10) {
-            if (handleCheckDatetime(value)) {
+            if (handleCheckFormat(MISA_RESOURCE.REGEX.DATE, value)) {
                 date.value = convertDatetime(value);
             } else {
                 date.value = convertDatetime(formatDate(new Date()));

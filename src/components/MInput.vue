@@ -1,4 +1,6 @@
 <script setup>
+import { ref } from "vue";
+
 const props = defineProps({
     fieldText: String,
     required: { type: Boolean, default: false },
@@ -13,6 +15,8 @@ const props = defineProps({
     textError: String,
 });
 
+const refInput = ref(null);
+
 const emit = defineEmits(["inputValue", "changeValue"]);
 
 // Xử lý đẩy value ô input lên component cha
@@ -24,6 +28,22 @@ const handleEmitInputValue = (value) => {
         console.log(error);
     }
 };
+
+/**
+ * Xử lý focus ô input
+ * created by: NHGiang
+ */
+const handleFocus = () => {
+    try {
+        if (refInput.value) {
+            refInput.value.focus();
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+defineExpose({ handleFocus });
 </script>
 
 <template>
@@ -39,6 +59,7 @@ const handleEmitInputValue = (value) => {
             :value="value"
             @input="handleEmitInputValue($event.target.value)"
             :placeHolder="placeHolder"
+            ref="refInput"
         />
         <div class="textfield-tooltip" v-if="tooltip">
             <span>{{ tooltip }}</span>

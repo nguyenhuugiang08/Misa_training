@@ -7,28 +7,26 @@ import MPopUpError from "./MPopUpError.vue";
 import MPopUpInfo from "./MPopUpInfo.vue";
 import { useDepartment } from "../composable/useDepartment";
 import { useEmployee } from "../composable/useEmployee";
-import { reactive, inject } from "vue";
+import { reactive, inject, onMounted, ref } from "vue";
 import { formatDate } from "../utilities/formatDate";
 import { convertDatetime } from "../utilities/convertDatetime";
 import { error, useValidate } from "../utilities/validateForm";
-import { usePosition } from "../composable/usePosition";
 import { MISA_ENUM } from "../base/enum";
 
 const props = defineProps({
     title: String,
 });
 
+const { state, setListToast } = inject("diy");
+const { employeeSelected } = state;
+
 const { listDepartments, getAllDepartments } = useDepartment();
 getAllDepartments();
 
 const { newEmployeeCode, getEmployeeCode, addNewEmloyee, editAnEmployee } = useEmployee();
-getEmployeeCode();
-
-const { listPositions, getAllPositions } = usePosition();
-getAllPositions();
-
-const { state, setListToast } = inject("diy");
-const { employeeSelected } = state;
+if (state.identityForm !== MISA_ENUM.FORM_MODE.EDIT) {
+    getEmployeeCode();
+}
 
 const employee = reactive({
     EmployeeCode: employeeSelected?.EmployeeCode || newEmployeeCode,
@@ -37,12 +35,17 @@ const employee = reactive({
     DateOfBirth: employeeSelected?.DateOfBirth ? formatDate(employeeSelected?.DateOfBirth) : "",
     IdentityNumber: employeeSelected?.IdentityNumber || "",
     DepartmentId: employeeSelected?.DepartmentId || "",
+    DepartmentName: employeeSelected?.DepartmentName || "",
     IdentityDate: employeeSelected?.IdentityDate ? formatDate(employeeSelected?.IdentityDate) : "",
-    PositionId: employeeSelected?.PositionId || "",
+    Position: employeeSelected?.Position || "",
     IdentityPlace: employeeSelected?.IdentityPlace || "",
     Address: employeeSelected?.Address || "",
     PhoneNumber: employeeSelected?.PhoneNumber || "",
     Email: employeeSelected?.Email || "",
+    BankName: employeeSelected?.BankName || "",
+    BankAccount: employeeSelected?.BankAccount || "",
+    BankBranch: employeeSelected?.BankBranch || "",
+    LandlineNumber: employeeSelected?.LandlineNumber || "",
 });
 
 const isPopUp = reactive({
@@ -50,6 +53,7 @@ const isPopUp = reactive({
     isOpenInfo: false,
 });
 const emit = defineEmits(["hideModal"]);
+const refEmployeeCode = ref(null);
 
 /**
  * Ẩn modal
@@ -69,7 +73,6 @@ const hideModal = () => {
  */
 const handleShowPopUpInfo = () => {
     try {
-        console.log(employeeSelected);
         isPopUp.isOpenInfo = true;
     } catch (error) {
         console.log(error);
@@ -87,7 +90,8 @@ const hanldeSubmitForm = async (isCloseForm = true) => {
             employee,
             state.listAllEmployee,
             state.identityForm,
-            employeeSelected.EmployeeCode
+            employeeSelected.EmployeeCode,
+            listDepartments
         );
 
         if (state.identityForm === MISA_ENUM.FORM_MODE.EDIT) {
@@ -122,8 +126,9 @@ const handleAddAndDuplicateEmployee = async (isCloseForm) => {
         await addNewEmloyee(
             {
                 ...employee,
-                IdentityDate: new Date(convertDatetime(employee.IdentityDate, true)).toJSON(),
-                DateOfBirth: convertDatetime(employee.DateOfBirth, false),
+                IdentityDate: new Date(convertDatetime(employee.IdentityDate, true)),
+                // DateOfBirth: convertDatetime(employee.DateOfBirth, false),
+                DateOfBirth: new Date(convertDatetime(employee.DateOfBirth, true)),
             },
             emit,
             state.identityForm,
@@ -145,12 +150,41 @@ const handleEditEmployee = async (isCloseForm) => {
             {
                 ...employee,
                 EmployeeId: employeeSelected.EmployeeId,
-                IdentityDate: new Date(convertDatetime(employee.IdentityDate, true)).toJSON(),
-                DateOfBirth: convertDatetime(employee.DateOfBirth, false),
+                IdentityDate: new Date(convertDatetime(employee.IdentityDate, true)),
+                // DateOfBirth: convertDatetime(employee.DateOfBirth, false),
+                DateOfBirth: new Date(convertDatetime(employee.DateOfBirth, true)),
             },
             emit,
             isCloseForm
         );
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Xử lý focus input employee code
+ * Created by: NHGiang
+ */
+onMounted(() => {
+    try {
+        refEmployeeCode.value.handleFocus();
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+/**
+ * Xử lý set lại tabindex khi hết 
+ * @param {*} e event object
+ */
+const handleSetTabindex = (e) => {
+    try {
+        if (e.keyCode === 9) {
+            e.preventDefault();
+            
+            refEmployeeCode.value.handleFocus();
+        }
     } catch (error) {
         console.log(error);
     }
@@ -243,6 +277,7 @@ const handleEditEmployee = async (isCloseForm) => {
                             @inputValue="employee.EmployeeCode = $event"
                             :text-error="error.employeeCodeError.textError"
                             @changeValue="error.employeeCodeError.status = $event"
+                            ref="refEmployeeCode"
                         />
                         <m-input
                             :fieldText="'Tên'"
@@ -259,7 +294,10 @@ const handleEditEmployee = async (isCloseForm) => {
                         v-if="listDepartments.length"
                         :options="listDepartments"
                         default=""
-                        @select="employee.DepartmentId = $event"
+                        @select="
+                            (employee.DepartmentId = $event.optionId),
+                                (employee.DepartmentName = $event.optionName)
+                        "
                         :text-label="'Đơn vị'"
                         :status="error.departmentError.status"
                         :required="true"
@@ -268,15 +306,8 @@ const handleEditEmployee = async (isCloseForm) => {
                         :fieldText="'Chức danh'"
                         :width="'388px'"
                         style="padding-bottom: 12px"
-                        :value="
-                            listPositions?.find((emp) => emp.PositionId === employee.PositionId)
-                                ?.PositionName
-                        "
-                        @inputValue="
-                            employee.PositionId = listPositions?.find(
-                                (emp) => emp.PositionName === $event
-                            )?.PositionId
-                        "
+                        :value="employee.Position"
+                        @inputValue="employee.Position = $event"
                     />
                 </div>
                 <div
@@ -393,6 +424,9 @@ const handleEditEmployee = async (isCloseForm) => {
                         style="padding-bottom: 12px; float: left"
                         :marginRight="'8px'"
                         :tooltip="'Số điện thoại cố động'"
+                        :value="employee.LandlineNumber"
+                        :status="error.landlineNumberError.status"
+                        @inputValue="employee.LandlineNumber = $event"
                     />
                     <m-input
                         :fieldText="'Email'"
@@ -408,18 +442,24 @@ const handleEditEmployee = async (isCloseForm) => {
                         :width="'271px'"
                         style="float: left; clear: left"
                         :marginRight="'8px'"
+                        :value="employee.BankAccount"
+                        @inputValue="employee.BankAccount = $event"
                     />
                     <m-input
                         :fieldText="'Tên ngân hàng'"
                         :width="'271px'"
                         style="float: left"
                         :marginRight="'8px'"
+                        :value="employee.BankName"
+                        @inputValue="employee.BankName = $event"
                     />
                     <m-input
                         :fieldText="'Chi nhánh'"
                         :width="'271px'"
                         style="float: left"
                         :marginRight="'8px'"
+                        :value="employee.BankBranch"
+                        @inputValue="employee.BankBranch = $event"
                     />
                 </div>
             </div>
@@ -441,6 +481,7 @@ const handleEditEmployee = async (isCloseForm) => {
                     for="show-modal"
                     class="btn btn-secondary modal-btn-cancel"
                     @click="hideModal"
+                    @keydown="handleSetTabindex"
                     tabindex="0"
                     >Hủy</label
                 >
@@ -456,6 +497,7 @@ const handleEditEmployee = async (isCloseForm) => {
                     error.dateOfBrithError.textError ||
                     error.identityDateError.textError ||
                     error.phoneNumberError.textError ||
+                    error.landlineNumberError.textError ||
                     error.emailError.textError ||
                     error.identityNumberError.textError ||
                     error.departmentError.textError

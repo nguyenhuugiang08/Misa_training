@@ -93,6 +93,7 @@ const handleChangePageNumber = async (pageNumber) => {
                 :prev-class="'prev-btn'"
                 :next-class="'next-btn'"
                 :click-handler="handleChangePageNumber"
+                hide-prev-next
             >
                 ></paginate
             >

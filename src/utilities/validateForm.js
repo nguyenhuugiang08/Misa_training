@@ -1,3 +1,4 @@
+import { MISA_ENUM } from "../base/enum";
 import { reactive } from "vue";
 import { MISA_RESOURCE } from "../base/resource";
 
@@ -22,6 +23,10 @@ const error = reactive({
         textError: "",
         status: false,
     },
+    landlineNumberError: {
+        textError: "",
+        status: false,
+    },
     emailError: {
         textError: "",
         status: false,
@@ -43,56 +48,18 @@ const {
     dateOfBirthErrorText,
     identityDateErrorText,
     phoneNumberErrorText,
+    landlineNumberErrorText,
     emailErrorText,
     identityNumberErrorText,
     departmentErrorText,
 } = MISA_RESOURCE;
 
 /**
- * Xử lý validate định dạng ngày tháng
- * CreatedBy: NHGiang
- */
-export const handleCheckDatetime = (dateTime) => {
-    try {
-        return /^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/.test(
-            dateTime
-        );
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-/**
- * Xử lý check định dạng số điện thoại
- * CreatedBy: NHGiang
- */
-const handleCheckPhonenumber = (phoneNumber) => {
-    try {
-        return /([\+84|84|0]+(3|5|7|8|9|1[2|6|8|9]))+([0-9]{8})\b/.test(phoneNumber);
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-/**
  * Xử lý check định đạng email
  */
-const handleCheckEmail = (email) => {
+export const handleCheckFormat = (regex, value) => {
     try {
-        return /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(
-            email
-        );
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-/**
- * Xử lý check định đạng email
- */
-const handleCheckIndentityNumber = (identityNumber) => {
-    try {
-        return /^([0-9]{12})\b/.test(identityNumber);
+        return regex.test(value);
     } catch (error) {
         console.log(error);
     }
@@ -102,14 +69,14 @@ const handleCheckIndentityNumber = (identityNumber) => {
  * Xử lý validate form
  * CreatedBy: NHGiang
  */
-const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
+const useValidate = (employee, list, identityForm, employeeSelectedCode, listDepartments) => {
     try {
         // Validate employee code
         if (!employee.EmployeeCode) {
             error.employeeCodeError.textError = employeeCodeErrorText.blank;
             error.employeeCodeError.status = true;
         } else {
-            if (identityForm === 0) {
+            if (identityForm === MISA_ENUM.FORM_MODE.ADD) {
                 const listCodes = list.map((emp) => emp.EmployeeCode);
                 if (listCodes.includes(employee.EmployeeCode)) {
                     error.employeeCodeError.textError = employeeCodeErrorText.duplicate;
@@ -120,7 +87,7 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
                 }
             }
 
-            if (identityForm === 1) {
+            if (identityForm === MISA_ENUM.FORM_MODE.EDIT) {
                 const listCodes = list
                     .filter((item) => item.EmployeeCode !== employeeSelectedCode)
                     .map((emp) => emp.EmployeeCode);
@@ -145,7 +112,7 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
 
         //Validate ngày sinh
         if (employee.DateOfBirth) {
-            if (!handleCheckDatetime(employee.DateOfBirth)) {
+            if (!handleCheckFormat(MISA_RESOURCE.REGEX.DATE, employee.DateOfBirth)) {
                 error.dateOfBrithError.textError = dateOfBirthErrorText.invalid;
                 error.dateOfBrithError.status = true;
             } else {
@@ -168,7 +135,7 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
 
         //Validate ngày cấp
         if (employee.IdentityDate) {
-            if (!handleCheckDatetime(employee.IdentityDate)) {
+            if (!handleCheckFormat(MISA_RESOURCE.REGEX.DATE, employee.IdentityDate)) {
                 error.identityDateError.textError = identityDateErrorText.invalid;
                 error.identityDateError.status = true;
             } else {
@@ -182,7 +149,7 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
 
         // Validate số điện thoại
         if (employee.PhoneNumber) {
-            if (!handleCheckPhonenumber(employee.PhoneNumber)) {
+            if (!handleCheckFormat(MISA_RESOURCE.REGEX.PHONE_NUMBER, employee.PhoneNumber)) {
                 error.phoneNumberError.textError = phoneNumberErrorText.invalid;
                 error.phoneNumberError.status = true;
             } else {
@@ -194,9 +161,23 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
             error.phoneNumberError.status = false;
         }
 
+        // validate số điện thoại cố định
+        if (employee.LandlineNumber) {
+            if (!handleCheckFormat(MISA_RESOURCE.REGEX.PHONE_NUMBER, employee.LandlineNumber)) {
+                error.landlineNumberError.textError = landlineNumberErrorText.invalid;
+                error.landlineNumberError.status = true;
+            } else {
+                error.landlineNumberError.textError = "";
+                error.landlineNumberError.status = false;
+            }
+        } else {
+            error.landlineNumberError.textError = "";
+            error.landlineNumberError.status = false;
+        }
+
         // Validate email
         if (employee.Email) {
-            if (!handleCheckEmail(employee.Email)) {
+            if (!handleCheckFormat(MISA_RESOURCE.REGEX.EMAIL, employee.Email)) {
                 error.emailError.textError = emailErrorText.invalid;
                 error.emailError.status = true;
             } else {
@@ -210,7 +191,7 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
 
         // Validate số căn cước công dân
         if (employee.IdentityNumber) {
-            if (!handleCheckIndentityNumber(employee.IdentityNumber)) {
+            if (!handleCheckFormat(MISA_RESOURCE.REGEX.IDENTITY_NUMBER, employee.IdentityNumber)) {
                 error.identityNumberError.textError = identityNumberErrorText.invalid;
                 error.identityNumberError.status = true;
             } else {
@@ -223,9 +204,12 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
         }
 
         // Validate đơn vị
+        const departmentNames = listDepartments.value.map((option) => option.optionName);
         if (!employee.DepartmentId) {
-            console.log(employee.PositionId);
             error.departmentError.textError = departmentErrorText.blank;
+            error.departmentError.status = true;
+        } else if (!departmentNames.includes(employee.DepartmentName)) {
+            error.departmentError.textError = departmentErrorText.notFound;
             error.departmentError.status = true;
         } else {
             error.departmentError.textError = "";
@@ -238,6 +222,7 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode) => {
             error.dateOfBrithError.status ||
             error.identityDateError.status ||
             error.phoneNumberError.status ||
+            error.landlineNumberError.status ||
             error.emailError.status ||
             error.departmentError.status ||
             error.identityNumberError.status;

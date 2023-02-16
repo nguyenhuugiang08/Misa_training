@@ -7,7 +7,7 @@ import { useEmployee } from "../composable/useEmployee";
 import { useRoute } from "vue-router";
 
 const { listEmployees, handleDeleteEmployee } = useEmployee();
-const { state } = inject("diy");
+const { state, setListItemChecked } = inject("diy");
 
 const isPopUp = reactive({
     isOpenWarning: false,
@@ -22,6 +22,10 @@ const isShowTooltip = ref(false);
 const listCheck = ref([]);
 const listTemporary = ref([]);
 
+/**
+ * Lấy ra trang thứ n sử dụng vue-router
+ * created by: NHGiang
+ */
 watch(
     () => route.query.pageNumber,
     (newValue) => {
@@ -30,6 +34,21 @@ watch(
                 listTemporary.value = [];
             }
             pageNumber.value = Number(newValue);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
+
+/**
+ * Lấy ra danh sách các item đã được check
+ * created by: NHGiang
+ */
+watch(
+    () => listCheck.value.length,
+    (newValue) => {
+        try {
+            setListItemChecked(listCheck);
         } catch (error) {
             console.log(error);
         }
@@ -69,8 +88,19 @@ const setListCheck = (e) => {
 const handleCheckAll = () => {
     try {
         const currentListEmployees = state.listEmployees.map((employee) => employee.EmployeeId);
+
+        /**
+         * Kiểm tra trang thứ n đã được check all
+         * - Nếu chưa check all -> Thêm tất cả các ID vào mảng listcheck
+         * - Nếu đã check all -> bỏ check all -> xóa các ID có trong trang ra khỏi mảng listCheck
+         * - Nếu check 1 vài element -> Thực hiện thêm các ID còn lại vào mảng listCheck
+         */
         if (!listPageChecked.value.includes(pageNumber.value)) {
-            listCheck.value = [...listCheck.value, ...currentListEmployees];
+            currentListEmployees.forEach((element) => {
+                if (!listCheck.value.includes(element)) {
+                    listCheck.value.push(element);
+                }
+            });
             listTemporary.value = [...currentListEmployees];
             listPageChecked.value.push(pageNumber.value);
         } else {
@@ -162,6 +192,9 @@ const hanldeSubmitFormDelete = async (event) => {
                     </p>
                 </th>
                 <th class="tbl-col">số điện thoại</th>
+                <th class="tbl-col">số tài khoản</th>
+                <th class="tbl-col tbl-col--large">tên ngân hàng</th>
+                <th class="tbl-col tbl-col--large">chi nhánh</th>
                 <th class="tbl-col" style="text-align: right; width: 129px; min-width: 129px">
                     tiền lương
                 </th>
@@ -184,7 +217,7 @@ const hanldeSubmitFormDelete = async (event) => {
                 <m-pop-up-warning
                     v-if="isPopUp.isOpenWarning"
                     :title="'Xác nhận xóa'"
-                    :text-info="`Bạn có thực sự muốn xóa Nhân viên ${code} không?`"
+                    :text-info="`Bạn có thực sự muốn xóa nhân viên ${code} không?`"
                     @closeWarning="isPopUp.isOpenWarning = !isPopUp.isOpenWarning"
                     @closeForm="isPopUp.isOpenWarning = !isPopUp.isOpenWarning"
                     @submitForm="
