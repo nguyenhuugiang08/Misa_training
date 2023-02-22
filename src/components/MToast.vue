@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { MISA_ENUM } from "../base/enum";
 
+// định nghĩa các props nhận vào
 const props = defineProps({
     toastMessage: String,
     statusMessage: String,
@@ -20,7 +21,7 @@ const handleCloseToast = () => {
     }
 };
 
-const isShow = ref(false);
+const isShow = ref(false); // trạng thái Ẩn/Hiện của toast message
 
 /**
  * Xử lý set thời gian toast message ẩn

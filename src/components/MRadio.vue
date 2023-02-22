@@ -1,4 +1,7 @@
 <script setup>
+import { ref } from "vue";
+
+// Định nghĩa cá props nhận vào
 const props = defineProps({
     value: Number,
     id: String,
@@ -8,11 +11,19 @@ const props = defineProps({
     marginRight: String,
 });
 
+// định nghĩa các hàm emit ra ngoài
 const emit = defineEmits(["radio"]);
 
-//Xử lý emit dữ liệu lên component cha
+const refRadio = ref(null);
+
+/**
+ * Xử lý emit giá trị được chọn ra ngoài
+ * @param {*} value -- giá trị ô radio được chọn
+ * Created by: NHGiang - (20/02/23)
+ */
 const handleEmitRadioValue = (value) => {
     try {
+        console.log(value);
         emit("radio", Number(value));
     } catch (error) {
         console.log(error);
@@ -21,9 +32,15 @@ const handleEmitRadioValue = (value) => {
 </script>
 
 <template>
-    <label :for="id" class="modal__gender-item" tabindex="0">
+    <label
+        :for="id"
+        class="modal__gender-item"
+        tabindex="0"
+        @keydown.enter="handleEmitRadioValue(refRadio.value)"
+    >
         <input
             type="radio"
+            ref="refRadio"
             :value="value"
             :id="id"
             :checked="value === defaultValue"
@@ -40,5 +57,3 @@ const handleEmitRadioValue = (value) => {
     </label>
     <span :style="{ marginLeft: '10px', marginRight: '20px' }">{{ labelText }}</span>
 </template>
-
-<style scoped></style>

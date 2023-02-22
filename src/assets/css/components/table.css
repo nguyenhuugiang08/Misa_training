@@ -55,7 +55,6 @@
     width: 40px;
     min-width: 40px;
     height: 44px;
-    border-bottom: 1px solid #c7c7c7;
     position: sticky !important;
     z-index: 11;
     background-color: #fff;
@@ -162,11 +161,11 @@ th {
 }
 
 .tbl .tbl-row:has([type="checkbox"]:checked) .tbl-col__first {
-    background-color: var(--table-bg-color) ;
+    background-color: var(--table-bg-color);
 }
 
 .tbl .tbl-row:has([type="checkbox"]:checked) .tbl-col__last {
-    background-color: var(--table-bg-color) ;
+    background-color: var(--table-bg-color);
 }
 
 .tbl .tbl-row:has([type="checkbox"]:checked):first-child {

@@ -7,36 +7,21 @@ import MRow from "../components/MRow.vue";
 
 const { state, setListToast } = inject("diy");
 const salary = ref(100000);
-
-const handleShowToast = () => {
-    try {
-        const toast = {
-            toastMessage: "Công việc đã vị xóa.",
-            statusMessage: "Thành công!",
-            status: 0,
-        };
-        setListToast(toast);
-    } catch (error) {
-        console.log(error);
-    }
-};
-
 </script>
 
 <template>
-    <div>
-        About
-        <button @click="handleShowToast">Show toast</button>
-
-        <m-toast
-            v-for="(toast, index) in state.listToast"
-            :key="index"
-            :toastMessage="toast.toastMessage"
-            :statusMessage="toast.statusMessage"
-            :status="toast.status"
-        />
-        <m-input-money v-model="salary" fieldText="Lương" @update:modelValue="salary = $event" />
-        <strong>Lương của nhân viên: {{ salary }}</strong>
+    <div class="content">
+        <div class="content__header">
+            <div class="content__header-text">Tiền mặt</div>
+        </div>
+        <div>
+            <m-input-money
+                v-model="salary"
+                fieldText="Lương"
+                @update:modelValue="salary = $event"
+            />
+            <strong>Lương của nhân viên: {{ salary }}</strong>
+        </div>
     </div>
 </template>
 

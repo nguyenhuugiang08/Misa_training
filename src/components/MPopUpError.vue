@@ -1,12 +1,17 @@
 <script setup>
+// Định nghĩa các props nhận vào
 const props = defineProps({
     title: { type: String, required: true },
     textError: { type: String, required: true },
 });
 
+// Định nghĩa các hàm được emit ra ngoài
 const emit = defineEmits(["closeError"]);
 
-//Xử lý đóng thông báo lỗi
+/**
+ * Xử lý đóng pop up error
+ * Created by: NHGiang - (20/02/23)
+ */
 const handleClosePopUp = () => {
     try {
         emit("closeError");

@@ -2,29 +2,46 @@ import { reactive, readonly } from "vue";
 import { MISA_ENUM } from "../base/enum";
 
 const state = reactive({
-    isSidebar: false,
-    listEmployees: [],
-    titleForm: "",
-    isForm: false,
-    employeeSelected: {},
-    totalEmployee: 0,
-    totalPageValue: 1,
-    identityForm: MISA_ENUM.FORM_MODE.ADD,
-    listAllEmployee: [],
-    listToast: [],
-    listItemChecked: [],
+    isSidebar: false, // Trạng thái Đóng/Mở sidebar
+    listEmployees: [], // Danh sách nhân viên
+    titleForm: "", // Tiêu đề form
+    isForm: false, // trạng thái Đóng/ Mở form
+    employeeSelected: {}, // Thông tin nhân viên đang được chọn
+    totalEmployee: 0, // Tổng số bản ghi
+    totalPageValue: 1, // Tổng số trang
+    identityForm: MISA_ENUM.FORM_MODE.ADD, // Định danh form - mặc định là form thêm
+    listAllEmployee: [], // Danh sách tất cả nhân viên
+    listToast: [], // Danh sách toast message
+    listItemChecked: [], // Danh sách các item được chọn
+    listPageChecked: [], // Danh sách các page đã được check all
+    keyword: "", // Từ khóa tìm kiếm
 });
 
-// set giá trị cho isSidebar thực hiện chức năng thu gọn/mở rộng sidebar
+/**
+ * Set trạng thái Đóng/Mở sidebar
+ * Created by: NHGiang - (17/02/23)
+ */
 const setIsSidebar = () => {
     try {
         state.isSidebar = !state.isSidebar;
+        const root = document.querySelector(":root");
+
+        // set lại độ rộng cho sidebar
+        if (state.isSidebar) {
+            root.style.setProperty("--width-sidebar", "52px");
+        } else {
+            root.style.setProperty("--width-sidebar", "178px");
+        }
     } catch (error) {
         console.log(error);
     }
 };
 
-// set danh sách các nhân viên dùng chung cho nhiều components
+/** ------------------------------------------------
+ * Set lại danh sách nhân viên
+ * @param {*} list -- Danh sách nhân viên
+ * Created By: NHGiang - (17/02/23)
+ */
 const setListEmployees = (list) => {
     try {
         state.listEmployees = list;
@@ -33,7 +50,11 @@ const setListEmployees = (list) => {
     }
 };
 
-// set title cho form
+/** ----------------------------------------------
+ * Set tiêu đề cho form
+ * @param {*} title -- Tiêu đề của Form
+ * Created by: NHGiang - (17/02/23)
+ */
 const setTitleForm = (title) => {
     try {
         state.titleForm = title;
@@ -42,7 +63,10 @@ const setTitleForm = (title) => {
     }
 };
 
-// set giá trị để đóng/ mở form
+/** -----------------------------------------------
+ * set giá trị để đóng/ mở form
+ * Created by: NHGiang - (17/02/23)
+ */
 const setIsForm = () => {
     try {
         state.isForm = !state.isForm;
@@ -51,7 +75,11 @@ const setIsForm = () => {
     }
 };
 
-// lấy ra nhân viên được chọn để update thông tin
+/** ------------------------------------------------
+ * lấy ra nhân viên được chọn để update thông tin
+ * @param {*} employee -- Đối tượng Employee đã chọn
+ * Created by: NHGiang - (17/02/23)
+ */
 const setEmployeeSelected = (employee) => {
     try {
         state.employeeSelected = employee;
@@ -60,7 +88,11 @@ const setEmployeeSelected = (employee) => {
     }
 };
 
-// lấy ra tổng số bản ghi trong database
+/** ------------------------------------------------
+ * lấy ra tổng số bản ghi trong database
+ * @param {*} total -- Tổng số bản ghi
+ * Created by: NHGiang - (17/02/23)
+ */
 const setTotalEmployee = (total) => {
     try {
         state.totalEmployee = total;
@@ -69,7 +101,11 @@ const setTotalEmployee = (total) => {
     }
 };
 
-// Lấy ra tổng số trang theo số bản ghi trên 1 trang
+/** ------------------------------------------------
+ * Lấy ra tổng số trang theo số bản ghi trên 1 trang
+ * @param {*} total -- Số bản ghi trên 1 trang
+ * Created by: NHGiang - (17/02/23)
+ */
 const setTotalPage = (total) => {
     try {
         state.totalPageValue = total;
@@ -79,6 +115,11 @@ const setTotalPage = (total) => {
 };
 
 // định nghĩa form theo action (0: thêm, 1: sửa)
+/** ------------------------------------------------
+ * Lấy ra tổng số trang theo số bản ghi trên 1 trang
+ * @param {*} val
+ * Created by: NHGiang - (17/02/23)
+ */
 const setIdentityForm = (val) => {
     try {
         state.identityForm = val;
@@ -114,6 +155,32 @@ const setListItemChecked = (list) => {
     }
 };
 
+/**
+ * Đặt lại từ khóa tìm khi nhập ô tìm kiếm
+ * @param {*} searchString Từ khóa tìm kiếm
+ * Craeted by: NHGiang - (19/02/23)
+ */
+const setKeyword = (searchString) => {
+    try {
+        state.keyword = searchString;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm lưu lại các trang đã được check all
+ * @param {*} list -- danh sách các trang đã check all
+ * Created by: NHGiang - (22/02/23)
+ */
+const setListPageChecked = (list) => {
+    try {
+        state.listPageChecked = list;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 export default {
     state: readonly(state),
     setIsSidebar,
@@ -127,4 +194,6 @@ export default {
     setlistAllEmployee,
     setListToast,
     setListItemChecked,
+    setKeyword,
+    setListPageChecked,
 };

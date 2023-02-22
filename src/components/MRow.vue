@@ -6,6 +6,8 @@ import { inject, ref } from "vue";
 import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
 import { MISA_ENUM } from "../base/enum";
 import { MISA_RESOURCE } from "../base/resource";
+
+// Định nghĩa các props nhận vào
 const props = defineProps({
     employee: Object,
     listCheck: Array,
@@ -14,22 +16,24 @@ const props = defineProps({
 const { getAnEmployee, editEmployee } = useEmployee();
 
 const emit = defineEmits(["check", "displayWarning"]);
-const isShowList = ref(false);
-const toDropList = ref(0);
+const isShowList = ref(false); // Trạng thái ẩn hiện danh sách chức năng (Nhân bản, Xóa)
+const toDropList = ref(0); // Khoảng cách của danh sách chức năng so với top của cửa số trình duyệt
 
 const { state, setIsForm, setTitleForm, setEmployeeSelected, setIdentityForm } = inject("diy");
 
 /**
- * Xử lý check row
- * CreatedBy: NHGiang
+ * Hàm xử lý check 1 dòng
+ * @param {String} itemId -- ID của đối tượng
+ * Created by: NHGiang - (20/02/23)
  */
-const handleCheck = (name) => {
-    emit("check", name);
+const handleCheckItem = (itemId) => {
+    emit("check", itemId);
 };
 
 /**
- * Xử lý sửa thông tin nhân viên
- * CreateBy: NHGiang
+ * Hàm xử lý Mở form sửa thông tin nhân viên và bindding dữ liệu vào form
+ * @param {String} employeeId -- Id của nhân viên được chọn
+ * Created by: NHGiang - (20/02/23)
  */
 const handleEditEmployee = async (employeeId) => {
     try {
@@ -44,6 +48,11 @@ const handleEditEmployee = async (employeeId) => {
     }
 };
 
+/**
+ * Hàm xử lý Mở form nhân bản thông tin nhân viên và bindding dữ liệu vào form
+ * @param {String} employeeId -- Id của nhân viên được chọn
+ * Created by: NHGiang - (20/02/23)
+ */
 const handleDuplicateEmployee = async (employeeId) => {
     try {
         await getAnEmployee(employeeId);
@@ -58,8 +67,9 @@ const handleDuplicateEmployee = async (employeeId) => {
 };
 
 /**
- * Xử lý hiển thị popup cảnh báo khi xóa
- * CreatedBy: NHGiang
+ * hàm xử lý hiện pop up cảnh báo khi xóa
+ * @param {Object} value -- object { Mã nhân viên, tên nhân viên } của nhân viên được chọn
+ * Created by: NHGiang - (20/02/23)
  */
 const handleDisplayPopUpWarning = (value) => {
     try {
@@ -71,8 +81,9 @@ const handleDisplayPopUpWarning = (value) => {
 };
 
 /**
- * Xử lý hiển thị droplist action
- * CreatedBy: NHGiang
+ * hàm xử lý vị trí hiển thị của danh sách chức năng
+ * @param {Object} e -- object event
+ * Created by: NHGiang - (20/02/23)
  */
 const handleDisplayHideListAction = (e) => {
     try {
@@ -104,7 +115,7 @@ const handleClickOutside = () => {
                 class="tbl-checkbox"
                 :id="employee.EmployeeId"
                 :value="employee.EmployeeId"
-                @change="handleCheck(employee.EmployeeId)"
+                @change="handleCheckItem(employee.EmployeeId)"
                 :checked="listCheck.includes(employee.EmployeeId)"
             />
             <label :for="employee.EmployeeId" class="mask">
@@ -135,9 +146,6 @@ const handleClickOutside = () => {
         <td class="tbl-col">{{ employee.BankAccount || "" }}</td>
         <td class="tbl-col">{{ employee.BankName || "" }}</td>
         <td class="tbl-col">{{ employee.BankBranch || "" }}</td>
-        <td class="tbl-col" style="text-align: right; width: 129px; min-width: 129px">
-            {{ formatMoney(employee.Salary) || "" }}
-        </td>
         <td class="tbl-col tbl-col__last">
             <div class="tbl-col__action">
                 <label class="tbl-col__action-edit" @click="handleEditEmployee(employee.EmployeeId)"
@@ -190,5 +198,3 @@ const handleClickOutside = () => {
         </ul>
     </tr>
 </template>
-
-<style scoped></style>

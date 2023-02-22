@@ -6,7 +6,10 @@ const props = defineProps({
 
 const emit = defineEmits(["closeInfo"]);
 
-//Xử lý đóng thông báo
+/**
+ * Xử lý đóng pop up info
+ * Created by: NHGiang - (20/02/23)
+ */
 const handleClosePopUp = () => {
     try {
         emit("closeInfo");
@@ -15,7 +18,10 @@ const handleClosePopUp = () => {
     }
 };
 
-// Xử lý đóng form
+/**
+ * Xử lý đóng form hiện tại
+ * Created by: NHGiang - (20/02/23)
+ */
 const handleCloseForm = () => {
     try {
         emit("closeForm");
@@ -24,7 +30,10 @@ const handleCloseForm = () => {
     }
 };
 
-// Xử lý submit form
+/**
+ * Xử lý submit form hiện tại
+ * Created by: NHGiang - (20/02/23)
+ */
 const handleSubmitForm = () => {
     try {
         emit("submitForm");

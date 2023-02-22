@@ -3,39 +3,39 @@ import { reactive } from "vue";
 import { MISA_RESOURCE } from "../base/resource";
 
 const error = reactive({
-    employeeCodeError: {
+    EmployeeCode: {
         textError: "",
         status: false,
     },
-    employeeNameError: {
+    FullName: {
         textError: "",
         status: false,
     },
-    dateOfBrithError: {
+    DateOfBirth: {
         textError: "",
         status: false,
     },
-    identityDateError: {
+    IdentityDate: {
         textError: "",
         status: false,
     },
-    phoneNumberError: {
+    PhoneNumber: {
         textError: "",
         status: false,
     },
-    landlineNumberError: {
+    LandlineNumber: {
         textError: "",
         status: false,
     },
-    emailError: {
+    Email: {
         textError: "",
         status: false,
     },
-    identityNumberError: {
+    IdentityNumber: {
         textError: "",
         status: false,
     },
-    departmentError: {
+    DepartmentId: {
         textError: "",
         status: false,
     },
@@ -43,19 +43,20 @@ const error = reactive({
 });
 
 const {
-    employeeCodeErrorText,
-    employeeNameErrorText,
-    dateOfBirthErrorText,
-    identityDateErrorText,
-    phoneNumberErrorText,
-    landlineNumberErrorText,
-    emailErrorText,
-    identityNumberErrorText,
-    departmentErrorText,
+    EmployeeCodeText,
+    FullNameText,
+    DateOfBirthText,
+    IdentityDateText,
+    PhoneNumberText,
+    LandlineNumberText,
+    EmailText,
+    IdentityNumberText,
+    DepartmentIdText,
 } = MISA_RESOURCE;
 
 /**
- * Xử lý check định đạng email
+ * Xử lý check định đạng
+ * Created by: NHGiang
  */
 export const handleCheckFormat = (regex, value) => {
     try {
@@ -73,17 +74,25 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode, listDep
     try {
         // Validate employee code
         if (!employee.EmployeeCode) {
-            error.employeeCodeError.textError = employeeCodeErrorText.blank;
-            error.employeeCodeError.status = true;
+            error.EmployeeCode.textError = EmployeeCodeText.blank;
+            error.EmployeeCode.status = true;
+        } else if (!handleCheckFormat(MISA_RESOURCE.REGEX.EMPLOYEE_CODE, employee.EmployeeCode)) {
+            error.EmployeeCode.textError = EmployeeCodeText.invalid;
+            error.EmployeeCode.status = true;
         } else {
-            if (identityForm === MISA_ENUM.FORM_MODE.ADD) {
+            if (
+                identityForm === MISA_ENUM.FORM_MODE.ADD ||
+                identityForm === MISA_ENUM.FORM_MODE.DUPLICATE
+            ) {
                 const listCodes = list.map((emp) => emp.EmployeeCode);
                 if (listCodes.includes(employee.EmployeeCode)) {
-                    error.employeeCodeError.textError = employeeCodeErrorText.duplicate;
-                    error.employeeCodeError.status = true;
+                    error.EmployeeCode.textError = EmployeeCodeText.duplicate(
+                        employee.EmployeeCode
+                    );
+                    error.EmployeeCode.status = true;
                 } else {
-                    error.employeeCodeError.textError = "";
-                    error.employeeCodeError.status = false;
+                    error.EmployeeCode.textError = "";
+                    error.EmployeeCode.status = false;
                 }
             }
 
@@ -92,140 +101,151 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode, listDep
                     .filter((item) => item.EmployeeCode !== employeeSelectedCode)
                     .map((emp) => emp.EmployeeCode);
                 if (listCodes.includes(employee.EmployeeCode)) {
-                    error.employeeCodeError.textError = employeeCodeErrorText.duplicate;
-                    error.employeeCodeError.status = true;
+                    error.EmployeeCode.textError = EmployeeCodeText.duplicate(
+                        employee.EmployeeCode
+                    );
+                    error.EmployeeCode.status = true;
                 } else {
-                    error.employeeCodeError.textError = "";
-                    error.employeeCodeError.status = false;
+                    error.EmployeeCode.textError = "";
+                    error.EmployeeCode.status = false;
                 }
             }
         }
 
         // Valide employee name
         if (!employee.FullName) {
-            error.employeeNameError.textError = employeeNameErrorText.blank;
-            error.employeeNameError.status = true;
+            error.FullName.textError = FullNameText.blank;
+            error.FullName.status = true;
         } else {
-            error.employeeNameError.textError = "";
-            error.employeeNameError.status = false;
+            error.FullName.textError = "";
+            error.FullName.status = false;
         }
 
         //Validate ngày sinh
         if (employee.DateOfBirth) {
             if (!handleCheckFormat(MISA_RESOURCE.REGEX.DATE, employee.DateOfBirth)) {
-                error.dateOfBrithError.textError = dateOfBirthErrorText.invalid;
-                error.dateOfBrithError.status = true;
+                error.DateOfBirth.textError = DateOfBirthText.invalid;
+                error.DateOfBirth.status = true;
             } else {
                 const yearOfBirth = Number(employee.DateOfBirth.split("/")[2]);
                 const dayOfBirth = Number(employee.DateOfBirth.split("/")[0]);
                 const monthOfBirth = Number(employee.DateOfBirth.split("/")[1]);
 
                 if (new Date(yearOfBirth + 18, monthOfBirth - 1, dayOfBirth) <= new Date()) {
-                    error.dateOfBrithError.textError = "";
-                    error.dateOfBrithError.status = false;
+                    error.DateOfBirth.textError = "";
+                    error.DateOfBirth.status = false;
                 } else {
-                    error.dateOfBrithError.textError = dateOfBirthErrorText.over;
-                    error.dateOfBrithError.status = true;
+                    error.DateOfBirth.textError = DateOfBirthText.over;
+                    error.DateOfBirth.status = true;
                 }
             }
         } else {
-            error.dateOfBrithError.textError = "";
-            error.dateOfBrithError.status = false;
+            error.DateOfBirth.textError = "";
+            error.DateOfBirth.status = false;
         }
 
         //Validate ngày cấp
         if (employee.IdentityDate) {
             if (!handleCheckFormat(MISA_RESOURCE.REGEX.DATE, employee.IdentityDate)) {
-                error.identityDateError.textError = identityDateErrorText.invalid;
-                error.identityDateError.status = true;
+                error.IdentityDate.textError = IdentityDateText.invalid;
+                error.IdentityDate.status = true;
             } else {
-                error.identityDateError.textError = "";
-                error.identityDateError.status = false;
+                const yearOfBirth = Number(employee.IdentityDate.split("/")[2]);
+                const dayOfBirth = Number(employee.IdentityDate.split("/")[0]);
+                const monthOfBirth = Number(employee.IdentityDate.split("/")[1]);
+
+                if (new Date(yearOfBirth, monthOfBirth - 1, dayOfBirth) <= new Date()) {
+                    error.IdentityDate.textError = "";
+                    error.IdentityDate.status = false;
+                } else {
+                    error.IdentityDate.textError = IdentityDateText.over;
+                    error.IdentityDate.status = true;
+                }
             }
         } else {
-            error.identityDateError.textError = "";
-            error.identityDateError.status = false;
+            error.IdentityDate.textError = "";
+            error.IdentityDate.status = false;
         }
 
         // Validate số điện thoại
         if (employee.PhoneNumber) {
             if (!handleCheckFormat(MISA_RESOURCE.REGEX.PHONE_NUMBER, employee.PhoneNumber)) {
-                error.phoneNumberError.textError = phoneNumberErrorText.invalid;
-                error.phoneNumberError.status = true;
+                error.PhoneNumber.textError = PhoneNumberText.invalid;
+                error.PhoneNumber.status = true;
             } else {
-                error.phoneNumberError.textError = "";
-                error.phoneNumberError.status = false;
+                error.PhoneNumber.textError = "";
+                error.PhoneNumber.status = false;
             }
         } else {
-            error.phoneNumberError.textError = "";
-            error.phoneNumberError.status = false;
+            error.PhoneNumber.textError = "";
+            error.PhoneNumber.status = false;
         }
 
         // validate số điện thoại cố định
         if (employee.LandlineNumber) {
             if (!handleCheckFormat(MISA_RESOURCE.REGEX.PHONE_NUMBER, employee.LandlineNumber)) {
-                error.landlineNumberError.textError = landlineNumberErrorText.invalid;
-                error.landlineNumberError.status = true;
+                error.LandlineNumber.textError = LandlineNumberText.invalid;
+                error.LandlineNumber.status = true;
             } else {
-                error.landlineNumberError.textError = "";
-                error.landlineNumberError.status = false;
+                error.LandlineNumber.textError = "";
+                error.LandlineNumber.status = false;
             }
         } else {
-            error.landlineNumberError.textError = "";
-            error.landlineNumberError.status = false;
+            error.LandlineNumber.textError = "";
+            error.LandlineNumber.status = false;
         }
 
         // Validate email
         if (employee.Email) {
             if (!handleCheckFormat(MISA_RESOURCE.REGEX.EMAIL, employee.Email)) {
-                error.emailError.textError = emailErrorText.invalid;
-                error.emailError.status = true;
+                error.Email.textError = EmailText.invalid;
+                error.Email.status = true;
             } else {
-                error.emailError.textError = "";
-                error.emailError.status = false;
+                error.Email.textError = "";
+                error.Email.status = false;
             }
         } else {
-            error.emailError.textError = "";
-            error.emailError.status = false;
+            error.Email.textError = "";
+            error.Email.status = false;
         }
 
         // Validate số căn cước công dân
         if (employee.IdentityNumber) {
             if (!handleCheckFormat(MISA_RESOURCE.REGEX.IDENTITY_NUMBER, employee.IdentityNumber)) {
-                error.identityNumberError.textError = identityNumberErrorText.invalid;
-                error.identityNumberError.status = true;
+                error.IdentityNumber.textError = IdentityNumberText.invalid;
+                error.IdentityNumber.status = true;
             } else {
-                error.identityNumberError.textError = "";
-                error.identityNumberError.status = false;
+                error.IdentityNumber.textError = "";
+                error.IdentityNumber.status = false;
             }
         } else {
-            error.identityNumberError.textError = "";
-            error.identityNumberError.status = false;
+            error.IdentityNumber.textError = "";
+            error.IdentityNumber.status = false;
         }
 
         // Validate đơn vị
         const departmentNames = listDepartments.value.map((option) => option.optionName);
         if (!employee.DepartmentId) {
-            error.departmentError.textError = departmentErrorText.blank;
-            error.departmentError.status = true;
+            error.DepartmentId.textError = DepartmentIdText.blank;
+            error.DepartmentId.status = true;
         } else if (!departmentNames.includes(employee.DepartmentName)) {
-            error.departmentError.textError = departmentErrorText.notFound;
-            error.departmentError.status = true;
+            error.DepartmentId.textError = DepartmentIdText.notFound;
+            error.DepartmentId.status = true;
         } else {
-            error.departmentError.textError = "";
-            error.departmentError.status = false;
+            error.DepartmentId.textError = "";
+            error.DepartmentId.status = false;
         }
 
         error.status =
-            error.employeeCodeError.status ||
-            error.employeeNameError.status ||
-            error.dateOfBrithError.status ||
-            error.identityDateError.status ||
-            error.phoneNumberError.status ||
-            error.landlineNumberError.status ||
-            error.emailError.status ||
-            error.departmentError.status ||
-            error.identityNumberError.status;
+            error.EmployeeCode.status ||
+            error.FullName.status ||
+            error.DateOfBirth.status ||
+            error.IdentityDate.status ||
+            error.PhoneNumber.status ||
+            error.LandlineNumber.status ||
+            error.Email.status ||
+            error.DepartmentId.status ||
+            error.IdentityNumber.status;
 
         return error.status;
     } catch (err) {

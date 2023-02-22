@@ -7,16 +7,34 @@ import MPopUpError from "./MPopUpError.vue";
 import MPopUpInfo from "./MPopUpInfo.vue";
 import { useDepartment } from "../composable/useDepartment";
 import { useEmployee } from "../composable/useEmployee";
-import { reactive, inject, onMounted, ref } from "vue";
+import { reactive, inject, onMounted, ref, defineComponent } from "vue";
 import { formatDate } from "../utilities/formatDate";
 import { convertDatetime } from "../utilities/convertDatetime";
 import { error, useValidate } from "../utilities/validateForm";
 import { MISA_ENUM } from "../base/enum";
 
+//Định nghĩa các component được import
+const components = defineComponent({
+    MCheckbox,
+    MInput,
+    MDateField,
+    MRadio,
+    MPopUpError,
+    MPopUpInfo,
+});
+
+/**
+ * Định nghĩa các props nhận
+ * created by: NHGiang - (17/02/23)
+ */
 const props = defineProps({
     title: String,
 });
 
+/**
+ * Inject
+ * CreatedBy: NHGiang - (20/02/23)
+ */
 const { state, setListToast } = inject("diy");
 const { employeeSelected } = state;
 
@@ -28,36 +46,45 @@ if (state.identityForm !== MISA_ENUM.FORM_MODE.EDIT) {
     getEmployeeCode();
 }
 
+/**
+ * Khởi tạo 1 đối tượng Employee
+ * CreatedBy: NHGiang - (17/02/23)
+ */
 const employee = reactive({
     EmployeeCode: employeeSelected?.EmployeeCode || newEmployeeCode,
     FullName: employeeSelected?.FullName || "",
     Gender: employeeSelected?.Gender || 0,
     DateOfBirth: employeeSelected?.DateOfBirth ? formatDate(employeeSelected?.DateOfBirth) : "",
-    IdentityNumber: employeeSelected?.IdentityNumber || "",
     DepartmentId: employeeSelected?.DepartmentId || "",
     DepartmentName: employeeSelected?.DepartmentName || "",
-    IdentityDate: employeeSelected?.IdentityDate ? formatDate(employeeSelected?.IdentityDate) : "",
-    Position: employeeSelected?.Position || "",
-    IdentityPlace: employeeSelected?.IdentityPlace || "",
-    Address: employeeSelected?.Address || "",
+    LandlineNumber: employeeSelected?.LandlineNumber || "",
     PhoneNumber: employeeSelected?.PhoneNumber || "",
     Email: employeeSelected?.Email || "",
-    BankName: employeeSelected?.BankName || "",
+    Address: employeeSelected?.Address || "",
+    IdentityNumber: employeeSelected?.IdentityNumber || "",
+    IdentityDate: employeeSelected?.IdentityDate ? formatDate(employeeSelected?.IdentityDate) : "",
+    IdentityPlace: employeeSelected?.IdentityPlace || "",
+    Position: employeeSelected?.Position || "",
     BankAccount: employeeSelected?.BankAccount || "",
+    BankName: employeeSelected?.BankName || "",
     BankBranch: employeeSelected?.BankBranch || "",
-    LandlineNumber: employeeSelected?.LandlineNumber || "",
 });
 
+// Object lưu trạng thái của pop up error và pop info
 const isPopUp = reactive({
     isOpenError: false,
     isOpenInfo: false,
 });
+
+// Định nghĩa các hàm được emit ra ngoài
 const emit = defineEmits(["hideModal"]);
+
+// Biến giúp tham chiếu đến Element input EmployeeCode trong DOM
 const refEmployeeCode = ref(null);
 
 /**
  * Ẩn modal
- * CreatedBy: NHGiang
+ * CreatedBy: NHGiang - (20/02/23)
  */
 const hideModal = () => {
     try {
@@ -69,47 +96,67 @@ const hideModal = () => {
 
 /**
  * Xử lý hiển thị thông báo khi nhấn nút x
- * CreatedBy: NHGiang
+ * CreatedBy: NHGiang - (20/02/23)
  */
 const handleShowPopUpInfo = () => {
     try {
-        isPopUp.isOpenInfo = true;
+        const {
+            EmployeeId,
+            GenderName,
+            CreatedDate,
+            CreatedBy,
+            ModifiedDate,
+            ModifiedBy,
+            ...employeeToCompare
+        } = employeeSelected;
+
+        employeeToCompare.DateOfBirth = formatDate(employeeToCompare.DateOfBirth);
+        employeeToCompare.IdentityDate = formatDate(employeeToCompare.IdentityDate);
+
+        if (JSON.stringify(employeeToCompare) !== JSON.stringify(employee)) {
+            isPopUp.isOpenInfo = true;
+        } else {
+            hideModal();
+        }
     } catch (error) {
         console.log(error);
     }
 };
 
 /**
- *  Xử lý submit form
- * CreatedBy: NHGiang
+ * Xử lý submit form
+ * @param {*} isCloseForm -- Trạng thái Đóng/Mở form
+ * Created by: NHGiang - (20/02/23)
  */
 const hanldeSubmitForm = async (isCloseForm = true) => {
     try {
         employee.DepartmentId = employee.DepartmentId || listDepartments.value?.[0].departmentId;
-        const status = useValidate(
-            employee,
-            state.listAllEmployee,
-            state.identityForm,
-            employeeSelected.EmployeeCode,
-            listDepartments
-        );
+        // const status = useValidate(
+        //     employee,
+        //     state.listAllEmployee,
+        //     state.identityForm,
+        //     employeeSelected.EmployeeCode,
+        //     listDepartments
+        // );
 
         if (state.identityForm === MISA_ENUM.FORM_MODE.EDIT) {
-            if (!status) {
-                await handleEditEmployee(isCloseForm);
-            } else {
-                isPopUp.isOpenError = true;
-            }
+            await handleEditEmployee(isCloseForm);
+            // if (!status) {
+            //     await handleEditEmployee(isCloseForm);
+            // } else {
+            //     isPopUp.isOpenError = true;
+            // }
         }
         if (
             state.identityForm === MISA_ENUM.FORM_MODE.ADD ||
             state.identityForm === MISA_ENUM.FORM_MODE.DUPLICATE
         ) {
-            if (!status) {
-                await handleAddAndDuplicateEmployee(isCloseForm);
-            } else {
-                isPopUp.isOpenError = true;
-            }
+            await handleAddAndDuplicateEmployee(isCloseForm);
+            // if (!status) {
+            //     await handleAddAndDuplicateEmployee(isCloseForm);
+            // } else {
+            //     isPopUp.isOpenError = true;
+            // }
         }
     } catch (err) {
         console.log(err);
@@ -117,8 +164,9 @@ const hanldeSubmitForm = async (isCloseForm = true) => {
 };
 
 /**
- * Xử lý Thêm 1 nhân viên mới và nhân bản
- * Created by: NHGiang (17/01/2023)
+ * Xử lý Thêm mới hoặc nhân bản 1 nhân viên
+ * @param {*} isCloseForm -- Trạng thái Đóng/Mở form
+ * Created by: NHGiang - (20/02/23)
  */
 const handleAddAndDuplicateEmployee = async (isCloseForm) => {
     try {
@@ -127,7 +175,6 @@ const handleAddAndDuplicateEmployee = async (isCloseForm) => {
             {
                 ...employee,
                 IdentityDate: new Date(convertDatetime(employee.IdentityDate, true)),
-                // DateOfBirth: convertDatetime(employee.DateOfBirth, false),
                 DateOfBirth: new Date(convertDatetime(employee.DateOfBirth, true)),
             },
             emit,
@@ -140,8 +187,9 @@ const handleAddAndDuplicateEmployee = async (isCloseForm) => {
 };
 
 /**
- * Xử lý sửa thông tin nhân viên
- * Created by: NHGiang (17/01/2023)
+ * Xử lý sửa thông tin của 1 nhân viên
+ * @param {*} isCloseForm -- Trạng thái Đóng/Mở form
+ * Created by: NHGiang - (20/02/23)
  */
 const handleEditEmployee = async (isCloseForm) => {
     try {
@@ -151,7 +199,6 @@ const handleEditEmployee = async (isCloseForm) => {
                 ...employee,
                 EmployeeId: employeeSelected.EmployeeId,
                 IdentityDate: new Date(convertDatetime(employee.IdentityDate, true)),
-                // DateOfBirth: convertDatetime(employee.DateOfBirth, false),
                 DateOfBirth: new Date(convertDatetime(employee.DateOfBirth, true)),
             },
             emit,
@@ -164,7 +211,7 @@ const handleEditEmployee = async (isCloseForm) => {
 
 /**
  * Xử lý focus input employee code
- * Created by: NHGiang
+ * Created by: NHGiang - (20/02/23)
  */
 onMounted(() => {
     try {
@@ -175,14 +222,15 @@ onMounted(() => {
 });
 
 /**
- * Xử lý set lại tabindex khi hết 
+ * Xử lý set lại tabindex khi hết
  * @param {*} e event object
+ * Created by: NHGiang - (20/02/23)
  */
 const handleSetTabindex = (e) => {
     try {
         if (e.keyCode === 9) {
             e.preventDefault();
-            
+
             refEmployeeCode.value.handleFocus();
         }
     } catch (error) {
@@ -223,17 +271,7 @@ const handleSetTabindex = (e) => {
                     <span>Là nhà cung cấp</span>
                 </div>
                 <div class="modal__header-right">
-                    <div
-                        :style="{
-                            background:
-                                'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -732px -31px',
-                            width: '24px',
-                            height: '24px',
-                            marginRight: '6px',
-                        }"
-                        class="modal__help-btn"
-                    ></div>
-                    <div class="modal__close-btn">
+                    <div class="modal__close-btn" @click="handleShowPopUpInfo">
                         <label
                             for="show-modal"
                             :style="{
@@ -243,7 +281,6 @@ const handleSetTabindex = (e) => {
                                 height: '18px',
                                 cursor: 'pointer',
                             }"
-                            @click="handleShowPopUpInfo"
                         ></label>
                     </div>
                 </div>
@@ -273,10 +310,11 @@ const handleSetTabindex = (e) => {
                             :width="'149px'"
                             :marginRight="'6px'"
                             :value="employee.EmployeeCode"
-                            :status="error.employeeCodeError.status"
+                            :status="error.EmployeeCode.status"
+                            :statusPublic="error.status"
                             @inputValue="employee.EmployeeCode = $event"
-                            :text-error="error.employeeCodeError.textError"
-                            @changeValue="error.employeeCodeError.status = $event"
+                            :text-error="error.EmployeeCode.textError"
+                            @changeValue="error.EmployeeCode.status = $event"
                             ref="refEmployeeCode"
                         />
                         <m-input
@@ -284,23 +322,26 @@ const handleSetTabindex = (e) => {
                             :required="true"
                             :width="'233px'"
                             :value="employee.FullName"
-                            :status="error.employeeNameError.status"
-                            :text-error="error.employeeNameError.textError"
+                            :status="error.FullName.status"
+                            :statusPublic="error.status"
+                            :text-error="error.FullName.textError"
                             @inputValue="employee.FullName = $event"
-                            @changeValue="error.employeeNameError.status = $event"
+                            @changeValue="error.FullName.status = $event"
                         />
                     </div>
                     <m-checkbox
                         v-if="listDepartments.length"
                         :options="listDepartments"
-                        default=""
+                        :default="employee.DepartmentId"
                         @select="
                             (employee.DepartmentId = $event.optionId),
                                 (employee.DepartmentName = $event.optionName)
                         "
                         :text-label="'Đơn vị'"
-                        :status="error.departmentError.status"
+                        :status="error.DepartmentId.status"
+                        :statusPublic="error.status"
                         :required="true"
+                        :textError="error.DepartmentId.textError"
                     />
                     <m-input
                         :fieldText="'Chức danh'"
@@ -331,7 +372,9 @@ const handleSetTabindex = (e) => {
                             :width="'166px'"
                             :fieldText="'Ngày sinh'"
                             :value="employee.DateOfBirth"
-                            :status="error.dateOfBrithError.status"
+                            :status="error.DateOfBirth.status"
+                            :textError="error.DateOfBirth.textError"
+                            :statusPublic="error.status"
                             @dateField="employee.DateOfBirth = $event"
                         />
                         <div style="padding-left: 10px; margin-left: 6px">
@@ -344,6 +387,7 @@ const handleSetTabindex = (e) => {
                                     :marginLeft="'10px'"
                                     :marginRight="'20px'"
                                     :defaultValue="employee.Gender"
+                                    :statusPublic="error.status"
                                     @radio="employee.Gender = $event"
                                 />
                                 <m-radio
@@ -364,6 +408,9 @@ const handleSetTabindex = (e) => {
                                     @radio="employee.Gender = $event"
                                 />
                             </div>
+                            <p v-if="error.status" class="textfield-error">
+                                {{ textError }}
+                            </p>
                         </div>
                     </div>
                     <div
@@ -379,15 +426,20 @@ const handleSetTabindex = (e) => {
                             :width="'242px'"
                             :marginRight="'6px'"
                             :value="employee.IdentityNumber"
-                            :status="error.identityNumberError.status"
+                            :status="error.IdentityNumber.status"
+                            :statusPublic="error.status"
                             @inputValue="employee.IdentityNumber = $event"
-                            @changeValue="error.identityNumberError.status = $event"
+                            @changeValue="error.IdentityNumber.status = $event"
                             :tooltip="'Số chứng minh nhân dân'"
+                            :text-error="error.IdentityNumber.textError"
                         />
                         <m-date-field
                             :width="'166px'"
                             :fieldText="'Ngày cấp'"
                             :value="employee.IdentityDate"
+                            :status="error.IdentityDate.status"
+                            :textError="error.IdentityDate.textError"
+                            :statusPublic="error.status"
                             @dateField="employee.IdentityDate = $event"
                         />
                     </div>
@@ -414,9 +466,10 @@ const handleSetTabindex = (e) => {
                         style="padding-bottom: 12px; float: left"
                         :marginRight="'8px'"
                         :value="employee.PhoneNumber"
-                        :status="error.phoneNumberError.status"
+                        :status="error.PhoneNumber.status"
                         @inputValue="employee.PhoneNumber = $event"
                         :tooltip="'Số điện thoại di động'"
+                        :text-error="error.PhoneNumber.textError"
                     />
                     <m-input
                         :fieldText="'ĐT cố định'"
@@ -425,8 +478,9 @@ const handleSetTabindex = (e) => {
                         :marginRight="'8px'"
                         :tooltip="'Số điện thoại cố động'"
                         :value="employee.LandlineNumber"
-                        :status="error.landlineNumberError.status"
+                        :status="error.LandlineNumber.status"
                         @inputValue="employee.LandlineNumber = $event"
+                        :text-error="error.LandlineNumber.textError"
                     />
                     <m-input
                         :fieldText="'Email'"
@@ -436,6 +490,8 @@ const handleSetTabindex = (e) => {
                         :value="employee.Email"
                         @inputValue="employee.Email = $event"
                         :placeHolder="'example@gmail.com'"
+                        :status="error.Email.status"
+                        :text-error="error.Email.textError"
                     />
                     <m-input
                         :fieldText="'Tài khoản ngân hàng'"
@@ -492,15 +548,15 @@ const handleSetTabindex = (e) => {
                 v-if="isPopUp.isOpenError"
                 :title="'Lỗi'"
                 :text-error="
-                    error.employeeCodeError.textError ||
-                    error.employeeNameError.textError ||
-                    error.dateOfBrithError.textError ||
-                    error.identityDateError.textError ||
-                    error.phoneNumberError.textError ||
-                    error.landlineNumberError.textError ||
-                    error.emailError.textError ||
-                    error.identityNumberError.textError ||
-                    error.departmentError.textError
+                    error.EmployeeCode.textError ||
+                    error.FullName.textError ||
+                    error.DateOfBirth.textError ||
+                    error.IdentityDate.textError ||
+                    error.PhoneNumber.textError ||
+                    error.LandlineNumber.textError ||
+                    error.Email.textError ||
+                    error.IdentityNumber.textError ||
+                    error.DepartmentId.textError
                 "
                 @closeError="isPopUp.isOpenError = !isPopUp.isOpenError"
             />

@@ -5,39 +5,39 @@ import { error } from "./validateForm";
  */
 export const handleSetStatusForm = () => {
     try {
-        error.employeeCodeError = {
+        error.EmployeeCode = {
             textError: "",
             status: false,
         };
-        error.employeeNameError = {
+        error.FullName = {
             textError: "",
             status: false,
         };
-        error.phoneNumberError = {
+        error.PhoneNumber = {
             textError: "",
             status: false,
         };
-        error.emailError = {
+        error.Email = {
             textError: "",
             status: false,
         };
-        error.dateOfBrithError = {
+        error.DateOfBirth = {
             textError: "",
             status: false,
         };
-        error.identityDateError = {
+        error.IdentityDate = {
             textError: "",
             status: false,
         };
-        error.landlineNumberError = {
+        error.LandlineNumber = {
             textError: "",
             status: false,
         };
-        error.departmentError = {
+        error.DepartmentId = {
             textError: "",
             status: false,
         };
-        error.identityNumberError = {
+        error.IdentityNumber = {
             textError: "",
             status: false,
         };

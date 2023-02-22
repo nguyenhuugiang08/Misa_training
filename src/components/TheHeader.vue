@@ -1,6 +1,12 @@
 <script setup>
-import { inject } from "vue";
+import { inject, ref } from "vue";
+import MPopUpError from "./MPopUpError.vue";
+
+// Lấy state và hàm set lại trạng thái của sidebar trong Store
 const { state, setIsSidebar } = inject("diy");
+
+// Khai báo biến set trạng thái của Popup thông báo chức năng đang thi công
+const isOpen = ref(false);
 </script>
 
 <template>
@@ -27,7 +33,8 @@ const { state, setIsSidebar } = inject("diy");
 
         <div class="header__right">
             <div
-                class="sidebar-item__icon"
+                class="sidebar-item__icon under-construction"
+                @click="isOpen = true"
                 style="
                     background: url('../../src/assets/img/Sprites.64af8f61.svg') no-repeat -788px -30px;
                 "
@@ -40,7 +47,7 @@ const { state, setIsSidebar } = inject("diy");
                     "
                 ></div>
                 <div class="header__right-text">Nguyễn Hữu Giang</div>
-                <div class="header__left-wrapper">
+                <div @click="isOpen = true" class="header__left-wrapper under-construction--special" >
                     <div
                         class="sidebar-item__icon"
                         style="
@@ -53,7 +60,60 @@ const { state, setIsSidebar } = inject("diy");
                 </div>
             </div>
         </div>
+        <div class="modal-error" v-if="isOpen">
+            <m-pop-up-error
+                v-if="isOpen"
+                :title="'Thông báo'"
+                :text-error="`Chức năng chưa thi công.`"
+                @closeError="isOpen = !isOpen"
+            />
+        </div>
     </div>
 </template>
 
-<style scoped></style>
+<style>
+.under-construction {
+    position: relative;
+    cursor: pointer;
+}
+.under-construction::before {
+    content: "Thông báo";
+    position: absolute;
+    width: max-content;
+    z-index: 999;
+    top: 32px;
+    background-color: #434242;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    animation: identifier 0.3s ease-in;
+    display: none;
+}
+
+.under-construction:hover::before {
+    display: block;
+}
+
+.under-construction--special {
+    position: relative;
+    cursor: pointer;
+}
+.under-construction--special::before {
+    content: "Thông tin tài khoản";
+    position: absolute;
+    width: max-content;
+    z-index: 999;
+    top: 32px;
+    right: -20px;
+    background-color: #434242;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    animation: identifier 0.3s ease-in;
+    display: none;
+}
+
+.under-construction--special:hover::before {
+    display: block;
+}
+</style>

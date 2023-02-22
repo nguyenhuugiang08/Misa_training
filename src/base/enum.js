@@ -1,23 +1,23 @@
 export const MISA_ENUM = {
     pageSizeOptions: [
         {
-            optionId: 10,
+            optionId: 10, // 10 bản ghi trên 1 trang
             optionName: "10 bản ghi trên 1 trang",
         },
         {
-            optionId: 20,
+            optionId: 20, // 20 bản ghi trên 1 trang
             optionName: "20 bản ghi trên 1 trang",
         },
         {
-            optionId: 30,
+            optionId: 30, // 30 bản ghi trên 1 trang
             optionName: "30 bản ghi trên 1 trang",
         },
         {
-            optionId: 50,
+            optionId: 50, // 50 bản ghi trên 1 trang
             optionName: "50 bản ghi trên 1 trang",
         },
         {
-            optionId: 100,
+            optionId: 100, // 100 bản ghi trên 1 trang
             optionName: "100 bản ghi trên 1 trang",
         },
     ],

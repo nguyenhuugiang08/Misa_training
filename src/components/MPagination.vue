@@ -3,15 +3,21 @@ import { defineComponent, watch, inject, ref } from "vue";
 import MCheckbox from "./MCheckbox.vue";
 import { useEmployee } from "../composable/useEmployee";
 import MLoading from "./MLoading.vue";
-import Paginate from "vuejs-paginate/src/components/Paginate.vue";
+import Paginate from "vuejs-paginate-next";
 import { useRoute, useRouter } from "vue-router";
 import { MISA_ENUM } from "../base/enum";
 
 const { state, setListEmployees, setTotalPage } = inject("diy");
 const pageSize = ref(20);
+const page = ref(1);
 const router = useRouter();
 const route = useRoute();
 const { query } = route;
+
+/**
+ * Theo dõi sự thay đổi pageSize từ URL
+ * Created by: NHGiang - (19/0/23)
+ */
 watch(
     () => route.query.pageSize,
     (newValue) => {
@@ -23,25 +29,44 @@ watch(
     }
 );
 
+/**
+ * Theo dõi sự thay đổi pageNumber từ URL
+ * Created by: NHGiang - (19/0/23)
+ */
+watch(
+    () => route.query.pageNumber,
+    (newValue) => {
+        page.value = newValue * 1;
+        try {
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
+
+// Định nghĩa các component được import
 const components = defineComponent({
     MCheckbox,
     MLoading,
     Paginate,
 });
 
+// Trạng thái ẩn hiện của loading khi thực hiện tác vụ bất đồng bộ
 const isLoading = ref(false);
 
 const { handleFilterPage, listEmployees, totalPage } = useEmployee();
 
 /**
- * Xử lý thay đổi số lượng bản ghi hiển thị trên trang
- * CreatedBy: NHGiang
+ * Xử lý thay đổi dữ liệu hiển thị trên trang khi thay đổi pageSize
+ * @param {*} pageSize -- Số lượng bản ghi trên 1 trang
+ * @param {*} pageNumber -- Trang thứ bao nhiêu
+ * Created by: NHGiang - (20/02/23)
  */
 const handleChangePageSize = async (pageSize, pageNumber = 1) => {
     try {
         router.push({ path: "/", query: { pageSize: pageSize, pageNumber: pageNumber } });
         isLoading.value = true;
-        await handleFilterPage(pageSize, pageNumber);
+        await handleFilterPage(state.keyword, pageSize, pageNumber);
         setListEmployees(listEmployees);
         setTotalPage(totalPage);
         isLoading.value = false;
@@ -51,14 +76,15 @@ const handleChangePageSize = async (pageSize, pageNumber = 1) => {
 };
 
 /**
- * Xử lý thay đổi trang
- * CreatedBy: NHGiang
+ * Xử lý thay đổi dữ liệu hiển thị trên trang khi thay đổi pageNumber
+ * @param {*} pageNumber -- Trang thứ bao nhiêu
+ * Created by: NHGiang - (20/02/23)
  */
 const handleChangePageNumber = async (pageNumber) => {
     try {
         router.push({ path: "/", query: { pageSize: pageSize.value, pageNumber: pageNumber } });
         isLoading.value = true;
-        await handleFilterPage(pageSize.value, pageNumber);
+        await handleFilterPage(state.keyword, pageSize.value, pageNumber);
         setListEmployees(listEmployees);
         isLoading.value = false;
     } catch (error) {
@@ -76,13 +102,14 @@ const handleChangePageNumber = async (pageNumber) => {
         <div style="display: flex; align-items: center">
             <m-checkbox
                 :options="MISA_ENUM.pageSizeOptions"
-                :default="MISA_ENUM.pageSizeOptions[1].optionName"
+                :default="MISA_ENUM.pageSizeOptions[1].optionId"
                 :is-top="true"
                 :width="'200px'"
                 style="position: relative; top: 4px"
-                @select="handleChangePageSize($event)"
+                @select="handleChangePageSize($event.optionId)"
             />
             <paginate
+                v-model="page"
                 :page-count="state.totalPageValue"
                 :page-range="3"
                 :margin-pages="1"

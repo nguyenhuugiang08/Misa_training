@@ -1,7 +1,7 @@
 import { ref } from "vue";
-import axios from "axios";
 import { MISA_RESOURCE } from "../base/resource";
 import { MISA_ENUM } from "../base/enum";
+import employeeApi from "../api/employeeApi";
 
 /**
  * Xử lý dữ liệu liên quan đến employee
@@ -9,44 +9,51 @@ import { MISA_ENUM } from "../base/enum";
  */
 export const useEmployee = () => {
     try {
-        const listEmployees = ref([]);
-        const newEmployeeCode = ref(null);
-        const listAllEmployees = ref([]);
-        const editEmployee = ref(null);
-        const totalRecord = ref(0);
-        const totalPage = ref(1);
+        const listEmployees = ref([]); // Danh sách nhân viên
+        const newEmployeeCode = ref(null); // Mã nhân viên mới
+        const listAllEmployees = ref([]); // Danh sách tất cả nhân viên
+        const editEmployee = ref(null); // Thông tin nhân viên được chọn để chỉnh sửa
+        const totalRecord = ref(0); // Tổng số bản ghi có trong DB
+        const totalPage = ref(1); // Tổng số trang
 
-         // Lấy danh sách employees
-         const getAllEmployees = async () => {
+        /**
+         * hàm gọi API và lấy danh sách tất cả nhân viên
+         * Created by: NHGiang - (20/02/23)
+         */
+        const getAllEmployees = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_MISA_EMPLOYEE_API}`);
-                listAllEmployees.value = [...response.data];
+                const response = await employeeApi.getEmployees();
+                listAllEmployees.value = [...response];
             } catch (error) {
                 console.log(error);
             }
         };
 
-        // Lấy mã nhân viên mới khi thêm dữ liệu
+        /**
+         * Hàm gọi API và lấy mã nhân viên mới
+         * Created by: NHGiang - (20/02/23)
+         */
         const getEmployeeCode = async () => {
             try {
-                const response = await fetch(
-                    `${import.meta.env.VITE_MISA_EMPLOYEE_API}/NewEmployeeCode`
-                );
-                const data = await response.text();
+                const response = await employeeApi.getEmployeeCode();
 
-                newEmployeeCode.value = data;
+                newEmployeeCode.value = response;
             } catch (error) {
                 console.log(error);
             }
         };
 
-        // Thêm nhân viên mới
+        /**
+         * Hàm gọi API thực hiện thêm nhân viên mới
+         * @param {*} employee -- Object chứa thông tin của nhân viên mói
+         * @param {*} emit
+         * @param {*} formMode -- Chế độ form thêm
+         * @param {*} isCloseForm -- trạng thái Đóng/Mở form
+         * Created by: NHGiang - (20/02/23)
+         */
         const addNewEmloyee = async (employee, emit, formMode, isCloseForm) => {
             try {
-                const response = await axios.post(
-                    `${import.meta.env.VITE_MISA_EMPLOYEE_API}`,
-                    employee
-                );
+                const response = await employeeApi.addNewEmloyee(employee);
 
                 if (formMode !== MISA_ENUM.FORM_MODE.DUPLICATE) {
                     emit("endAdd", {
@@ -81,40 +88,31 @@ export const useEmployee = () => {
             }
         };
 
-        // Tìm kiếm nhân viên theo tên, mã nhân viên
-        const searchEmployees = async (keyword) => {
-            try {
-                const response = await axios.get(
-                    `${import.meta.env.VITE_MISA_EMPLOYEE_API}/filter?entityFilter=${keyword}`
-                );
-                const { Data } = response.data;
-                listEmployees.value = [...Data];
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        // Lấy thông tin 1 nhân viên
+        /**
+         * hàm gọi API và lấy thông tin của nhân viên theo ID
+         * @param {*} employeeId -- ID của nhân viên
+         * Created by: NHGiang - (20/02/23)
+         */
         const getAnEmployee = async (employeeId) => {
             try {
-                const response = await axios.get(
-                    `${import.meta.env.VITE_MISA_EMPLOYEE_API}/${employeeId}`
-                );
+                const response = await employeeApi.getEmployeeById(employeeId);
 
-                const data = response.data;
-                editEmployee.value = data;
+                editEmployee.value = response;
             } catch (error) {
                 console.log(error);
             }
         };
 
-        // Sửa thông tin của nhân viên
+        /**
+         * hàm gọi API và sửa thông tin nhân viên theo ID
+         * @param {*} employee -- Thông tin của nhân viên sau sửa
+         * @param {*} emit
+         * @param {*} isCloseForm -- Trạng thái Đóng/Mở form
+         */
         const editAnEmployee = async (employee, emit, isCloseForm) => {
             try {
-                const response = await axios.put(
-                    `${import.meta.env.VITE_MISA_EMPLOYEE_API}/${employee.EmployeeId}`,
-                    employee
-                );
+                const response = await employeeApi.editEmployee(employee);
+
                 emit("endEdit", {
                     toastMessage: MISA_RESOURCE.TOAST.EDIT_SUCCESS.TOAST_MESSAGE,
                     statusMessage: MISA_RESOURCE.TOAST.EDIT_SUCCESS.STATUS_MESSAGE,
@@ -131,16 +129,22 @@ export const useEmployee = () => {
             }
         };
 
-        // Xử lý phân trang
-        const handleFilterPage = async (pageSize = 20, pageNumber = 1) => {
+        /**
+         * Hàm gọi API và lấy danh sách nhân viên theo bộ lọc và phân trang
+         * @param {*} keyword -- Từ khóa tìm kiếm
+         * @param {*} pageSize -- Số bản ghi trên 1 trang
+         * @param {*} pageNumber -- trang thứ bao nhiêu
+         * Created by: NHGiang - (20/02/23)
+         */
+        const handleFilterPage = async (keyword, pageSize = 20, pageNumber = 1) => {
             try {
-                const response = await axios.get(
-                    `${
-                        import.meta.env.VITE_MISA_EMPLOYEE_API
-                    }/filter?pageSize=${pageSize}&pageNumber=${pageNumber}`
+                const response = await employeeApi.getEmployeesByFilterAndPaging(
+                    keyword,
+                    pageSize,
+                    pageNumber
                 );
 
-                const { Data, TotalRecord, TotalPage } = response.data;
+                const { Data, TotalRecord, TotalPage } = response;
                 listEmployees.value = [...Data];
                 totalRecord.value = TotalRecord;
                 totalPage.value = TotalPage;
@@ -149,42 +153,32 @@ export const useEmployee = () => {
             }
         };
 
-        // xử lý xóa nhân viên theo mẫ
+        /**
+         * Hàm gọi API và thực hiện xóa nhân viên theo ID
+         * @param {String} employeeId -- ID của nhân viên cần xóa
+         * Created by: NHGiang - (20/02/23)
+         */
         const handleDeleteEmployee = async (employeeId) => {
             try {
-                const response = await axios.delete(
-                    `${import.meta.env.VITE_MISA_EMPLOYEE_API}/${employeeId}`
-                );
+                const response = await employeeApi.deleteEmployee(employeeId);
             } catch (error) {
                 console.log(error);
             }
         };
 
-        // Xuất ra Excel
+        /**
+         * Hàm gọi API và thực hiện xuất danh sách nhân viên ra file excel
+         * @param {*} param0
+         * Created by: NHGiang - (20/02/23)
+         */
         const handlExportExcel = async ({ keyword, dataCount, pageNumber }) => {
             try {
                 const outputFilename = MISA_RESOURCE.FILE_EXCEL_NAME;
 
-                const headers = {
-                    "Content-Disposition": `attachment; filename=${outputFilename}`,
-                    "Content-Type":
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                };
-                const config = {
-                    method: "GET",
-                    url: URL,
-                    responseType: "arraybuffer",
-                    headers,
-                };
+                const response = await employeeApi.exportExcel(keyword, dataCount, pageNumber);
 
-                const response = await axios.get(
-                    `${
-                        import.meta.env.VITE_MISA_EMPLOYEE_API
-                    }/export?keyword=${keyword}&dataCount=${dataCount}&pageNumber=${pageNumber}`,
-                    config
-                );
-
-                const url = URL.createObjectURL(new Blob([response.data]));
+                // Thực hiện tạo 1 thẻ a để thực hiện tải file khi xuất xong
+                const url = URL.createObjectURL(new Blob([response]));
                 const link = document.createElement("a");
                 link.href = url;
                 link.setAttribute("download", outputFilename);
@@ -195,15 +189,14 @@ export const useEmployee = () => {
             }
         };
 
-        // Thực hiện xóa nhiều bản ghi
+        /**
+         * Hàm gọi API và thực hiện xóa nhiều nhân viên được chọn
+         * @param {*} employeeIds -- Danh sách ID của các nhân viên muốn xóa
+         * Created by: NHGiang - (20/02/23)
+         */
         const handleBulkDelete = async (employeeIds) => {
             try {
-                const response = await axios.delete(
-                    `${import.meta.env.VITE_MISA_EMPLOYEE_API}/deleteMultipleEmployee`,
-                    {
-                        data: employeeIds,
-                    }
-                );
+                const response = await employeeApi.deleteMultipleEmployees(employeeIds);
             } catch (error) {
                 console.log(error);
             }
@@ -218,7 +211,6 @@ export const useEmployee = () => {
             totalPage,
             getEmployeeCode,
             addNewEmloyee,
-            searchEmployees,
             getAnEmployee,
             getAllEmployees,
             editAnEmployee,

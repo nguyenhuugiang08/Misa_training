@@ -7,6 +7,7 @@
 @import url(./components/pagiantion.css);
 @import url(./components/table.css);
 @import url(./components/modal.css);
+@import url(./components/import.css);
 
 * {
     margin: 0;
@@ -31,6 +32,8 @@
 
     --table-bg-color: #e5f3ff;
     --table-bg-color-hover: #f2f9ff;
+
+    --width-sidebar: 178px;
 }
 
 @font-face {
@@ -57,14 +60,13 @@ body {
 }
 
 .navbar {
-    width: 178px;
+    width: var(--width-sidebar);
     height: 100vh;
     background-color: #041434;
-    /* overflow: hidden; */
 }
 
 .main {
-    /* width: calc(100% - 178px); */
+    width: calc(100% - var(--width-sidebar));
     overflow: auto;
 }
 

@@ -436,7 +436,7 @@
 .modal-error {
     background-color: #0000004d;
     position: fixed;
-    z-index: 99;
+    z-index: 999;
     inset: 0;
     display: flex;
     justify-content: center;

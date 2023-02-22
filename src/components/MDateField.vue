@@ -7,6 +7,7 @@ import { MISA_RESOURCE } from "../base/resource";
 import { convertDatetime } from "../utilities/convertDatetime";
 import { handleCheckFormat } from "../utilities/validateForm";
 
+// Định nghĩa các props nhận vào
 const props = defineProps({
     fieldText: String,
     required: { type: Boolean, default: false },
@@ -14,18 +15,25 @@ const props = defineProps({
     marginRight: String,
     value: String,
     status: Boolean,
+    statusPublic: Boolean,
+    textError: String,
     type: { type: String, default: "text" },
 });
 
-const date = ref(convertDatetime(props.value));
-const isFocus = ref(false);
-const datepicker = ref(null);
-const isOpenDatepicker = ref(false);
+const date = ref(convertDatetime(props.value)); // Giá trị ngày tháng được hiển thị
+const isFocus = ref(false); // Trạng focus của ô input
+const datepicker = ref(null); // Tham chiếu đến component DatePicker
+const isOpenDatepicker = ref(false); // Trạng thái Đóng /Mở của date picker
+
+// Định nghĩa các hàm emit lên component cha
 const emit = defineEmits(["dateField"]);
 
 /**
- *  Xử lý đẩy value ô input lên component cha
- * CreatedBy: NHGiang
+ * Khi thay đổi giá trị ô input
+ * - Kiểm tra nếu ngày tháng nhập vào hợp lệ -> gán lại giá trị biến date -> hiển thị lên giao diện
+ * - Kiểm tra nếu ngày tháng nhập vào không hợp lệ -> gán lại giá trị biến date là ngày hiện tại -> hiển thị lên giao diện
+ * @param {*} value -- Giá trị ô input
+ * Created by: NHGiang - (20/02/23)
  */
 const handleEmitInputValue = (value) => {
     try {
@@ -44,7 +52,7 @@ const handleEmitInputValue = (value) => {
 
 /**
  * Xử lý logic liên quan datepicker
- * CreatedBy: NHGiang
+ * CreatedBy: NHGiang - (20/02/23)
  */
 const handleDatepicker = () => {
     try {
@@ -60,6 +68,11 @@ const handleDatepicker = () => {
         console.log(error);
     }
 };
+
+/**
+ * Theo dõi giá trị biến date -> emit giá trị ra ngoài
+ * Created by: NHGiang
+ */
 watch(
     () => date.value,
     (newValue) => {
@@ -121,6 +134,8 @@ watch(
                 <span @click="selectCurrentDate()" title="Select current date"> Hôm nay </span>
             </template>
         </Datepicker>
+        <p v-if="statusPublic || status" class="textfield-error">{{ textError }}</p>
+        <!-- <div v-if="status" class="error-input">{{ textError }}</div> -->
     </div>
 </template>
 
@@ -182,4 +197,5 @@ watch(
     align-items: center;
     cursor: pointer;
 }
+
 </style>

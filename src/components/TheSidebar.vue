@@ -5,7 +5,7 @@ const index = ref(1);
 </script>
 
 <template>
-    <div class="navbar" :style="{ width: state.isSidebar ? '52px' : '178px' }">
+    <div class="navbar">
         <div class="navbar-header">
             <div class="sidebar-item__icon navbar-header__icon" v-if="!state.isSidebar">
                 <div
@@ -92,7 +92,7 @@ const index = ref(1);
                 <p v-if="!state.isSidebar">Tiền gửi</p>
             </router-link>
             <router-link
-                to="/"
+                to="/purchase"
                 :class="{ 'sidebar-item--active': index === 4 }"
                 @click="index = 4"
                 class="sidebar-item"
@@ -109,7 +109,7 @@ const index = ref(1);
                 <p v-if="!state.isSidebar">Mua hàng</p>
             </router-link>
             <router-link
-                to="/"
+                to="/sell"
                 :class="{ 'sidebar-item--active': index === 5 }"
                 @click="index = 5"
                 class="sidebar-item"
@@ -126,7 +126,7 @@ const index = ref(1);
                 <p v-if="!state.isSidebar">Bán hàng</p>
             </router-link>
             <router-link
-                to="/"
+                to="/order-management"
                 :class="{ 'sidebar-item--active': index === 6 }"
                 @click="index = 6"
                 class="sidebar-item"
@@ -143,7 +143,7 @@ const index = ref(1);
                 <p v-if="!state.isSidebar">Quản lý đơn hàng</p>
             </router-link>
             <router-link
-                to="/"
+                to="/granary"
                 :class="{ 'sidebar-item--active': index === 7 }"
                 @click="index = 7"
                 class="sidebar-item"
@@ -160,7 +160,7 @@ const index = ref(1);
                 <p v-if="!state.isSidebar">Kho</p>
             </router-link>
             <router-link
-                to="/"
+                to="/tools"
                 :class="{ 'sidebar-item--active': index === 8 }"
                 @click="index = 8"
                 class="sidebar-item"
@@ -177,7 +177,7 @@ const index = ref(1);
                 <p v-if="!state.isSidebar">Công cụ dụng cụ</p>
             </router-link>
             <router-link
-                to="/"
+                to="/fixed-assets"
                 :class="{ 'sidebar-item--active': index === 9 }"
                 @click="index = 9"
                 class="sidebar-item"
@@ -194,7 +194,7 @@ const index = ref(1);
                 <p v-if="!state.isSidebar">Tài sản cố định</p>
             </router-link>
             <router-link
-                to="/"
+                to="/tax"
                 :class="{ 'sidebar-item--active': index === 10 }"
                 @click="index = 10"
                 class="sidebar-item"
@@ -211,7 +211,7 @@ const index = ref(1);
                 <p v-if="!state.isSidebar">Thuế</p>
             </router-link>
             <router-link
-                to="/"
+                to="/worth"
                 :class="{ 'sidebar-item--active': index === 11 }"
                 @click="index = 11"
                 class="sidebar-item"
@@ -228,7 +228,7 @@ const index = ref(1);
                 <p v-if="!state.isSidebar">Giá thành</p>
             </router-link>
             <router-link
-                to="/"
+                to="/overall"
                 :class="{ 'sidebar-item--active': index === 12 }"
                 @click="index = 12"
                 class="sidebar-item"
@@ -245,7 +245,7 @@ const index = ref(1);
                 <p v-if="!state.isSidebar">Tổng hợp</p>
             </router-link>
             <router-link
-                to="/"
+                to="/fund"
                 :class="{ 'sidebar-item--active': index === 13 }"
                 @click="index = 13"
                 class="sidebar-item"
@@ -262,7 +262,7 @@ const index = ref(1);
                 <p v-if="!state.isSidebar">Ngân sách</p>
             </router-link>
             <router-link
-                to="/"
+                to="/report"
                 :class="{ 'sidebar-item--active': index === 14 }"
                 @click="index = 14"
                 class="sidebar-item"
@@ -279,7 +279,7 @@ const index = ref(1);
                 <p v-if="!state.isSidebar">Báo cáo</p>
             </router-link>
             <router-link
-                to="/"
+                to="/financial-analysis"
                 :class="{ 'sidebar-item--active': index === 15 }"
                 @click="index = 15"
                 class="sidebar-item"
@@ -296,7 +296,7 @@ const index = ref(1);
                 <p v-if="!state.isSidebar">Phân tích tài chính</p>
             </router-link>
             <router-link
-                to="/"
+                to="/financial-knowledge"
                 :class="{ 'sidebar-item--active': index === 16 }"
                 @click="index = 16"
                 class="sidebar-item"
