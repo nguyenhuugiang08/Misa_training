@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, inject } from "vue";
 import { MISA_ENUM } from "../base/enum";
 
 // định nghĩa các props nhận vào
@@ -8,6 +8,8 @@ const props = defineProps({
     statusMessage: String,
     status: Number,
 });
+
+const { deleteToastHidden } = inject("diy");
 
 /**
  * Xử lý đóng toast message
@@ -30,6 +32,7 @@ const isShow = ref(false); // trạng thái Ẩn/Hiện của toast message
 setTimeout(() => {
     try {
         isShow.value = true;
+        deleteToastHidden();
     } catch (error) {
         console.log(error);
     }
@@ -61,7 +64,7 @@ setTimeout(() => {
             >
                 {{ statusMessage }}
             </div>
-            {{ toastMessage }}
+            {{ ` ${toastMessage}` }}
         </div>
         <div class="toast-close">
             <div class="toast-close__icon" @click="handleCloseToast"></div>
@@ -96,20 +99,24 @@ setTimeout(() => {
 .toast-success {
     color: var(--primary-color);
     font-weight: 700;
+    margin-right: 4px;
 }
 
 .toast-error {
     color: #de3618;
+    margin-right: 4px;
     font-weight: 700;
 }
 
 .toast-warning {
     color: #f49342;
+    margin-right: 4px;
     font-weight: 700;
 }
 
 .toast-info {
     color: #009eeb;
+    margin-right: 4px;
     font-weight: 700;
 }
 

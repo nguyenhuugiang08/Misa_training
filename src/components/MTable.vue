@@ -7,7 +7,8 @@ import { useEmployee } from "../composable/useEmployee";
 import { useRoute } from "vue-router";
 
 const { listEmployees, handleDeleteEmployee } = useEmployee();
-const { state, setListItemChecked, setListPageChecked } = inject("diy");
+const { state, setListItemChecked, setListPageChecked, setTotalEmployee, setTotalPage } =
+    inject("diy");
 
 const isPopUp = reactive({
     isOpenWarning: false, // Trạng thái Đóng/Mở pop up warning
@@ -160,6 +161,8 @@ const hanldeSubmitFormDelete = async (event) => {
     try {
         emit("startDelete");
         await handleDeleteEmployee(id.value);
+        setTotalEmployee(state.totalEmployee - 1);
+        setTotalPage(Math.ceil((state.totalEmployee - 1) / route.query.pageSize));
         emit("endDelete", { event: event, id: id.value });
     } catch (err) {
         console.log(err);

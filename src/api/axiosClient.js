@@ -1,7 +1,12 @@
 import axios from "axios";
+import { MISA_RESOURCE } from "../base/resource";
 import queryString from "query-string";
 import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
 import { error as validateError } from "../utilities/validateForm";
+import diy from "../store/diy";
+import { MISA_ENUM } from "../base/enum";
+
+const { setListToast } = diy;
 
 const axiosClient = axios.create({
     baseURL: import.meta.env.VITE_MISA_API,
@@ -34,7 +39,7 @@ axiosClient.interceptors.response.use(
         /**
          * Xử lý lỗi API với mã lỗi 400
          */
-        if (status === 400) {
+        if (status === MISA_ENUM.STATUS_CODE.BAD_REQUEST) {
             const { MoreInfo } = data;
             const keysValidateError = Object.keys(validateError);
             handleSetStatusForm();
@@ -54,8 +59,14 @@ axiosClient.interceptors.response.use(
         /**
          * Xử lý lỗi API với mã lỗi 500
          */
-        if(status === 500) {
+        if (status === MISA_ENUM.STATUS_CODE.INTERNAL_SERVER_ERROR) {
+            const errorMessage = {
+                toastMessage: MISA_RESOURCE.TOAST.SERVER_ERROR.TOAST_MESSAGE,
+                statusMessage: MISA_RESOURCE.TOAST.SERVER_ERROR.STATUS_MESSAGE,
+                status: MISA_RESOURCE.TOAST.SERVER_ERROR.STATUS,
+            };
 
+            setListToast(errorMessage);
         }
         throw error;
     }

@@ -110,3 +110,47 @@
     opacity: 0.56;
     cursor: not-allowed;
 }
+
+.btn-save {
+    position: relative;
+}
+
+.btn-save::after {
+    content: "Cất (Ctrl + S)";
+    position: absolute;
+    background-color: #434242;
+    color: #fff;
+    top: 40px;
+    width: max-content;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: none;
+    line-height: 18px;
+    animation: identifier 0.3s ease-in;
+}
+
+.btn-save:hover::after {
+    display: block;
+}
+
+.btn-save-add {
+    position: relative;
+}
+
+.btn-save-add::after {
+    content: "Cất và thêm (Ctrl + Shift + S)";
+    position: absolute;
+    background-color: #434242;
+    color: #fff;
+    top: 40px;
+    width: max-content;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: none;
+    line-height: 18px;
+    animation: identifier 0.3s ease-in;
+}
+
+.btn-save-add:hover::after {
+    display: block;
+}

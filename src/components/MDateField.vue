@@ -45,6 +45,10 @@ const handleEmitInputValue = (value) => {
             }
             emit("dateField", value);
         }
+
+        if (value.length === 0) {
+            datepicker.value.clearValue();
+        }
     } catch (error) {
         console.log(error);
     }
@@ -83,6 +87,18 @@ watch(
         }
     }
 );
+
+/**
+ * Hàm thực hiện reset lại value datepicker
+ * Created by: NHGiang - (23/02/23)
+ */
+const handleClearValue = () => {
+    try {
+        datepicker.value.clearValue();
+    } catch (error) {
+        console.log(error);
+    }
+};
 </script>
 
 <template>
@@ -100,6 +116,7 @@ watch(
                 <label for="" class="textfield__label modal-label">
                     {{ fieldText }}
                     <label
+                        v-if="!value"
                         class="modal-icon textfield__icon datepicker__wrapper"
                         @click.self="handleDatepicker"
                         :style="{
@@ -113,6 +130,22 @@ watch(
                         }"
                     >
                         <div class="datepicker__wrapper-icon"></div>
+                    </label>
+                    <label
+                        v-if="value"
+                        class="modal-icon textfield__icon datepicker__wrapper"
+                        @click="handleClearValue"
+                        :style="{
+                            borderColor: `${
+                                status
+                                    ? 'var(--error-color)'
+                                    : isFocus
+                                    ? 'var(--primary-color)'
+                                    : ''
+                            }`,
+                        }"
+                    >
+                        <div class="datepicker__wrapper-icon-close"></div>
                     </label>
                 </label>
                 <input
@@ -134,8 +167,11 @@ watch(
                 <span @click="selectCurrentDate()" title="Select current date"> Hôm nay </span>
             </template>
         </Datepicker>
-        <p v-if="statusPublic || status" class="textfield-error">{{ textError }}</p>
-        <!-- <div v-if="status" class="error-input">{{ textError }}</div> -->
+        <!-- <p v-if="statusPublic || status" class="textfield-error">
+            {{ textError }}
+            <div class="textfield-error__detail"> {{ textError }}</div>
+        </p> -->
+        <div v-if="status" class="error-input">{{ textError }}</div>
     </div>
 </template>
 
@@ -150,6 +186,12 @@ watch(
     background: url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -128px -312px;
     width: 16px;
     height: 16px;
+}
+
+.datepicker__wrapper-icon-close {
+    background: url("../../src/assets/img/Sprites.ee5d4fa7.svg") no-repeat -84px -316px;
+    width: 8px;
+    height: 8px;
 }
 
 .dp__button {
@@ -197,5 +239,4 @@ watch(
     align-items: center;
     cursor: pointer;
 }
-
 </style>

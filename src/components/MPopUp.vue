@@ -7,7 +7,7 @@ import MPopUpError from "./MPopUpError.vue";
 import MPopUpInfo from "./MPopUpInfo.vue";
 import { useDepartment } from "../composable/useDepartment";
 import { useEmployee } from "../composable/useEmployee";
-import { reactive, inject, onMounted, ref, defineComponent } from "vue";
+import { reactive, inject, onMounted, ref, defineComponent, onUnmounted } from "vue";
 import { formatDate } from "../utilities/formatDate";
 import { convertDatetime } from "../utilities/convertDatetime";
 import { error, useValidate } from "../utilities/validateForm";
@@ -82,6 +82,12 @@ const emit = defineEmits(["hideModal"]);
 // Biến giúp tham chiếu đến Element input EmployeeCode trong DOM
 const refEmployeeCode = ref(null);
 
+// Biến giúp tham chiếu đến Element button HỦY trong DOM
+const refCancelBtn = ref(null);
+
+// Biến giúp tham chiếu đến Element button Cất trong DOM
+const refSaveBtn = ref(null);
+
 /**
  * Ẩn modal
  * CreatedBy: NHGiang - (20/02/23)
@@ -130,7 +136,7 @@ const handleShowPopUpInfo = () => {
  */
 const hanldeSubmitForm = async (isCloseForm = true) => {
     try {
-        employee.DepartmentId = employee.DepartmentId || listDepartments.value?.[0].departmentId;
+        employee.DepartmentId = employee.DepartmentId || listDepartments.value?.[0].optionId;
         // const status = useValidate(
         //     employee,
         //     state.listAllEmployee,
@@ -174,6 +180,7 @@ const handleAddAndDuplicateEmployee = async (isCloseForm) => {
         await addNewEmloyee(
             {
                 ...employee,
+                EmployeeCode: employee.EmployeeCode.trim(),
                 IdentityDate: new Date(convertDatetime(employee.IdentityDate, true)),
                 DateOfBirth: new Date(convertDatetime(employee.DateOfBirth, true)),
             },
@@ -198,6 +205,7 @@ const handleEditEmployee = async (isCloseForm) => {
             {
                 ...employee,
                 EmployeeId: employeeSelected.EmployeeId,
+                EmployeeCode: employee.EmployeeCode.trim(),
                 IdentityDate: new Date(convertDatetime(employee.IdentityDate, true)),
                 DateOfBirth: new Date(convertDatetime(employee.DateOfBirth, true)),
             },
@@ -228,10 +236,65 @@ onMounted(() => {
  */
 const handleSetTabindex = (e) => {
     try {
-        if (e.keyCode === 9) {
+        if (e.keyCode === MISA_ENUM.KEY_CODE.TAB) {
             e.preventDefault();
-
             refEmployeeCode.value.handleFocus();
+        }
+        if (e.shiftKey && e.keyCode === MISA_ENUM.KEY_CODE.TAB) {
+            refSaveBtn.value.focus();
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm xử lỹ phím tắt
+ * @param {*} e
+ * Created by: NHGiang - (24/02/23)
+ */
+const docKeyDown = (e) => {
+    // Cất form với phím tắt ctrl + S
+    if (e.ctrlKey && e.key === "s") {
+        e.preventDefault();
+        e.stopPropagation();
+        hanldeSubmitForm(true);
+    }
+
+    // Cất form và mở form thêm với phím tắt ctrl + shift + S
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        e.stopPropagation();
+        hanldeSubmitForm(false);
+    }
+
+    // Đóng form với phím tắt ESC
+    if (e.keyCode === MISA_ENUM.KEY_CODE.ESCAPE) {
+        handleShowPopUpInfo();
+    }
+};
+
+/**
+ * Hàm thêm event keydown
+ * Created by: NHGiang - (24/02/23)
+ */
+onMounted(() => {
+    document.addEventListener("keydown", docKeyDown, false);
+});
+
+/**
+ * Hàm xử lý remove event
+ * Created by: NHGiang - (24/02/23)
+ */
+onUnmounted(() => {
+    document.removeEventListener("keydown", docKeyDown);
+});
+
+const handleSetReverseTabindex = (e) => {
+    try {
+        if (e.shiftKey && e.keyCode === MISA_ENUM.KEY_CODE.TAB) {
+            e.preventDefault();
+            refCancelBtn.value.focus();
         }
     } catch (error) {
         console.log(error);
@@ -241,12 +304,12 @@ const handleSetTabindex = (e) => {
 
 <template>
     <div class="overlay">
-        <div class="modal">
+        <div class="modal" @keydown="handleCloseForm">
             <div class="modal__header">
                 <div class="modal__header-left">
                     <div class="modal__header-left-text">{{ title }}</div>
                     <label for="radio1" class="modal__header-left-wrapper">
-                        <input type="checkbox" id="radio1" />
+                        <input type="checkbox" id="radio1" disabled />
                         <div
                             :style="{
                                 background:
@@ -258,7 +321,7 @@ const handleSetTabindex = (e) => {
                     </label>
                     <span>Là khách hàng</span>
                     <label for="radio2" class="modal__header-left-wrapper">
-                        <input type="checkbox" id="radio2" />
+                        <input type="checkbox" id="radio2" disabled />
                         <div
                             :style="{
                                 background:
@@ -293,7 +356,7 @@ const handleSetTabindex = (e) => {
                         alignItems: 'flex-start',
                         flexDirection: 'column',
                         width: '414px',
-                        paddingRight: '26px',
+                        marginRight: '24px',
                     }"
                 >
                     <div
@@ -307,8 +370,8 @@ const handleSetTabindex = (e) => {
                         <m-input
                             :fieldText="'Mã'"
                             :required="true"
-                            :width="'149px'"
-                            :marginRight="'6px'"
+                            :width="'161px'"
+                            :marginRight="'8px'"
                             :value="employee.EmployeeCode"
                             :status="error.EmployeeCode.status"
                             :statusPublic="error.status"
@@ -316,11 +379,12 @@ const handleSetTabindex = (e) => {
                             :text-error="error.EmployeeCode.textError"
                             @changeValue="error.EmployeeCode.status = $event"
                             ref="refEmployeeCode"
+                            @keydown="handleSetReverseTabindex"
                         />
                         <m-input
                             :fieldText="'Tên'"
                             :required="true"
-                            :width="'233px'"
+                            :width="'245px'"
                             :value="employee.FullName"
                             :status="error.FullName.status"
                             :statusPublic="error.status"
@@ -342,10 +406,12 @@ const handleSetTabindex = (e) => {
                         :statusPublic="error.status"
                         :required="true"
                         :textError="error.DepartmentId.textError"
+                        tabindex="0"
+                        :bottom="'12px'"
                     />
                     <m-input
                         :fieldText="'Chức danh'"
-                        :width="'388px'"
+                        :width="'414px'"
                         style="padding-bottom: 12px"
                         :value="employee.Position"
                         @inputValue="employee.Position = $event"
@@ -377,15 +443,15 @@ const handleSetTabindex = (e) => {
                             :statusPublic="error.status"
                             @dateField="employee.DateOfBirth = $event"
                         />
-                        <div style="padding-left: 10px; margin-left: 6px">
+                        <div style="padding-left: 10px; margin-left: 6px; height: 58px">
                             <label class="textfield__label modal-label"> Giới tính </label>
                             <div class="modal__gender">
                                 <m-radio
                                     :id="'male'"
                                     :value="MISA_ENUM.GENDER.MALE"
                                     :labelText="'Nam'"
-                                    :marginLeft="'10px'"
-                                    :marginRight="'20px'"
+                                    :marginLeft="'8px'"
+                                    :marginRight="'24px'"
                                     :defaultValue="employee.Gender"
                                     :statusPublic="error.status"
                                     @radio="employee.Gender = $event"
@@ -394,8 +460,8 @@ const handleSetTabindex = (e) => {
                                     :id="'female'"
                                     :value="MISA_ENUM.GENDER.FEMALE"
                                     :labelText="'Nữ'"
-                                    :marginLeft="'10px'"
-                                    :marginRight="'20px'"
+                                    :marginLeft="'8px'"
+                                    :marginRight="'24px'"
                                     :defaultValue="employee.Gender"
                                     @radio="employee.Gender = $event"
                                 />
@@ -403,14 +469,14 @@ const handleSetTabindex = (e) => {
                                     :id="'other'"
                                     :value="MISA_ENUM.GENDER.OTHER"
                                     :labelText="'Khác'"
-                                    :marginLeft="'10px'"
+                                    :marginLeft="'8px'"
                                     :defaultValue="employee.Gender"
                                     @radio="employee.Gender = $event"
                                 />
                             </div>
-                            <p v-if="error.status" class="textfield-error">
+                            <!-- <p v-if="error.status" class="textfield-error">
                                 {{ textError }}
-                            </p>
+                            </p> -->
                         </div>
                     </div>
                     <div
@@ -423,8 +489,8 @@ const handleSetTabindex = (e) => {
                     >
                         <m-input
                             :fieldText="'Số CMND'"
-                            :width="'242px'"
-                            :marginRight="'6px'"
+                            :width="'240px'"
+                            :marginRight="'8px'"
                             :value="employee.IdentityNumber"
                             :status="error.IdentityNumber.status"
                             :statusPublic="error.status"
@@ -455,14 +521,14 @@ const handleSetTabindex = (e) => {
                 <div class="modal-contact">
                     <m-input
                         :fieldText="'Địa chỉ'"
-                        :width="'829px'"
+                        :width="'852px'"
                         style="padding-bottom: 12px"
                         :value="employee.Address"
                         @inputValue="employee.Address = $event"
                     />
                     <m-input
                         :fieldText="'ĐT di động'"
-                        :width="'271px'"
+                        :width="'278px'"
                         style="padding-bottom: 12px; float: left"
                         :marginRight="'8px'"
                         :value="employee.PhoneNumber"
@@ -473,7 +539,7 @@ const handleSetTabindex = (e) => {
                     />
                     <m-input
                         :fieldText="'ĐT cố định'"
-                        :width="'271px'"
+                        :width="'279px'"
                         style="padding-bottom: 12px; float: left"
                         :marginRight="'8px'"
                         :tooltip="'Số điện thoại cố động'"
@@ -484,9 +550,8 @@ const handleSetTabindex = (e) => {
                     />
                     <m-input
                         :fieldText="'Email'"
-                        :width="'271px'"
+                        :width="'279px'"
                         style="padding-bottom: 12px; float: left"
-                        :marginRight="'8px'"
                         :value="employee.Email"
                         @inputValue="employee.Email = $event"
                         :placeHolder="'example@gmail.com'"
@@ -495,7 +560,7 @@ const handleSetTabindex = (e) => {
                     />
                     <m-input
                         :fieldText="'Tài khoản ngân hàng'"
-                        :width="'271px'"
+                        :width="'278px'"
                         style="float: left; clear: left"
                         :marginRight="'8px'"
                         :value="employee.BankAccount"
@@ -503,7 +568,7 @@ const handleSetTabindex = (e) => {
                     />
                     <m-input
                         :fieldText="'Tên ngân hàng'"
-                        :width="'271px'"
+                        :width="'279px'"
                         style="float: left"
                         :marginRight="'8px'"
                         :value="employee.BankName"
@@ -511,9 +576,8 @@ const handleSetTabindex = (e) => {
                     />
                     <m-input
                         :fieldText="'Chi nhánh'"
-                        :width="'271px'"
+                        :width="'279px'"
                         style="float: left"
-                        :marginRight="'8px'"
                         :value="employee.BankBranch"
                         @inputValue="employee.BankBranch = $event"
                     />
@@ -523,13 +587,18 @@ const handleSetTabindex = (e) => {
                 <div class="modal-footer__wrapper">
                     <button
                         type="submit"
-                        class="btn btn-secondary modal-btn__secondary"
+                        class="btn btn-secondary modal-btn__secondary btn-save"
                         tabindex="0"
                         @click="hanldeSubmitForm(true)"
                     >
                         Cất
                     </button>
-                    <button @click="hanldeSubmitForm(false)" class="btn btn-primary" tabindex="0">
+                    <button
+                        @click="hanldeSubmitForm(false)"
+                        class="btn btn-primary btn-save-add"
+                        tabindex="0"
+                        ref="refSaveBtn"
+                    >
                         Cất và thêm
                     </button>
                 </div>
@@ -539,6 +608,7 @@ const handleSetTabindex = (e) => {
                     @click="hideModal"
                     @keydown="handleSetTabindex"
                     tabindex="0"
+                    ref="refCancelBtn"
                     >Hủy</label
                 >
             </div>

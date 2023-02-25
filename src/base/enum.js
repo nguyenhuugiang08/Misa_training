@@ -41,5 +41,11 @@ export const MISA_ENUM = {
         ENTER: 13, // phím enter
         DOWN_ARROW: 40, // phím mũi tên xuống
         UP_ARROW: 38, // phím mũi tên lên
+        ESCAPE: 27, // phím esc
+        TAB: 9, // phím tab
+    },
+    STATUS_CODE: {
+        BAD_REQUEST: 400, // status code 400
+        INTERNAL_SERVER_ERROR: 500, // status code 500
     },
 };

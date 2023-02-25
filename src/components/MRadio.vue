@@ -55,5 +55,5 @@ const handleEmitRadioValue = (value) => {
             }"
         ></div>
     </label>
-    <span :style="{ marginLeft: '10px', marginRight: '20px' }">{{ labelText }}</span>
+    <span :style="{ marginLeft: marginLeft, marginRight: marginRight }">{{ labelText }}</span>
 </template>

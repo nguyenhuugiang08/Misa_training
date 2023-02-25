@@ -146,6 +146,18 @@ const setListToast = (toast) => {
     }
 };
 
+/**
+ * Hàm xóa toast message khỏi mảng sau khi bị ẩn khỏi giao diện
+ * Created by: NHGiang - (23/02/23)
+ */
+const deleteToastHidden = () => {
+    try {
+        state.listToast.pop();
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 // Lấy ra danh sách các item được check
 const setListItemChecked = (list) => {
     try {
@@ -196,4 +208,5 @@ export default {
     setListItemChecked,
     setKeyword,
     setListPageChecked,
+    deleteToastHidden,
 };

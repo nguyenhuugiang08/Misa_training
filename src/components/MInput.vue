@@ -72,14 +72,15 @@ defineExpose({ handleFocus });
         <div class="textfield-tooltip" v-if="tooltip">
             <span>{{ tooltip }}</span>
         </div>
-        <p
+        <!-- <p
             v-if="statusPublic || status"
             class="textfield-error"
             :style="{ minWidth: width, width: width }"
         >
             {{ textError }}
         </p>
-        <!-- <div v-if="status" class="error-input">{{ textError }}</div> -->
+        <div class="textfield-error__detail">{{ textError }}</div> -->
+        <div v-if="status" class="error-input">{{ textError }}</div>
     </div>
 </template>
 
@@ -101,9 +102,9 @@ defineExpose({ handleFocus });
 .error-input {
     position: absolute;
     padding: 4px 8px;
-    background: #111;
+    background: #f65d5d;
     color: #fff;
-    border-radius: 2px;
+    border-radius: 4px;
     z-index: 99;
     text-align: center;
     left: 50%;
@@ -119,7 +120,7 @@ defineExpose({ handleFocus });
     height: 0;
     width: 0;
     border: 8px solid;
-    border-color: transparent transparent #111 transparent;
+    border-color: transparent transparent #f65d5d transparent;
     top: -13px;
     left: 50%;
     transform: translateX(-50%);
@@ -127,5 +128,10 @@ defineExpose({ handleFocus });
 
 .textfield .textfield__input:hover ~ .error-input {
     display: block;
+}
+
+.textfield-error__detail {
+    position: absolute;
+    color: #fff;
 }
 </style>

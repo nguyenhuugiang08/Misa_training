@@ -115,7 +115,11 @@ progress {
 
 .btn-import-prev {
     background-color: transparent;
+}
+
+.btn-import-prev a {
     color: #fff;
+    text-decoration: none;
 }
 
 .btn-import-prev:hover {
@@ -266,4 +270,10 @@ progress {
     overflow: hidden;
     padding: 0;
     font-size: 12px;
+}
+
+.cancel-file {
+    background: url('../../src/assets/img/Sprites.ee5d4fa7.svg') no-repeat -84px -316px;
+    width: 8px;
+    height: 8px;
 }

@@ -148,6 +148,7 @@
     bottom: 40px;
     overflow: auto;
     z-index: 9990;
+    font-weight: 400;
 }
 
 .textfield-list--action {

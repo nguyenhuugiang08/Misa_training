@@ -88,7 +88,11 @@ const handleDisplayPopUpWarning = (value) => {
 const handleDisplayHideListAction = (e) => {
     try {
         isShowList.value = !isShowList.value;
-        toDropList.value = e.target.getBoundingClientRect().y + 32;
+        if (e.target.getBoundingClientRect().y > 620) {
+            toDropList.value = e.target.getBoundingClientRect().y - 130;
+        } else {
+            toDropList.value = e.target.getBoundingClientRect().y + 32;
+        }
     } catch (error) {
         console.log(error);
     }

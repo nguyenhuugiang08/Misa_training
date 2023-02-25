@@ -153,6 +153,14 @@ const employeeApi = {
             console.log(error);
         }
     },
+
+    checkExcelData: (data) => {
+        try {
+            return axiosClient.post(`${baseUrl}/checkData`, data);
+        } catch (error) {
+            console.log(error);
+        }
+    },
 };
 
 export default employeeApi;

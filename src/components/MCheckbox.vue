@@ -1,5 +1,5 @@
 <script setup>
-import { ref, inject, watch } from "vue";
+import { ref, inject, watch, onMounted } from "vue";
 import { MISA_ENUM } from "../base/enum";
 
 const selected = ref(props.default ? props.default : null); // Giá trị của item được lựa chọn.
@@ -14,15 +14,19 @@ const indexOptionSelected = ref(0); // Chỉ số của lựa chọn đã đư�
 const props = defineProps({
     options: Array,
     default: String,
-    tabindex: Number,
     textLabel: String,
     required: Boolean,
     isTop: Boolean,
     width: String,
     status: Boolean,
     statusPublic: Boolean,
+    isAbsolute: Boolean,
+    bottom: String,
     textError: String,
 });
+
+const refCheckBox = ref(null);
+const refList = ref(null);
 
 // Gán giá trị ban của mảng optionSearch là danh sách tất cả các lựa chọn.
 optionSearch.value = [...props.options];
@@ -143,6 +147,7 @@ const handleInputKeydown = (event) => {
         const maxLength = optionSearch.value.length;
         switch (event.keyCode) {
             case MISA_ENUM.KEY_CODE.DOWN_ARROW: // Khi ấn phím mũi tên xuống
+                isOpen.value = true;
                 if (indexOptionSelected.value < maxLength - 1) {
                     indexOptionSelected.value++;
                 } else {
@@ -169,64 +174,67 @@ const handleInputKeydown = (event) => {
         console.log(error);
     }
 };
+
+/**
+ * Hàm xử lý focus ô input khi thực hiện tab vào
+ * @param {} e
+ * Created by: NHGiang - (25/03/23)
+ */
+const handleFocusCheckBox = (e) => {
+    try {
+        if (e.target.getAttribute("tabindex") !== -1) {
+            e.target.setAttribute("tabindex", -1);
+        }
+        refCheckBox.value.focus();
+        console.log(e);
+    } catch (error) {
+        console.log(error);
+    }
+};
 </script>
 
 <template>
-    <div
-        class="textfield modal-textfield"
-        style="padding-bottom: 12px"
-        :tabindex="tabindex"
-        @blur="isOpen = false"
-        :style="width && { minWidth: width, width: width }"
+    <label
+        for=""
+        class="textfield__label modal-label label-checkbox"
+        :style="{
+            minWidth: width && `${width}`,
+            width: width && `${width}`,
+            position: isAbsolute ? `absolute` : 'relative',
+        }"
     >
-        <label for="" class="textfield__label modal-label">
-            {{ textLabel }} <span v-if="required" class="required">*</span>
-            <div
-                class="modal-icon textfield__icon drop-department"
-                style="display: flex; justify-content: center; align-items: center"
-                :style="{
-                    top: `${isTop && '4px !important'}`,
-                    borderColor: `${
-                        status ? 'var(--error-color)' : isFocus ? 'var(--primary-color)' : ''
-                    }`,
-                }"
-                @click="
-                    isOpen = !isOpen;
-                    optionSearch = [...options];
-                "
-                @keydown="handleInputKeydown"
-                tabindex="0"
-                v-click-outside-element="handleClickOutside"
-            >
-                <div
-                    :style="{
-                        background:
-                            'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -564px -365px',
-                        width: '8px',
-                        height: '5px',
-                    }"
-                ></div>
-            </div>
-        </label>
-        <input
-            type="text"
-            class="textfield__input modal-textfield__input"
-            :class="status ? 'textfield--error-input' : ''"
-            id="employee-department"
-            :value="selected"
-            :style="width && { minWidth: width, width: width }"
-            @focus="isFocus = status ? false : true"
-            @blur="isFocus = false"
-            @input="handleSearchOption($event.target.value)"
-            autocomplete="off"
+        {{ textLabel }} <span v-if="required" class="required">*</span>
+        <div
+            class="modal-icon textfield__icon drop-department"
+            style="display: flex; justify-content: center; align-items: center"
+            :style="{
+                top: `${isTop && '-16px !important'}`,
+                borderColor: `${
+                    status ? 'var(--error-color)' : isFocus ? 'var(--primary-color)' : ''
+                }`,
+            }"
+            @click="
+                isOpen = !isOpen;
+                optionSearch = [...options];
+            "
             @keydown="handleInputKeydown"
-        />
-        <p v-if="statusPublic || status" class="textfield-error">{{ textError }}</p>
-        <!-- <div v-if="status" class="error-input">{{ textError }}</div> -->
+            v-click-outside-element="handleClickOutside"
+        >
+            <div
+                :style="{
+                    background:
+                        'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -564px -365px',
+                    width: '8px',
+                    height: '5px',
+                    transform: `${isOpen ? 'rotate(180deg)' : 'rotate(0deg)'}`,
+                }"
+            ></div>
+        </div>
         <ul
             class="textfield-list modal-list list-departments"
-            :style="isTop && { top: 'unset', bottom: '48px' }"
+            :style="{ top: isTop && 'unset', bottom: isTop && '24px', width: width && `${width}` }"
             v-if="isOpen"
+            ref="refList"
         >
             <li
                 v-for="(option, index) of optionSearch"
@@ -238,7 +246,37 @@ const handleInputKeydown = (event) => {
                 {{ option.optionName }}
             </li>
         </ul>
-    </div>
+    </label>
+    <input
+        ref="refCheckBox"
+        type="text"
+        class="textfield__input modal-textfield__input"
+        :class="status ? 'textfield--error-input' : ''"
+        id="employee-department"
+        :value="selected"
+        :style="{
+            minWidth: width && `${width}`,
+            width: width && `${width}`,
+            marginBottom: bottom ? `${bottom}` : '0',
+        }"
+        @focus="isFocus = status ? false : true"
+        @blur="isFocus = false"
+        @input="handleSearchOption($event.target.value)"
+        autocomplete="off"
+        @keydown="handleInputKeydown"
+    />
+    <!-- <p v-if="statusPublic || status" class="textfield-error">{{ textError }}</p> -->
+    <div v-if="status" class="error-input">{{ textError }}</div>
 </template>
+<style scoped>
+.label-checkbox {
+    width: 414px;
+    position: relative;
+}
 
-<style scoped></style>
+.drop-department {
+    position: absolute;
+    z-index: 92;
+    cursor: pointer;
+}
+</style>

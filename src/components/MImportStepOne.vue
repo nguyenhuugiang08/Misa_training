@@ -4,7 +4,13 @@ import MRadio from "./MRadio.vue";
 import { formatBytes } from "../utilities/formatCapacity";
 
 const file = ref(null);
+const refFile = ref(null);
 
+/**
+ * Hàm thực hiện chọn file khi bấm chọn file
+ * @param {*} event
+ * Created by: NHGiang - (23/02/23)
+ */
 const handleChangeFile = (event) => {
     try {
         file.value = event.target.files?.[0];
@@ -12,6 +18,11 @@ const handleChangeFile = (event) => {
         console.log(error);
     }
 };
+
+/**
+ * Hàm thực hiện chọn file khi kéo/thả file
+ * @param {*} e
+ */
 const drop = (e) => {
     file.value = e.dataTransfer.files[0];
 };
@@ -44,6 +55,7 @@ const drop = (e) => {
                 <input
                     type="file"
                     id="file"
+                    ref="refFile"
                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     @change="handleChangeFile"
                 />

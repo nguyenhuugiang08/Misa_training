@@ -13,10 +13,9 @@
     max-width: 900px;
     width: 900px;
     background-color: #fff;
-    padding-bottom: 20px;
+    padding-bottom: 24px;
     border-radius: 2px;
     box-shadow: 0 5px 20px 0 #0000001a
-        /* display: none; */
 }
 
 .modal__header {
@@ -29,13 +28,14 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    padding: 20px 32px;
+    padding: 24px;
 }
 
 .modal__header-left-text {
     font-size: 24px;
     color: #111;
     font-weight: 700;
+    line-height: 24px;
 }
 
 .modal__header-left-wrapper {
@@ -54,7 +54,7 @@
 
 .modal__header-left span {
     padding: 0 10px;
-    line-height: 32px;
+    line-height: 24px;
 }
 
 .modal__header-left-wrapper div {
@@ -78,7 +78,7 @@
 }
 
 .modal-main {
-    padding: 0 22px 0 32px;
+    padding: 0 24px;
     display: flex;
     flex-wrap: wrap;
     overflow-y: auto;
@@ -111,7 +111,7 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 0 32px 0 32px;
+    padding: 0 24px;
     flex-direction: row-reverse;
 }
 
@@ -131,13 +131,23 @@
 }
 
 .modal-textfield {
-    max-width: 388px;
-    width: 388px;
+    max-width: 414px;
+    width: 414px;
 }
 
-.modal-textfield .modal-textfield__input {
-    max-width: 388px;
-    width: 388px;
+ .modal-textfield__input {
+    max-width: 414px;
+    width: 414px;
+    height: 36px;
+    padding: 0 8px 0 12px;
+    outline: none;
+    border-radius: 2px;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    background-color: #fff;
+    min-width: 260px;
+    position: relative;
+    z-index: 90;
 }
 
 .modal-label {
@@ -172,8 +182,8 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     border: 1px solid var(--border-color);
     cursor: pointer;

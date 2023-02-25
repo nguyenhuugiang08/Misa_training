@@ -1,4 +1,18 @@
-<script setup></script>
+<script setup>
+import { useRoute, useRouter } from "vue-router";
+import { ref } from "vue";
+
+const router = useRouter();
+const identityStep = ref(1);
+
+const handleNextStep = (e) => {
+    try {
+        if (identityStep.value < 3) identityStep.value = identityStep.value + 1;
+    } catch (error) {
+        console.log(error);
+    }
+};
+</script>
 
 <template>
     <div class="import">
@@ -25,8 +39,10 @@
             <router-view></router-view>
         </div>
         <div class="import-footer">
-            <button class="btn btn-secondary btn-import-prev">Hủy</button>
-            <button class="btn btn-primary">Tiếp tục</button>
+            <button class="btn btn-secondary btn-import-prev">
+                <router-link to="/">Hủy</router-link>
+            </button>
+            <button class="btn btn-primary" @click="handleNextStep">Tiếp tục</button>
         </div>
     </div>
 </template>

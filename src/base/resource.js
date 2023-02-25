@@ -9,7 +9,7 @@ export const MISA_RESOURCE = {
          * @returns -- text lỗi
          */
         duplicate: (employeeCode) => `Mã <${employeeCode}> đã tồn tại.`,
-        invalid: "Mã nhân viên không đúng định dạng."
+        invalid: "Mã nhân viên không đúng định dạng.",
     },
     FullNameText: {
         blank: "Tên không được để trống.", // Text lỗi khi tên nhân viên để trống.
@@ -87,6 +87,11 @@ export const MISA_RESOURCE = {
             TOAST_MESSAGE: "Nhân bản nhân viên thất bại, vui lòng kiểm tra lại.",
             STATUS_MESSAGE: "Lỗi! ",
             STATUS: MISA_ENUM.STATUS_TOAST.ERROR, // trạng thái khi nhân bản thất bại
+        },
+        SERVER_ERROR: {
+            TOAST_MESSAGE: "Có lỗi xảy ra, vui lòng liên hệ MISA để được giúp đỡ.",
+            STATUS_MESSAGE: "Lỗi!",
+            STATUS: MISA_ENUM.STATUS_TOAST.ERROR,
         },
     },
     REGEX: {

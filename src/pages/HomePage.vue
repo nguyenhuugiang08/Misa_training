@@ -15,9 +15,9 @@ import MPopUpWarning from "../components/MPopUpWarning.vue";
 const {
     listEmployees,
     listAllEmployees,
-    getAllEmployees,
     totalPage,
     totalRecord,
+    getAllEmployees,
     handleFilterPage,
     handlExportExcel,
     handleBulkDelete,
@@ -93,10 +93,12 @@ const debounceSearch = async (val) => {
         setKeyword(val);
         router.push({ path: "/", query: { pageSize: pageSize.value, pageNumber: 1 } });
         isLoading.value = true;
-        await handleFilterPage(val, pageSize.value, 1);
-        setListEmployees(listEmployees);
-        setTotalPage(totalPage);
-        isLoading.value = false;
+        setTimeout(async () => {
+            await handleFilterPage(val, pageSize.value, 1);
+            setListEmployees(listEmployees);
+            setTotalPage(totalPage);
+            isLoading.value = false;
+        }, 500);
     } catch (error) {
         console.log(error);
     }
@@ -160,6 +162,10 @@ const handleEndDeleteEmployee = async ({ event, id }) => {
     try {
         const newListEmpolyees = listEmployees.value.filter((emp) => emp.EmployeeId !== id);
         setListEmployees(newListEmpolyees);
+        if (state.listItemChecked.includes(id)) {
+            const newListChecked = state.listItemChecked.filter((item) => item !== id);
+            setListItemChecked(newListChecked);
+        }
         isLoading.value = false;
         handleShowToast(event);
     } catch (error) {
@@ -175,10 +181,12 @@ const handleRefresh = async () => {
     try {
         isLoading.value = true;
         router.push({ path: "/", query: { pageSize: pageSize.value, pageNumber: 1 } });
-        await handleFilterPage(state.keyword, pageSize.value, 1);
-        setListEmployees(listEmployees);
-        setTotalPage(totalPage);
-        isLoading.value = false;
+        setTimeout(async () => {
+            await handleFilterPage(state.keyword, pageSize.value, 1);
+            setListEmployees(listEmployees);
+            setTotalPage(totalPage);
+            isLoading.value = false;
+        }, 500);
     } catch (error) {
         console.log(error);
     }
@@ -229,6 +237,7 @@ const handleBatchExecution = async () => {
         await handleBulkDelete(state.listItemChecked);
         setListItemChecked([]);
         setListPageChecked([]);
+        router.push({ path: "/", query: { pageSize: pageSize.value, pageNumber: 1 } });
         handleFilterPage("", route.query.pageSize, 1);
         setListEmployees(listEmployees);
         setTotalEmployee(totalRecord);
@@ -423,6 +432,7 @@ const handleDisplayWraningPopUp = (e) => {
 .unchecked {
     color: #ff3939;
     margin: 0 25px 0 16px;
+    cursor: pointer;
 }
 
 .btn-delete-multiple__icon {
