@@ -135,19 +135,23 @@
     width: 414px;
 }
 
- .modal-textfield__input {
+.modal-textfield__input {
     max-width: 414px;
     width: 414px;
-    height: 36px;
+    height: 32px;
     padding: 0 8px 0 12px;
     outline: none;
     border-radius: 2px;
     border: 1px solid var(--border-color);
-    cursor: pointer;
+    cursor: text;
     background-color: #fff;
     min-width: 260px;
     position: relative;
     z-index: 90;
+}
+
+.modal-textfield__input:focus {
+    border: 1px solid var(--primary-color);
 }
 
 .modal-label {
@@ -164,8 +168,8 @@
 }
 
 .modal-icon {
-    height: 36px !important;
-    width: 36px !important;
+    height: 32px !important;
+    width: 32px !important;
     top: 22px !important;
     right: 0 !important;
     outline: none;
@@ -175,7 +179,7 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    height: 36px;
+    height: 32px;
 }
 
 .modal__gender-item {
@@ -392,11 +396,12 @@
 .modal-confirm__content {
     display: flex;
     justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 24px;
 }
 
 .modal-confirm__content-text {
-    padding: 12px 0 0 12px;
-    margin-bottom: 24px;
+    padding: 0 0 0 12px;
 }
 
 .modal-confirm__line {

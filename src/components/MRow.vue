@@ -6,11 +6,13 @@ import { inject, ref } from "vue";
 import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
 import { MISA_ENUM } from "../base/enum";
 import { MISA_RESOURCE } from "../base/resource";
+import MPopUpError from "./MPopUpError.vue";
 
 // Định nghĩa các props nhận vào
 const props = defineProps({
-    employee: Object,
+    entity: Object,
     listCheck: Array,
+    hasCheckbox: Boolean,
 });
 
 const { getAnEmployee, editEmployee } = useEmployee();
@@ -18,6 +20,7 @@ const { getAnEmployee, editEmployee } = useEmployee();
 const emit = defineEmits(["check", "displayWarning"]);
 const isShowList = ref(false); // Trạng thái ẩn hiện danh sách chức năng (Nhân bản, Xóa)
 const toDropList = ref(0); // Khoảng cách của danh sách chức năng so với top của cửa số trình duyệt
+const isOpen = ref(false); // Trạng thái popup thông báo chức năng chưa thi công
 
 const { state, setIsForm, setTitleForm, setEmployeeSelected, setIdentityForm } = inject("diy");
 
@@ -113,7 +116,7 @@ const handleClickOutside = () => {
 
 <template>
     <tr class="tbl-row" @dblclick="handleEditEmployee(employee.EmployeeId)">
-        <td class="tbl-col tbl-col__first">
+        <td class="tbl-col tbl-col__first" v-if="hasCheckbox">
             <input
                 type="checkbox"
                 class="tbl-checkbox"
@@ -134,22 +137,15 @@ const handleClickOutside = () => {
             </label>
         </td>
         <td class="tbl-col">
-            <span>{{ employee.EmployeeCode || "" }}</span>
+            <span>{{ entity.BankNumber || "" }}</span>
         </td>
-        <td class="tbl-col tbl-col--large">{{ employee.FullName || "" }}</td>
+        <td class="tbl-col tbl-col--large">{{ entity.BankName || "" }}</td>
         <td class="tbl-col">
-            {{ employee.Gender === MISA_ENUM.GENDER.OTHER ? "Khác" : employee.GenderName }}
+            {{ entity.Nature === MISA_ENUM.GENDER.OTHER ? "Khác" : entity.Nature }}
         </td>
-        <td class="tbl-col" style="text-align: center">
-            {{ formatDate(employee.DateOfBirth) || "" }}
-        </td>
-        <td class="tbl-col">{{ employee.Position || "" }}</td>
-        <td class="tbl-col tbl-col--large">{{ employee.DepartmentName || "" }}</td>
-        <td class="tbl-col">{{ employee.IdentityNumber || "" }}</td>
-        <td class="tbl-col">{{ employee.PhoneNumber || "" }}</td>
-        <td class="tbl-col">{{ employee.BankAccount || "" }}</td>
-        <td class="tbl-col">{{ employee.BankName || "" }}</td>
-        <td class="tbl-col">{{ employee.BankBranch || "" }}</td>
+        <td class="tbl-col">{{ entity.EnglishName || "" }}</td>
+        <td class="tbl-col tbl-col--large">{{ entity.Explain || "" }}</td>
+        <td class="tbl-col tbl-col--large">{{ entity.IsActive || "" }}</td>
         <td class="tbl-col tbl-col__last">
             <div class="tbl-col__action">
                 <label class="tbl-col__action-edit" @click="handleEditEmployee(employee.EmployeeId)"
@@ -198,7 +194,24 @@ const handleClickOutside = () => {
             >
                 Xóa
             </li>
-            <li class="tbl-col__action-item" @click="isShowList = false">Ngừng sử dụng</li>
+            <li
+                class="tbl-col__action-item"
+                @click="
+                    isShowList = false;
+                    isOpen = true;
+                "
+            >
+                Ngừng sử dụng
+            </li>
         </ul>
+
+        <div class="modal-error" v-if="isOpen">
+            <m-pop-up-error
+                v-if="isOpen"
+                :title="'Thông báo'"
+                :text-error="`Chức năng chưa thi công.`"
+                @closeError="isOpen = !isOpen"
+            />
+        </div>
     </tr>
 </template>

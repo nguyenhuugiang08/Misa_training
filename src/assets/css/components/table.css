@@ -26,13 +26,12 @@
 }
 
 .tbl .tbl-row {
-    height: 44px;
+    height: 32px;
     border-bottom: 1px solid #E0E0E0;
     position: relative;
 }
 
 .tbl .tbl-row th {
-    text-transform: uppercase;
     font-size: 13px;
 }
 
@@ -54,7 +53,7 @@
     padding-right: 0;
     width: 40px;
     min-width: 40px;
-    height: 44px;
+    height: 32px;
     position: sticky !important;
     z-index: 11;
     background-color: #fff;
@@ -201,7 +200,7 @@ th {
 }
 
 .tbl-col__action .sidebar-item__icon {
-    margin: 8px 10px;
+    margin: 0 10px;
 }
 
 .tbl-col__action-item {

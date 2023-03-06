@@ -58,7 +58,7 @@ const index = ref(1);
                 <p v-if="!state.isSidebar">Tổng quan</p>
             </router-link>
             <router-link
-                to="/cash"
+                to="/cash/procedure"
                 @click="index = 2"
                 :class="{ 'sidebar-item--active': index === 2 }"
                 class="sidebar-item"
@@ -296,7 +296,7 @@ const index = ref(1);
                 <p v-if="!state.isSidebar">Phân tích tài chính</p>
             </router-link>
             <router-link
-                to="/financial-knowledge"
+                to="/category"
                 :class="{ 'sidebar-item--active': index === 16 }"
                 @click="index = 16"
                 class="sidebar-item"
@@ -304,13 +304,13 @@ const index = ref(1);
                 <div class="sidebar-item__icon">
                     <div
                         style="
-                            background: url('../../src/assets/img/Sprites.ee5d4fa7.svg') no-repeat -552px -1666px;
-                            width: 16px;
-                            height: 15px;
+                            background: url('../../src/assets/img/Sprites.svg') no-repeat -1711px -33px;
+                            width: 17px;
+                            height: 14px;
                         "
                     ></div>
                 </div>
-                <p v-if="!state.isSidebar">Kiến thức</p>
+                <p v-if="!state.isSidebar">Danh mục</p>
             </router-link>
         </ul>
     </div>

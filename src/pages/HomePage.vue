@@ -298,7 +298,7 @@ const handleDisplayWraningPopUp = (e) => {
                         @click.self="handleDisplayWraningPopUp"
                     >
                         <div class="btn-delete-multiple__icon"></div>
-                        Xóa tất cả
+                        Xóa
                     </button>
                 </div>
                 <div class="textfield">
@@ -386,36 +386,6 @@ const handleDisplayWraningPopUp = (e) => {
     right: 0;
     top: 0;
     z-index: 999;
-}
-
-.export {
-    position: relative;
-    top: 4px;
-    margin-left: 8px;
-}
-
-.export::before {
-    content: "Xuất ra Excel";
-    position: absolute;
-    width: max-content;
-    z-index: 999;
-    top: 32px;
-    background-color: #434242;
-    color: #fff;
-    padding: 2px 6px;
-    border-radius: 4px;
-    animation: identifier 0.3s ease-in;
-    display: none;
-}
-
-.export:hover::before {
-    display: block;
-}
-
-.export-icon {
-    background: url("../../src/assets/img/Sprites.ee5d4fa7.svg") no-repeat -705px -202px;
-    width: 23px;
-    height: 20px;
 }
 
 .batch-execution {

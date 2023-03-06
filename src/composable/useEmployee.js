@@ -2,6 +2,9 @@ import { ref } from "vue";
 import { MISA_RESOURCE } from "../base/resource";
 import { MISA_ENUM } from "../base/enum";
 import employeeApi from "../api/employeeApi";
+import diy from "../store/diy";
+
+const { setListToast } = diy;
 
 /**
  * Xử lý dữ liệu liên quan đến employee
@@ -132,8 +135,8 @@ export const useEmployee = () => {
         /**
          * Hàm gọi API và lấy danh sách nhân viên theo bộ lọc và phân trang
          * @param {*} keyword -- Từ khóa tìm kiếm
-         * @param {*} pageSize -- Số bản ghi trên 1 trang
-         * @param {*} pageNumber -- trang thứ bao nhiêu
+         * @param {*} pageSize -- Số bản ghi trên 1 trang, mặc định là 20 bản ghi trên 1 trang
+         * @param {*} pageNumber -- trang thứ bao nhiêu, mặc định là trang đầu tiên
          * Created by: NHGiang - (20/02/23)
          */
         const handleFilterPage = async (keyword, pageSize = 20, pageNumber = 1) => {
@@ -197,6 +200,13 @@ export const useEmployee = () => {
         const handleBulkDelete = async (employeeIds) => {
             try {
                 const response = await employeeApi.deleteMultipleEmployees(employeeIds);
+
+                const toastMessage = {
+                    toastMessage: MISA_RESOURCE.TOAST.DELETE_MULTIPLE_SUCCESS.TOAST_MESSAGE,
+                    statusMessage: MISA_RESOURCE.TOAST.DELETE_MULTIPLE_SUCCESS.STATUS_MESSAGE,
+                    status: MISA_RESOURCE.TOAST.DELETE_MULTIPLE_SUCCESS.STATUS,
+                };
+                setListToast(toastMessage);
             } catch (error) {
                 console.log(error);
             }

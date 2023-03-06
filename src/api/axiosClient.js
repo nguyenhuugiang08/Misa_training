@@ -38,11 +38,12 @@ axiosClient.interceptors.response.use(
 
         /**
          * Xử lý lỗi API với mã lỗi 400
+         * Created by: NHGiang - (26/02/23)
          */
         if (status === MISA_ENUM.STATUS_CODE.BAD_REQUEST) {
             const { MoreInfo } = data;
             const keysValidateError = Object.keys(validateError);
-            handleSetStatusForm();
+            handleSetStatusForm(); // xét lại trạng thái chưa có lỗi ban đầu
 
             if (MoreInfo) {
                 const keysMoreInfo = Object.keys(MoreInfo);
@@ -58,6 +59,7 @@ axiosClient.interceptors.response.use(
 
         /**
          * Xử lý lỗi API với mã lỗi 500
+         * Created by: NHGiang - (26/02/23)
          */
         if (status === MISA_ENUM.STATUS_CODE.INTERNAL_SERVER_ERROR) {
             const errorMessage = {

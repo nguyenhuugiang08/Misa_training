@@ -1,10 +1,10 @@
 .btn {
-    height: 36px;
+    height: 32px;
     border-radius: 4px;
     min-width: 80px;
     border: none;
     color: #fff;
-    line-height: 36px;
+    line-height: 32px;
     font-weight: 500;
     cursor: pointer;
     padding: 0 16px;
@@ -79,30 +79,93 @@
     justify-content: center;
     align-items: center;
     width: max-content;
-}
-
-.cbo-btn .cbo-btn__left {
-    border-top-right-radius: 0;
+    border-radius: 3px;
+    position: relative;
     border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
 }
 
-.cbo-btn .cbo-btn__right {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+.cbo-btn::after {
+    position: absolute;
+    content: "";
+    width: 1px;
+    background-color: #fff;
+    height: 70%;
+    right: 0;
+}
+
+.cbo-icon {
+    height: 32px;
+    width: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    right: 16px;
+    z-index: 10;
     background-color: var(--primary-color);
-    border: none;
-    border-left: 1px solid var(--border-color);
-    color: #fff;
-    padding: 0 12px;
-    width: max-content;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    cursor: pointer;
 }
 
-.cbo-btn .btn-icon:hover {
+.cbo-icon:hover {
     background-color: var(--secondary-color);
 }
 
 .cbo-btn .btn-icon:focus {
     background-color: var(--focus-color);
+}
+
+.cbo-list {
+    position: absolute;
+    position: absolute;
+    width: max-content;
+    list-style: none;
+    max-height: 160px;
+    border-radius: 2px;
+    background-color: #fff;
+    box-shadow: 0 4px 16px #171b2a3d;
+    height: max-content;
+    transition: height 0.2s ease-in;
+    overflow: hidden;
+    bottom: 42px;
+    overflow: auto;
+    z-index: 20;
+    font-weight: 400;
+    right: 16px;
+}
+
+.cbo-item {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    color: #1F1F1F;
+    cursor: pointer;
+    padding: 0 14px 0 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+}
+
+.cbo-item:hover {
+    background-color: #ebedf0;
+    color: #2ca01c;
+}
+
+.save-add::after {
+    content: "Cất và thêm (Ctrl + Shift + S)";
+    position: absolute;
+    background-color: #434242;
+    color: #fff;
+    top: 40px;
+    width: max-content;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: none;
+    line-height: 18px;
+    animation: identifier 0.3s ease-in;
 }
 
 /* button disable */
@@ -153,4 +216,20 @@
 
 .btn-save-add:hover::after {
     display: block;
+}
+
+.cbo-btn-icon {
+    background: url('../../src/assets/img/Sprites.svg') no-repeat -852px -365px;
+    width: 8px;
+    height: 5px;
+}
+
+.btn-curved--left {
+    border-top-left-radius: 99px;
+    border-bottom-left-radius: 99px;
+}
+
+.btn-curved--right {
+    border-top-right-radius: 99px;
+    border-bottom-right-radius: 99px;
 }

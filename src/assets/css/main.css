@@ -8,6 +8,9 @@
 @import url(./components/table.css);
 @import url(./components/modal.css);
 @import url(./components/import.css);
+@import url(./components/category.css);
+@import url(./components/payment.css);
+@import url(./components/account.css);
 
 * {
     margin: 0;
@@ -33,6 +36,8 @@
     --table-bg-color-hover: #f2f9ff;
 
     --width-sidebar: 178px;
+    --color-link: #0075c0;
+    --tab__router-height: 32px;
 }
 
 @font-face {
@@ -80,10 +85,47 @@ body {
 .content {
     height: calc(100vh - 48px);
     background-color: #eceef1;
-    padding: 0 30px 0 20px;
+    padding: 0 24px;
     overflow: auto;
 }
 
 .required {
     color: var(--error-color);
+}
+
+.checkbox-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.export {
+    position: relative;
+    top: 4px;
+    margin-left: 8px;
+}
+
+.export::before {
+    content: "Xuất ra Excel";
+    position: absolute;
+    width: max-content;
+    z-index: 999;
+    top: 32px;
+    background-color: #434242;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    animation: identifier 0.3s ease-in;
+    display: none;
+}
+
+.export:hover::before {
+    display: block;
+}
+
+.export-icon {
+    background: url("../../src/assets/img/Sprites.ee5d4fa7.svg") no-repeat -705px -202px;
+    width: 23px;
+    height: 20px;
 }

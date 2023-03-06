@@ -6,7 +6,7 @@ import diy from "./store/diy";
 import { vue3Debounce } from "vue-debounce";
 import vueDebounce, { PluginConfig, debounce } from "vue-debounce";
 import vueClickOutsideElement from 'vue-click-outside-element'
-
+import 'devextreme/dist/css/dx.light.css';
 
 const app = createApp(App);
 

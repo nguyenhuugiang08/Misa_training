@@ -70,10 +70,17 @@ export const handleCheckFormat = (regex, value) => {
  * Xử lý validate form
  * CreatedBy: NHGiang
  */
-const useValidate = (employee, list, identityForm, employeeSelectedCode, listDepartments) => {
+const useValidate = (
+    employee,
+    list,
+    identityForm,
+    employeeSelectedCode,
+    employeeSelectedIdentityNumber,
+    listDepartments
+) => {
     try {
         // Validate employee code
-        if (!employee.EmployeeCode) {
+        if (!employee.EmployeeCode.trim()) {
             error.EmployeeCode.textError = EmployeeCodeText.blank;
             error.EmployeeCode.status = true;
         } else if (!handleCheckFormat(MISA_RESOURCE.REGEX.EMPLOYEE_CODE, employee.EmployeeCode)) {
@@ -113,8 +120,11 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode, listDep
         }
 
         // Valide employee name
-        if (!employee.FullName) {
+        if (!employee.FullName.trim()) {
             error.FullName.textError = FullNameText.blank;
+            error.FullName.status = true;
+        } else if (!handleCheckFormat(MISA_RESOURCE.REGEX.FULL_NAME, employee.FullName)) {
+            error.FullName.textError = FullNameText.invalid;
             error.FullName.status = true;
         } else {
             error.FullName.textError = "";
@@ -168,7 +178,7 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode, listDep
         }
 
         // Validate số điện thoại
-        if (employee.PhoneNumber) {
+        if (employee.PhoneNumber.trim()) {
             if (!handleCheckFormat(MISA_RESOURCE.REGEX.PHONE_NUMBER, employee.PhoneNumber)) {
                 error.PhoneNumber.textError = PhoneNumberText.invalid;
                 error.PhoneNumber.status = true;
@@ -182,7 +192,7 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode, listDep
         }
 
         // validate số điện thoại cố định
-        if (employee.LandlineNumber) {
+        if (employee.LandlineNumber.trim()) {
             if (!handleCheckFormat(MISA_RESOURCE.REGEX.PHONE_NUMBER, employee.LandlineNumber)) {
                 error.LandlineNumber.textError = LandlineNumberText.invalid;
                 error.LandlineNumber.status = true;
@@ -196,7 +206,7 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode, listDep
         }
 
         // Validate email
-        if (employee.Email) {
+        if (employee.Email.trim()) {
             if (!handleCheckFormat(MISA_RESOURCE.REGEX.EMAIL, employee.Email)) {
                 error.Email.textError = EmailText.invalid;
                 error.Email.status = true;
@@ -210,13 +220,37 @@ const useValidate = (employee, list, identityForm, employeeSelectedCode, listDep
         }
 
         // Validate số căn cước công dân
-        if (employee.IdentityNumber) {
+        if (employee.IdentityNumber.trim()) {
             if (!handleCheckFormat(MISA_RESOURCE.REGEX.IDENTITY_NUMBER, employee.IdentityNumber)) {
                 error.IdentityNumber.textError = IdentityNumberText.invalid;
                 error.IdentityNumber.status = true;
             } else {
-                error.IdentityNumber.textError = "";
-                error.IdentityNumber.status = false;
+                if (
+                    identityForm === MISA_ENUM.FORM_MODE.ADD ||
+                    identityForm === MISA_ENUM.FORM_MODE.DUPLICATE
+                ) {
+                    const listIdentityNumbers = list.map((emp) => emp.IdentityNumber);
+                    if (listIdentityNumbers.includes(employee.IdentityNumber)) {
+                        error.IdentityNumber.textError = IdentityNumberText.duplicate;
+                        error.IdentityNumber.status = true;
+                    } else {
+                        error.IdentityNumber.textError = "";
+                        error.IdentityNumber.status = false;
+                    }
+                }
+
+                if (identityForm === MISA_ENUM.FORM_MODE.EDIT) {
+                    const listIdentityNumbers = list
+                        .filter((item) => item.IdentityNumber !== employeeSelectedIdentityNumber)
+                        .map((emp) => emp.IdentityNumber);
+                    if (listIdentityNumbers.includes(employee.IdentityNumber)) {
+                        error.IdentityNumber.textError = IdentityNumberText.duplicate;
+                        error.IdentityNumber.status = true;
+                    } else {
+                        error.IdentityNumber.textError = "";
+                        error.IdentityNumber.status = false;
+                    }
+                }
             }
         } else {
             error.IdentityNumber.textError = "";

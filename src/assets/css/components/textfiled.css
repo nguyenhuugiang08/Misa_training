@@ -3,6 +3,10 @@
     position: relative;
 }
 
+.textfield--fullwidth {
+    width: 100%;
+}
+
 .textfield .textfield__label {
     margin-bottom: 8px;
     display: block;
@@ -17,12 +21,12 @@
 }
 
 .textfield .textfield__input {
-    height: 36px;
+    height: 32px;
     padding: 0 8px 0 12px;
     outline: none;
     border-radius: 2px;
     border: 1px solid var(--border-color);
-    cursor: pointer;
+    cursor: text;
     background-color: #fff;
     min-width: 260px;
     position: relative;
@@ -73,8 +77,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     background-color: #fff;
 }
 
@@ -94,8 +98,8 @@
 .textfield .textfield__icon:focus {
     right: 0;
     top: 8px;
-    height: 36px;
-    width: 36px;
+    height: 32px;
+    width: 32px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -106,8 +110,8 @@
 .textfield .textfield__icon--add:focus {
     right: 0;
     top: 8px;
-    height: 36px;
-    width: 36px;
+    height: 32px;
+    width: 32px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -183,13 +187,16 @@
 }
 
 .textfield-item {
-    height: 36px;
+    height: 32px;
     display: flex;
     align-items: center;
     background-color: #fff;
     color: #1F1F1F;
     cursor: pointer;
     padding: 0 14px 0 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .textfield-item:hover {
@@ -205,10 +212,6 @@
 .textfield-item--active:hover {
     background-color: var(--primary-color);
     color: #fff;
-}
-
-.textfield-list::-webkit-scrollbar {
-    display: none;
 }
 
 .textfield-max-content {
@@ -256,8 +259,8 @@
     background-color: #EBEBEB;
     right: 0;
     top: 4px;
-    height: 36px;
-    width: 36px;
+    height: 32px;
+    width: 32px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -321,6 +324,10 @@
     z-index: 99;
     animation: identifier 0.3s ease-in;
     display: none;
+}
+
+.textfield-readonly {
+    background-color: #eff0f2 !important;
 }
 
 @keyframes identifier {

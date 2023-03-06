@@ -6,6 +6,12 @@ import MPopUpWarning from "./MPopUpWarning.vue";
 import { useEmployee } from "../composable/useEmployee";
 import { useRoute } from "vue-router";
 
+const props = defineProps({
+    columns: Array,
+    hasCheckbox: Boolean,
+    entities: { type: Array, default: [] },
+});
+
 const { listEmployees, handleDeleteEmployee } = useEmployee();
 const { state, setListItemChecked, setListPageChecked, setTotalEmployee, setTotalPage } =
     inject("diy");
@@ -174,7 +180,11 @@ const hanldeSubmitFormDelete = async (event) => {
     <table class="tbl">
         <tbody>
             <tr class="tbl-row">
-                <th class="tbl-col tbl-col__first tbl-col__first--bg-private" style="z-index: 99">
+                <th
+                    class="tbl-col tbl-col__first tbl-col__first--bg-private"
+                    style="z-index: 99"
+                    v-if="hasCheckbox"
+                >
                     <input
                         type="checkbox"
                         id="toggle"
@@ -193,42 +203,18 @@ const hanldeSubmitFormDelete = async (event) => {
                         ></div>
                     </label>
                 </th>
-                <th class="tbl-col">mã nhân viên</th>
-                <th class="tbl-col tbl-col--large">tên nhân viên</th>
-                <th class="tbl-col">giới tính</th>
-                <th class="tbl-col" style="text-align: center">ngày sinh</th>
-                <th class="tbl-col">vị trí</th>
-                <th class="tbl-col tbl-col--large">đơn vị</th>
-                <th class="tbl-col">
-                    <label
-                        class="tbl-col__identity"
-                        @mouseover="isShowTooltip = true"
-                        @mouseout="isShowTooltip = false"
-                        >số CMND</label
-                    >
-                    <p v-if="isShowTooltip" class="tbl-col__identity-tooltip">
-                        Số chứng minh nhân dân
-                    </p>
+                <th
+                    :class="`tbl-col ${column.isLarge ? 'tbl-col--large' : ''}`"
+                    v-for="(column, index) in columns"
+                    :key="index"
+                >
+                    {{ column.columnName }}
                 </th>
-                <th class="tbl-col">số điện thoại</th>
-                <th class="tbl-col">số tài khoản</th>
-                <th class="tbl-col tbl-col--large">tên ngân hàng</th>
-                <th class="tbl-col tbl-col--large">chi nhánh</th>
                 <th class="tbl-col tbl-col__last tbl-col__last--bg-private" style="z-index: 99">
                     chức năng
                 </th>
             </tr>
-            <mrow
-                v-for="employee in state.listEmployees"
-                :key="employee.EmployeeId"
-                :employee="employee"
-                :listCheck="listCheck"
-                @check="setListCheck($event)"
-                @displayWarning="handleShowWarning($event)"
-            />
-            <!-- <div v-if="!state.listEmployees.length" class="tbl-loading">
-                <m-Loading />
-            </div> -->
+            <mrow v-for="(entity, index) in entities" :key="index" :entity="entity" />
             <div v-if="!state.listEmployees.length" class="not-found">
                 <img
                     src="https://actappg2.misacdn.net/img/bg_report_nodata.76e50bd8.svg"

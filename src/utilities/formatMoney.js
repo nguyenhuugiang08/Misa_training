@@ -7,7 +7,7 @@ export const formatMoney = (money) => {
         if (!money) {
             return "0 VND";
         }
-        money = new Intl.NumberFormat("it-IT", { style: "currency", currency: "VND" }).format(
+        money = new Intl.NumberFormat("vi-VI").format(
             money
         );
         return money;

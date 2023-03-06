@@ -137,32 +137,36 @@ const handleShowPopUpInfo = () => {
 const hanldeSubmitForm = async (isCloseForm = true) => {
     try {
         employee.DepartmentId = employee.DepartmentId || listDepartments.value?.[0].optionId;
-        // const status = useValidate(
-        //     employee,
-        //     state.listAllEmployee,
-        //     state.identityForm,
-        //     employeeSelected.EmployeeCode,
-        //     listDepartments
-        // );
 
+        // Thực hiện validate trước khi gọi API
+        const status = useValidate(
+            employee,
+            state.listAllEmployee,
+            state.identityForm,
+            employeeSelected.EmployeeCode,
+            employeeSelected.IdentityNumber,
+            listDepartments
+        );
+
+        // submit với form edit
         if (state.identityForm === MISA_ENUM.FORM_MODE.EDIT) {
-            await handleEditEmployee(isCloseForm);
-            // if (!status) {
-            //     await handleEditEmployee(isCloseForm);
-            // } else {
-            //     isPopUp.isOpenError = true;
-            // }
+            if (!status) {
+                await handleEditEmployee(isCloseForm);
+            } else {
+                isPopUp.isOpenError = true;
+            }
         }
+
+        // submit với form thêm hoặc nhân bản
         if (
             state.identityForm === MISA_ENUM.FORM_MODE.ADD ||
             state.identityForm === MISA_ENUM.FORM_MODE.DUPLICATE
         ) {
-            await handleAddAndDuplicateEmployee(isCloseForm);
-            // if (!status) {
-            //     await handleAddAndDuplicateEmployee(isCloseForm);
-            // } else {
-            //     isPopUp.isOpenError = true;
-            // }
+            if (!status) {
+                await handleAddAndDuplicateEmployee(isCloseForm);
+            } else {
+                isPopUp.isOpenError = true;
+            }
         }
     } catch (err) {
         console.log(err);
@@ -181,6 +185,7 @@ const handleAddAndDuplicateEmployee = async (isCloseForm) => {
             {
                 ...employee,
                 EmployeeCode: employee.EmployeeCode.trim(),
+                FullName: employee.FullName.trim(),
                 IdentityDate: new Date(convertDatetime(employee.IdentityDate, true)),
                 DateOfBirth: new Date(convertDatetime(employee.DateOfBirth, true)),
             },
@@ -206,6 +211,7 @@ const handleEditEmployee = async (isCloseForm) => {
                 ...employee,
                 EmployeeId: employeeSelected.EmployeeId,
                 EmployeeCode: employee.EmployeeCode.trim(),
+                FullName: employee.FullName.trim(),
                 IdentityDate: new Date(convertDatetime(employee.IdentityDate, true)),
                 DateOfBirth: new Date(convertDatetime(employee.DateOfBirth, true)),
             },
@@ -290,6 +296,10 @@ onUnmounted(() => {
     document.removeEventListener("keydown", docKeyDown);
 });
 
+/**
+ * Hàm set lại Tabindex khi nhấn Shift + Tab
+ * Created by: NHGiang - (26/02/23)
+ */
 const handleSetReverseTabindex = (e) => {
     try {
         if (e.shiftKey && e.keyCode === MISA_ENUM.KEY_CODE.TAB) {
@@ -401,6 +411,7 @@ const handleSetReverseTabindex = (e) => {
                             (employee.DepartmentId = $event.optionId),
                                 (employee.DepartmentName = $event.optionName)
                         "
+                        @changeValue="error.DepartmentId.status = false"
                         :text-label="'Đơn vị'"
                         :status="error.DepartmentId.status"
                         :statusPublic="error.status"

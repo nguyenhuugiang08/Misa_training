@@ -1,6 +1,5 @@
 <script setup></script>
 
 <template>
-    <div>step three</div>
+    <router-view></router-view>
 </template>
-

@@ -11,6 +11,8 @@
   "dependencies": {
     "@vuepic/vue-datepicker": "^3.6.3",
     "axios": "^1.2.2",
+    "devextreme": "22.2.4",
+    "devextreme-vue": "22.2.4",
     "query-string": "^8.1.0",
     "vite-svg-loader": "^4.0.0",
     "vue": "^3.2.45",

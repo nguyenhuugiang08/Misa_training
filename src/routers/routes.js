@@ -8,10 +8,6 @@ export const routes = [
                 component: () => import("../pages/HomePage.vue"),
             },
             {
-                path: "/cash",
-                component: () => import("../pages/CashPage.vue"),
-            },
-            {
                 path: "/deposits",
                 component: () => import("../pages/DepositsPage.vue"),
             },
@@ -64,26 +60,36 @@ export const routes = [
                 component: () => import("../pages/FinancialAnalysisPage.vue"),
             },
             {
-                path: "/financial-knowledge",
-                component: () => import("../pages/FinancialKnowledgePage.vue"),
+                path: "/category",
+                component: () => import("../pages/CategoryPage.vue"),
+            },
+            {
+                path: "/account-system",
+                component: () => import("../pages/AccountSystemPage.vue"),
             },
         ],
     },
     {
-        path: "/import",
-        component: () => import("../layouts/ImportLayout.vue"),
+        path: "/pay",
+        component: () => import("../layouts/SecondLayout.vue"),
         children: [
             {
-                path: "step-one",
-                component: () => import("../components/MImportStepOne.vue"),
+                path: "pay-detail",
+                component: () => import("../pages/PaymentDetailsPage.vue"),
+            },
+        ]
+    },
+    {
+        path: "/cash",
+        component: () => import("../layouts/TabRouterLayout.vue"),
+        children: [
+            {
+                path: "procedure",
+                component: () => import("../pages/ProcedurePage.vue"),
             },
             {
-                path: "step-two",
-                component: () => import("../components/MImportStepTwo.vue"),
-            },
-            {
-                path: "step-three",
-                component: () => import("../components/MImportStepThree.vue"),
+                path: "pay",
+                component: () => import("../pages/PayPage.vue"),
             },
         ],
     },

@@ -105,8 +105,8 @@ const handleChangePageNumber = async (pageNumber) => {
                 :default="MISA_ENUM.pageSizeOptions[1].optionId"
                 :is-top="true"
                 :width="'200px'"
-                @select="handleChangePageSize($event.optionId)"
                 :is-absolute="true"
+                @select="handleChangePageSize($event.optionId)"
             />
             <paginate
                 v-model="page"

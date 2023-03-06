@@ -18,15 +18,17 @@ const props = defineProps({
     statusPublic: Boolean,
     textError: String,
     type: { type: String, default: "text" },
+    bottom: String,
 });
 
 const date = ref(convertDatetime(props.value)); // Giá trị ngày tháng được hiển thị
 const isFocus = ref(false); // Trạng focus của ô input
 const datepicker = ref(null); // Tham chiếu đến component DatePicker
 const isOpenDatepicker = ref(false); // Trạng thái Đóng /Mở của date picker
+const isShowError = ref(false); // Trạng thái ẩn/hiện message lỗi
 
 // Định nghĩa các hàm emit lên component cha
-const emit = defineEmits(["dateField"]);
+const emit = defineEmits(["dateField", "changeValue"]);
 
 /**
  * Khi thay đổi giá trị ô input
@@ -110,6 +112,7 @@ const handleClearValue = () => {
             format="dd/MM/yyyy"
             text-input
             show-now-button=""
+            locale="vi"
             :day-names="['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']"
         >
             <template #dp-input="{ value }">
@@ -152,12 +155,23 @@ const handleClearValue = () => {
                     :type="type"
                     class="textfield__input"
                     :class="status ? 'textfield--error-input' : ''"
-                    :style="{ minWidth: width, width: width, marginRight: marginRight }"
+                    :style="{
+                        minWidth: width,
+                        width: width,
+                        marginRight: marginRight,
+                        marginBottom: bottom ? `${bottom}` : '0',
+                    }"
                     placeholder="DD/MM/YYYY"
                     :value="value"
                     @input="handleEmitInputValue($event.target.value)"
-                    @focus="isFocus = status ? false : true"
+                    @focus="
+                        isFocus = status ? false : true;
+                        emit('changeValue', true);
+                    "
                     @blur="isFocus = false"
+                    @mouseover="isShowError = true"
+                    @mouseleave="isShowError = false"
+                    @keydown.tab="datepicker.closeMenu()"
                 />
             </template>
             <template #month="{ text }">
@@ -167,11 +181,9 @@ const handleClearValue = () => {
                 <span @click="selectCurrentDate()" title="Select current date"> Hôm nay </span>
             </template>
         </Datepicker>
-        <!-- <p v-if="statusPublic || status" class="textfield-error">
+        <div v-if="status" class="error-input" :style="{ display: isShowError ? 'block' : 'none' }">
             {{ textError }}
-            <div class="textfield-error__detail"> {{ textError }}</div>
-        </p> -->
-        <div v-if="status" class="error-input">{{ textError }}</div>
+        </div>
     </div>
 </template>
 

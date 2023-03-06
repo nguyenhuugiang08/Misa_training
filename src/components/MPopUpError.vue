@@ -1,4 +1,7 @@
 <script setup>
+import { MISA_ENUM } from "../base/enum";
+import { onMounted, onUnmounted } from "vue";
+
 // Định nghĩa các props nhận vào
 const props = defineProps({
     title: { type: String, required: true },
@@ -19,6 +22,34 @@ const handleClosePopUp = () => {
         console.log(error);
     }
 };
+
+/**
+ * Hàm xử lỹ phím tắt
+ * @param {*} e
+ * Created by: NHGiang - (24/02/23)
+ */
+const docKeyDown = (e) => {
+    // Đóng popup error với phím tắt ESC
+    if (e.keyCode === MISA_ENUM.KEY_CODE.ESCAPE) {
+        handleClosePopUp();
+    }
+};
+
+/**
+ * Hàm thêm event keydown
+ * Created by: NHGiang - (24/02/23)
+ */
+onMounted(() => {
+    document.addEventListener("keydown", docKeyDown, false);
+});
+
+/**
+ * Hàm xử lý remove event
+ * Created by: NHGiang - (24/02/23)
+ */
+onUnmounted(() => {
+    document.removeEventListener("keydown", docKeyDown);
+});
 </script>
 
 <template>

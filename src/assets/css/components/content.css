@@ -3,6 +3,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 24px 0 11px 0;
+    position: relative;
 }
 
 .content__header-text {
@@ -14,7 +15,7 @@
     background-color: #fff;
     box-shadow: 0 0 3px #01161e29;
     height: calc(100vh - 48px - 71px - 10px);
-    padding: 0 30px 0 20px;
+    padding: 0 12px;
     position: relative;
 }
 

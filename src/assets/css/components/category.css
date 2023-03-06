@@ -1,0 +1,33 @@
+.category {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.category-content {
+    padding: 32px;
+    background-color: #fff;
+    margin-top: 24px;
+    width: 100%;
+    height: 632px;
+}
+
+.category-label {
+    padding-bottom: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    display: block;
+}
+
+.category-list {
+    list-style: none;
+    display: block;
+}
+
+.category-item {
+    display: block;
+    text-decoration: none;
+    color: var(--color-link);
+    padding-bottom: 8px;
+}

@@ -12,27 +12,30 @@ const indexOptionSelected = ref(0); // Chỉ số của lựa chọn đã đư�
 
 // Định nghĩa các props nhận vào.
 const props = defineProps({
-    options: Array,
+    options: { type: Array, default: [] },
     default: String,
     textLabel: String,
     required: Boolean,
-    isTop: Boolean,
+    isTop: { type: Boolean, default: false },
     width: String,
     status: Boolean,
     statusPublic: Boolean,
     isAbsolute: Boolean,
     bottom: String,
     textError: String,
+    marginRight: String,
+    disabled: Boolean,
 });
 
 const refCheckBox = ref(null);
 const refList = ref(null);
+const isShowError = ref(false);
 
 // Gán giá trị ban của mảng optionSearch là danh sách tất cả các lựa chọn.
 optionSearch.value = [...props.options];
 
 // Emit các sự kiện ra ngoài component cha
-const emit = defineEmits(["select"]);
+const emit = defineEmits(["select", "changeValue"]);
 
 /**
  * Hiển thị tên option được chọn lên giao diện.
@@ -70,15 +73,20 @@ const handleDefaultValue = (optionId) => {
  * - Nếu có ID của giá trị mặc định -> Hiển thị tên của option lên giao diện
  * - Nếu không có -> gán indexOptionSelected = -1
  */
-if (props.default) {
-    selected.value = handleDefaultValue(props.default);
-    indexOptionSelected.value = optionSearch.value.findIndex(
-        (option) => option?.optionId === props.default
-    );
+if (props.disabled) {
+    selected.value = "";
+    indexOptionSelected.value = -1;
 } else {
-    indexOptionSelected.value = optionSearch.value.findIndex(
-        (option) => option?.optionName === selected.value
-    );
+    if (props.default) {
+        selected.value = handleDefaultValue(props.default);
+        indexOptionSelected.value = optionSearch.value.findIndex(
+            (option) => option?.optionId === props.default
+        );
+    } else {
+        indexOptionSelected.value = optionSearch.value.findIndex(
+            (option) => option?.optionName === selected.value
+        );
+    }
 }
 
 /**
@@ -100,42 +108,35 @@ const handleClickOutside = () => {
  */
 const handleSearchOption = (keyword) => {
     try {
+        emit("changeValue", true);
         indexOptionSelected.value = 0;
         isOpen.value = true;
         selected.value = keyword;
+
+        // thực hiện tìm kiếm option theo từ khóa nhập
+        optionSearch.value = props.options.filter((option) =>
+            option.optionName.toLowerCase().includes(keyword.toLowerCase())
+        );
+
+        /**
+         * - Nếu giá trị nhập trùng với 1 option -> gửi giá trị nhập -> hợp lệ
+         * - Nếu không trùng -> gửi giá trị nhập -> không có trong danh mục
+         */
+        if (optionSearch.value.length === 1) {
+            const newOptionId = props.options.find(
+                (option) => option.optionName === keyword
+            )?.optionId;
+            emit("select", { optionId: newOptionId, optionName: keyword });
+        } else {
+            emit("select", {
+                optionId: props.options[indexOptionSelected.value].optionId,
+                optionName: keyword,
+            });
+        }
     } catch (error) {
         console.log(error);
     }
 };
-
-/**
- * Theo dõi giá ô input thay đổi khi tìm kiếm hiển thị danh sách các option tướng ứng tìm được
- * Created by: NHGiang - (20/02/23)
- */
-watch(
-    () => selected.value,
-    (newValue) => {
-        try {
-            optionSearch.value = props.options.filter((option) =>
-                option.optionName.toLowerCase().includes(newValue.toLowerCase())
-            );
-
-            if (optionSearch.value.length === 1) {
-                const newOptionId = props.options.find(
-                    (option) => option.optionName === newValue
-                )?.optionId;
-                emit("select", { optionId: newOptionId, optionName: newValue });
-            } else {
-                emit("select", {
-                    optionId: props.options[indexOptionSelected.value].optionId,
-                    optionName: newValue,
-                });
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
-);
 
 /**
  * Xử lý tác vụ liên quan đến keyboard
@@ -147,12 +148,14 @@ const handleInputKeydown = (event) => {
         const maxLength = optionSearch.value.length;
         switch (event.keyCode) {
             case MISA_ENUM.KEY_CODE.DOWN_ARROW: // Khi ấn phím mũi tên xuống
-                isOpen.value = true;
                 if (indexOptionSelected.value < maxLength - 1) {
-                    indexOptionSelected.value++;
+                    if (isOpen.value === true) {
+                        indexOptionSelected.value++;
+                    }
                 } else {
                     indexOptionSelected.value = 0;
                 }
+                isOpen.value = true;
                 break;
             case MISA_ENUM.KEY_CODE.UP_ARROW: // Khi ấn phím mũi tên lên
                 if (indexOptionSelected.value > 0) {
@@ -167,26 +170,12 @@ const handleInputKeydown = (event) => {
                     indexOptionSelected.value
                 );
                 break;
+            case MISA_ENUM.KEY_CODE.TAB: // Khi ấn phím enter
+                isOpen.value = false;
+                break;
             default:
                 break;
         }
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-/**
- * Hàm xử lý focus ô input khi thực hiện tab vào
- * @param {} e
- * Created by: NHGiang - (25/03/23)
- */
-const handleFocusCheckBox = (e) => {
-    try {
-        if (e.target.getAttribute("tabindex") !== -1) {
-            e.target.setAttribute("tabindex", -1);
-        }
-        refCheckBox.value.focus();
-        console.log(e);
     } catch (error) {
         console.log(error);
     }
@@ -201,6 +190,7 @@ const handleFocusCheckBox = (e) => {
             minWidth: width && `${width}`,
             width: width && `${width}`,
             position: isAbsolute ? `absolute` : 'relative',
+            marginRight: marginRight,
         }"
     >
         {{ textLabel }} <span v-if="required" class="required">*</span>
@@ -208,13 +198,15 @@ const handleFocusCheckBox = (e) => {
             class="modal-icon textfield__icon drop-department"
             style="display: flex; justify-content: center; align-items: center"
             :style="{
-                top: `${isTop && '-16px !important'}`,
+                top: `${
+                    isTop ? '-16px !important' : !textLabel ? '4px !important' : '22px !important'
+                }`,
                 borderColor: `${
                     status ? 'var(--error-color)' : isFocus ? 'var(--primary-color)' : ''
                 }`,
             }"
             @click="
-                isOpen = !isOpen;
+                isOpen = !disabled ? !isOpen : false;
                 optionSearch = [...options];
             "
             @keydown="handleInputKeydown"
@@ -232,7 +224,11 @@ const handleFocusCheckBox = (e) => {
         </div>
         <ul
             class="textfield-list modal-list list-departments"
-            :style="{ top: isTop && 'unset', bottom: isTop && '24px', width: width && `${width}` }"
+            :style="{
+                top: isTop ? 'unset' : !textLabel && '38px',
+                bottom: isTop && '24px',
+                width: width && `${width}`,
+            }"
             v-if="isOpen"
             ref="refList"
         >
@@ -246,27 +242,40 @@ const handleFocusCheckBox = (e) => {
                 {{ option.optionName }}
             </li>
         </ul>
+        <div
+            v-if="status"
+            class="error-checkbox"
+            :style="{ display: isShowError ? 'block' : 'none' }"
+        >
+            {{ textError }}
+        </div>
     </label>
     <input
         ref="refCheckBox"
         type="text"
+        :disabled="disabled"
         class="textfield__input modal-textfield__input"
-        :class="status ? 'textfield--error-input' : ''"
+        :class="(status ? 'checkbox--error-input' : '', disabled ? 'textfield-readonly' : '')"
         id="employee-department"
         :value="selected"
         :style="{
             minWidth: width && `${width}`,
             width: width && `${width}`,
             marginBottom: bottom ? `${bottom}` : '0',
+            marginRight: marginRight,
         }"
-        @focus="isFocus = status ? false : true"
+        @focus="
+            isFocus = status ? false : true;
+            emit('changeValue', true);
+            isOpen = true;
+        "
         @blur="isFocus = false"
         @input="handleSearchOption($event.target.value)"
         autocomplete="off"
         @keydown="handleInputKeydown"
+        @mouseover="isShowError = true"
+        @mouseleave="isShowError = false"
     />
-    <!-- <p v-if="statusPublic || status" class="textfield-error">{{ textError }}</p> -->
-    <div v-if="status" class="error-input">{{ textError }}</div>
 </template>
 <style scoped>
 .label-checkbox {
@@ -278,5 +287,45 @@ const handleFocusCheckBox = (e) => {
     position: absolute;
     z-index: 92;
     cursor: pointer;
+}
+
+.drop-department:hover {
+    background-color: #ebebeb;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    border: 1px solid var(--border-color);
+    border-left: none;
+}
+
+.checkbox--error-input {
+    border: 1px solid var(--error-color);
+}
+
+.error-checkbox {
+    position: absolute;
+    padding: 4px 8px;
+    background: #f65d5d;
+    color: #fff;
+    border-radius: 4px;
+    z-index: 99;
+    text-align: center;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    top: 64px;
+    font-weight: 400;
+    display: none;
+}
+
+.error-checkbox::before {
+    content: "";
+    position: absolute;
+    height: 0;
+    width: 0;
+    border: 8px solid;
+    border-color: transparent transparent #f65d5d transparent;
+    top: -13px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 </style>

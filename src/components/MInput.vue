@@ -15,6 +15,8 @@ const props = defineProps({
     placeHolder: String,
     autofoucus: Boolean,
     textError: String,
+    bottom: String,
+    fullWidth: Boolean,
 });
 
 // biến giúp tham chiếu đến element Input trong DOM
@@ -55,7 +57,7 @@ defineExpose({ handleFocus });
 </script>
 
 <template>
-    <div class="textfield">
+    <div :class="{ textfield: true, 'textfield--fullwidth': fullWidth }">
         <label for="" class="textfield__label modal-label">
             {{ fieldText }} <span v-if="required" class="required">*</span>
         </label>
@@ -63,7 +65,12 @@ defineExpose({ handleFocus });
             :type="type"
             class="textfield__input"
             :class="status ? 'textfield--error-input' : ''"
-            :style="{ minWidth: width, width: width, marginRight: marginRight }"
+            :style="{
+                minWidth: width,
+                width: width,
+                marginRight: marginRight,
+                marginBottom: bottom ? `${bottom}` : '0',
+            }"
             :value="value"
             @input="handleEmitInputValue($event.target.value)"
             :placeHolder="placeHolder"
@@ -72,14 +79,6 @@ defineExpose({ handleFocus });
         <div class="textfield-tooltip" v-if="tooltip">
             <span>{{ tooltip }}</span>
         </div>
-        <!-- <p
-            v-if="statusPublic || status"
-            class="textfield-error"
-            :style="{ minWidth: width, width: width }"
-        >
-            {{ textError }}
-        </p>
-        <div class="textfield-error__detail">{{ textError }}</div> -->
         <div v-if="status" class="error-input">{{ textError }}</div>
     </div>
 </template>

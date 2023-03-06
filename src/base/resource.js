@@ -13,6 +13,7 @@ export const MISA_RESOURCE = {
     },
     FullNameText: {
         blank: "Tên không được để trống.", // Text lỗi khi tên nhân viên để trống.
+        invalid: "Tên nhân viên không đúng định dạng.",
     },
     DateOfBirthText: {
         invalid: "Ngày sinh không hợp lệ.", // Text lỗi khi ngày sinh không hợp lệ.
@@ -33,6 +34,7 @@ export const MISA_RESOURCE = {
     },
     IdentityNumberText: {
         invalid: "Số căn cước không đúng định dạng.",
+        duplicate: "Số căn cước đã tồn tại trong hệ thống.",
     },
     DepartmentIdText: {
         blank: "Đơn vị không được để trống.",
@@ -44,18 +46,18 @@ export const MISA_RESOURCE = {
         DUPLICATE: "Nhân bản nhân viên", // tiêu đề form nhân bản
     },
     MONTH_DATEPICKER: {
-        Jan: "Tháng 1",
-        Feb: "Tháng 2",
-        Mar: "Tháng 3",
-        Apr: "Tháng 4",
-        May: "Tháng 5",
-        Jun: "Tháng 6",
-        Jul: "Tháng 7",
-        Aug: "Tháng 8",
-        Sep: "Tháng 9",
-        Oct: "Tháng 10",
-        Nov: "Tháng 11",
-        Dec: "Tháng 12",
+        "Thg 1": "Tháng 1",
+        "Thg 2": "Tháng 2",
+        "Thg 3": "Tháng 3",
+        "Thg 4": "Tháng 4",
+        "Thg 5": "Tháng 5",
+        "Thg 6": "Tháng 6",
+        "Thg 7": "Tháng 7",
+        "Thg 8": "Tháng 8",
+        "Thg 9": "Tháng 9",
+        "Thg 10": "Tháng 10",
+        "Thg 11": "Tháng 11",
+        "Thg 12": "Tháng 12",
     },
     TOAST: {
         ADD_SUCCESS: {
@@ -71,7 +73,7 @@ export const MISA_RESOURCE = {
         EDIT_SUCCESS: {
             TOAST_MESSAGE: "Thông tin nhân viên đã được thay đổi.",
             STATUS_MESSAGE: "Thành công! ",
-            STATUS: MISA_ENUM.STATUS_TOAST.SUCCESS, // trạng thái khi sửa thất bại
+            STATUS: MISA_ENUM.STATUS_TOAST.SUCCESS, // trạng thái khi sửa thành công
         },
         EDIT_FAILED: {
             TOAST_MESSAGE: "Sửa thông tin nhân viên thất bại, vui lòng kiểm tra lại.",
@@ -93,6 +95,11 @@ export const MISA_RESOURCE = {
             STATUS_MESSAGE: "Lỗi!",
             STATUS: MISA_ENUM.STATUS_TOAST.ERROR,
         },
+        DELETE_MULTIPLE_SUCCESS: {
+            TOAST_MESSAGE: "Xóa thành công các nhân viên đã chọn.",
+            STATUS_MESSAGE: "Thành công! ",
+            STATUS: MISA_ENUM.STATUS_TOAST.SUCCESS,
+        },
     },
     REGEX: {
         // biếu thức chính quy validate ngày tháng.
@@ -100,11 +107,182 @@ export const MISA_RESOURCE = {
         // Biểu thức chính quy validate email.
         EMAIL: /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i,
         // Biểu thức chính quy validate số điện thoại
-        PHONE_NUMBER: /([\+84|84|0]+(3|5|7|8|9|1[2|6|8|9]))+([0-9]{8})\b/,
+        PHONE_NUMBER: /0[0-9]{9}\b/,
         // biểu thức chính quy validate số chứng minh nhân dân
         IDENTITY_NUMBER: /^([0-9]{12})\b/,
         // Biểu thức chính quy validate mã nhân viên
         EMPLOYEE_CODE: /NV-[0-9]{5,17}\b/,
+        // Biểu thức chính quy validate tên nhân viên
+        FULL_NAME:
+            /^([a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s\W|_]{1,100}$)\b/,
     },
     FILE_EXCEL_NAME: "Danh_sach_nhan_vien.xlsx", // Tên file excel khi xuất.
+    COLUMNS_NAME_TABLE: [
+        {
+            columnName: "Số tài khoản",
+            isLarge: false,
+        },
+        {
+            columnName: "Tên tài khoản",
+            isLarge: true,
+        },
+        {
+            columnName: "Tính chất",
+            isLarge: false,
+        },
+        {
+            columnName: "Tên tiếng anh",
+            isLarge: true,
+        },
+        {
+            columnName: "Diễn giải",
+            isLarge: true,
+        },
+        {
+            columnName: "Trạng thái",
+            isLarge: false,
+        },
+    ],
+    TAB: [
+        {
+            tabName: "Quy trình",
+            tabLink: "/cash/procedure",
+        },
+        {
+            tabName: "Chi tiền",
+            tabLink: "/cash/pay",
+        },
+    ],
+    SAVE_ACTIVE: [
+        {
+            optionName: "Cất và đóng",
+            optionId: 0,
+        },
+        {
+            optionName: "Cất và thêm",
+            optionId: 1,
+        },
+    ],
+    PAY_ACTIVE: [
+        {
+            optionId: 0,
+            optionName: "1. Trả tiền nhà cung cấp (không theo hóa đơn)",
+        },
+        {
+            optionId: 1,
+            optionName: "2. Trả các khoản vay",
+        },
+        {
+            optionId: 1,
+            optionName: "3. Tạm ứng cho nhân viên",
+        },
+        {
+            optionId: 1,
+            optionName: "4. Chi mua ngoài có hóa đơn",
+        },
+        {
+            optionId: 1,
+            optionName: "5. Trả lương nhân viên",
+        },
+        {
+            optionId: 1,
+            optionName: "6. Chuyển tiền cho chi nhánh khác",
+        },
+        {
+            optionId: 1,
+            optionName: "7. Chi khác",
+        },
+    ],
+    COLUMNS_NAME_TABLE_DETAIL: [
+        {
+            columnName: "#",
+            width: "34px",
+        },
+        {
+            columnName: "Diễn giải",
+            width: "522px",
+        },
+        {
+            columnName: "TK Nợ",
+            width: "150px",
+        },
+        {
+            columnName: "TK Có",
+            width: "150px",
+        },
+        {
+            columnName: "Số tiền",
+            width: "150px",
+        },
+        {
+            columnName: "Đối tượng",
+            width: "150px",
+        },
+        {
+            columnName: "Tên đối tượng",
+            width: "280px",
+        },
+        {
+            columnName: "",
+            width: "35px",
+        },
+    ],
+    BUTTON_ACTION_SAVE: [
+        {
+            optionName: "Cất và đóng",
+            tooltip: "Cất và đóng (Ctrl + Q)",
+        },
+        {
+            optionName: "Cất và thêm",
+            tooltip: "Cất và thêm (Ctrl + Shift + S)",
+        },
+    ],
+    ACCOUNT_NATURE: [
+        {
+            optionId: 0,
+            optionName: "Dư Có",
+        },
+        {
+            optionId: 1,
+            optionName: "Dư Nợ",
+        },
+        {
+            optionId: 2,
+            optionName: "Lưỡng tính",
+        },
+        {
+            optionId: 3,
+            optionName: "Không có số dư",
+        },
+    ],
+    COLUMNS_NAME_TABLE_PAY: [
+        {
+            columnName: "Ngày hạch toán",
+            width: "34px",
+        },
+        {
+            columnName: "Ngày chứng từ",
+            width: "522px",
+        },
+        {
+            columnName: "Số chứng từ",
+            width: "150px",
+        },
+        {
+            columnName: "Diễn giải",
+            width: "310px",
+        },
+        {
+            columnName: "Số tiền",
+            width: "150px",
+        },
+        {
+            columnName: "Mã Đối tượng",
+            width: "150px",
+        },
+        {
+            columnName: "Đối tượng",
+            width: "280px",
+        },
+    ],
 };
