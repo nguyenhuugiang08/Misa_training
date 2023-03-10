@@ -12,7 +12,7 @@ const indexTab = ref(0);
         <the-sidebar />
         <div class="main">
             <the-header />
-            <div class="content">
+            <div class="content content-payment">
                 <div class="content__header tab">
                     <ul class="tab-list">
                         <router-link

@@ -3,11 +3,11 @@ import { MISA_ENUM } from "../base/enum";
 
 const state = reactive({
     isSidebar: false, // Trạng thái Đóng/Mở sidebar
-    listEmployees: [], // Danh sách nhân viên
+    Entities: [], // Danh sách nhân viên
     titleForm: "", // Tiêu đề form
     isForm: false, // trạng thái Đóng/ Mở form
-    employeeSelected: {}, // Thông tin nhân viên đang được chọn
-    totalEmployee: 0, // Tổng số bản ghi
+    entitySelected: {}, // Thông tin nhân viên đang được chọn
+    totalEntities: 0, // Tổng số bản ghi
     totalPageValue: 1, // Tổng số trang
     identityForm: MISA_ENUM.FORM_MODE.ADD, // Định danh form - mặc định là form thêm
     listAllEmployee: [], // Danh sách tất cả nhân viên
@@ -42,9 +42,9 @@ const setIsSidebar = () => {
  * @param {*} list -- Danh sách nhân viên
  * Created By: NHGiang - (17/02/23)
  */
-const setListEmployees = (list) => {
+const setEntities = (list) => {
     try {
-        state.listEmployees = list;
+        state.Entities = list;
     } catch (error) {
         console.log(error);
     }
@@ -93,9 +93,9 @@ const setEmployeeSelected = (employee) => {
  * @param {*} total -- Tổng số bản ghi
  * Created by: NHGiang - (17/02/23)
  */
-const setTotalEmployee = (total) => {
+const setTotalEntities = (total) => {
     try {
-        state.totalEmployee = total;
+        state.totalEntities = total;
     } catch (error) {
         console.log(error);
     }
@@ -196,11 +196,11 @@ const setListPageChecked = (list) => {
 export default {
     state: readonly(state),
     setIsSidebar,
-    setListEmployees,
+    setEntities,
     setTitleForm,
     setIsForm,
     setEmployeeSelected,
-    setTotalEmployee,
+    setTotalEntities,
     setTotalPage,
     setIdentityForm,
     setlistAllEmployee,

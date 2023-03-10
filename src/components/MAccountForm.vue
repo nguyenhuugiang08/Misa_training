@@ -1,13 +1,14 @@
 <script setup>
 import MInput from "./MInput.vue";
 import MCheckbox from "./MCheckbox.vue";
-import { MISA_RESOURCE } from "../base/resource";
+import { MISA_RESOURCE, ACCOUNT_TRACK } from "../base/resource";
 import { ref } from "vue";
 
 const emit = defineEmits(["closeForm"]);
 
 const isShowTrackDetail = ref(true); // Trạng thái Đóng/Mở của theo dõi chi tiết
 const isResize = ref(false); // Trạng thái Mở rộng/ Thu gọn
+const isChecked = ref(false);
 </script>
 
 <template>
@@ -62,7 +63,6 @@ const isResize = ref(false); // Trạng thái Mở rộng/ Thu gọn
                     <div class="checkbox-wrapper" style="width: 25%; margin-right: 8px">
                         <m-checkbox
                             text-label="Tài khoản tổng hợp"
-                            required
                             width="100%"
                             bottom="12px"
                             :default="MISA_RESOURCE.ACCOUNT_NATURE[1].optionId"
@@ -87,7 +87,11 @@ const isResize = ref(false); // Trạng thái Mở rộng/ Thu gọn
                     </div>
                 </div>
                 <div class="row">
-                    <label for="accounting" class="modal__header-left-wrapper account-checkbox">
+                    <label
+                        for="accounting"
+                        class="modal__header-left-wrapper account-checkbox"
+                        tabindex="0"
+                    >
                         <input type="checkbox" id="accounting" />
                         <div class="check-icon"></div>
                     </label>
@@ -109,209 +113,39 @@ const isResize = ref(false); // Trạng thái Mở rộng/ Thu gọn
                     </div>
                     Theo dõi chi tiết theo
                 </div>
-                <div class="track-detail" :style="{ height: !isShowTrackDetail ? '0' : '200px' }">
-                    <div class="account-track__left">
-                        <div class="row account-track__left-row">
-                            <div class="row-left">
-                                <label
-                                    for="subject"
-                                    class="modal__header-left-wrapper account-checkbox"
-                                >
-                                    <input type="checkbox" id="subject" />
-                                    <div class="check-icon"></div>
-                                </label>
-                                <span>Đối tượng</span>
-                            </div>
-                            <div class="checkbox-wrapper" style="width: 50%">
-                                <m-checkbox
-                                    width="100%"
-                                    :default="MISA_RESOURCE.ACCOUNT_NATURE[1].optionId"
-                                    :options="MISA_RESOURCE.ACCOUNT_NATURE"
-                                    disabled
-                                />
-                            </div>
+                <div class="track-detail" :style="{ height: !isShowTrackDetail ? '0' : '300px' }">
+                    <div
+                        class="row account-track__left-row"
+                        v-for="(item, index) in ACCOUNT_TRACK"
+                        :key="index"
+                        style="width: 50%; float: left"
+                    >
+                        <div
+                            class="row-left"
+                            :style="{ marginLeft: index % 2 !== 0 ? '32px' : '0' }"
+                        >
+                            <label
+                                for="subject"
+                                class="modal__header-left-wrapper account-checkbox"
+                                tabindex="0"
+                                @click="isChecked = !isChecked"
+                            >
+                                <input type="checkbox" id="subject" :checked="isChecked" />
+                                <div class="check-icon"></div>
+                            </label>
+                            <span class="track-text">{{ item.trackText }}</span>
                         </div>
-                        <div class="row account-track__left-row">
-                            <div class="row-left">
-                                <label
-                                    for="subjectTHCP"
-                                    class="modal__header-left-wrapper account-checkbox"
-                                >
-                                    <input type="checkbox" id="subjectTHCP" />
-                                    <div class="check-icon"></div>
-                                </label>
-                                <span>Đối tượng THCP</span>
-                            </div>
-                            <div class="checkbox-wrapper" style="width: 50%">
-                                <m-checkbox
-                                    width="100%"
-                                    :default="MISA_RESOURCE.ACCOUNT_NATURE[1].optionId"
-                                    :options="MISA_RESOURCE.ACCOUNT_NATURE"
-                                    disabled
-                                />
-                            </div>
-                        </div>
-                        <div class="row account-track__left-row">
-                            <div class="row-left">
-                                <label
-                                    for="order"
-                                    class="modal__header-left-wrapper account-checkbox"
-                                >
-                                    <input type="checkbox" id="order" />
-                                    <div class="check-icon"></div>
-                                </label>
-                                <span>Đơn đặt hàng</span>
-                            </div>
-                            <div class="checkbox-wrapper" style="width: 50%">
-                                <m-checkbox
-                                    width="100%"
-                                    :default="MISA_RESOURCE.ACCOUNT_NATURE[1].optionId"
-                                    :options="MISA_RESOURCE.ACCOUNT_NATURE"
-                                    disabled
-                                />
-                            </div>
-                        </div>
-                        <div class="row account-track__left-row">
-                            <div class="row-left">
-                                <label
-                                    for="purchase-contract"
-                                    class="modal__header-left-wrapper account-checkbox"
-                                >
-                                    <input type="checkbox" id="purchase-contract" />
-                                    <div class="check-icon"></div>
-                                </label>
-                                <span>Hợp đồng mua</span>
-                            </div>
-                            <div class="checkbox-wrapper" style="width: 50%">
-                                <m-checkbox
-                                    width="100%"
-                                    :default="MISA_RESOURCE.ACCOUNT_NATURE[1].optionId"
-                                    :options="MISA_RESOURCE.ACCOUNT_NATURE"
-                                    disabled
-                                />
-                            </div>
-                        </div>
-                        <div class="row account-track__left-row">
-                            <div class="row-left">
-                                <label
-                                    for="unit"
-                                    class="modal__header-left-wrapper account-checkbox"
-                                >
-                                    <input type="checkbox" id="unit" />
-                                    <div class="check-icon"></div>
-                                </label>
-                                <span>Đơn vị</span>
-                            </div>
-                            <div class="checkbox-wrapper" style="width: 50%">
-                                <m-checkbox
-                                    width="100%"
-                                    :default="MISA_RESOURCE.ACCOUNT_NATURE[1].optionId"
-                                    :options="MISA_RESOURCE.ACCOUNT_NATURE"
-                                    disabled
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="account-track__right">
-                        <div class="row account-track__left-row">
-                            <div class="row-left">
-                                <label
-                                    for="subject"
-                                    class="modal__header-left-wrapper account-checkbox"
-                                >
-                                    <input type="checkbox" id="subject" />
-                                    <div class="check-icon"></div>
-                                </label>
-                                <span>Đối tượng</span>
-                            </div>
-                            <div class="checkbox-wrapper" style="width: 50%">
-                                <m-checkbox
-                                    width="100%"
-                                    :default="MISA_RESOURCE.ACCOUNT_NATURE[1].optionId"
-                                    :options="MISA_RESOURCE.ACCOUNT_NATURE"
-                                    disabled
-                                />
-                            </div>
-                        </div>
-                        <div class="row account-track__left-row">
-                            <div class="row-left">
-                                <label
-                                    for="subjectTHCP"
-                                    class="modal__header-left-wrapper account-checkbox"
-                                >
-                                    <input type="checkbox" id="subjectTHCP" />
-                                    <div class="check-icon"></div>
-                                </label>
-                                <span>Đối tượng THCP</span>
-                            </div>
-                            <div class="checkbox-wrapper" style="width: 50%">
-                                <m-checkbox
-                                    width="100%"
-                                    :default="MISA_RESOURCE.ACCOUNT_NATURE[1].optionId"
-                                    :options="MISA_RESOURCE.ACCOUNT_NATURE"
-                                    disabled
-                                />
-                            </div>
-                        </div>
-                        <div class="row account-track__left-row">
-                            <div class="row-left">
-                                <label
-                                    for="order"
-                                    class="modal__header-left-wrapper account-checkbox"
-                                >
-                                    <input type="checkbox" id="order" />
-                                    <div class="check-icon"></div>
-                                </label>
-                                <span>Đơn đặt hàng</span>
-                            </div>
-                            <div class="checkbox-wrapper" style="width: 50%">
-                                <m-checkbox
-                                    width="100%"
-                                    :default="MISA_RESOURCE.ACCOUNT_NATURE[1].optionId"
-                                    :options="MISA_RESOURCE.ACCOUNT_NATURE"
-                                    disabled
-                                />
-                            </div>
-                        </div>
-                        <div class="row account-track__left-row">
-                            <div class="row-left">
-                                <label
-                                    for="purchase-contract"
-                                    class="modal__header-left-wrapper account-checkbox"
-                                >
-                                    <input type="checkbox" id="purchase-contract" />
-                                    <div class="check-icon"></div>
-                                </label>
-                                <span>Hợp đồng mua</span>
-                            </div>
-                            <div class="checkbox-wrapper" style="width: 50%">
-                                <m-checkbox
-                                    width="100%"
-                                    :default="MISA_RESOURCE.ACCOUNT_NATURE[1].optionId"
-                                    :options="MISA_RESOURCE.ACCOUNT_NATURE"
-                                    disabled
-                                />
-                            </div>
-                        </div>
-                        <div class="row account-track__left-row">
-                            <div class="row-left">
-                                <label
-                                    for="unit"
-                                    class="modal__header-left-wrapper account-checkbox"
-                                >
-                                    <input type="checkbox" id="unit" />
-                                    <div class="check-icon"></div>
-                                </label>
-                                <span>Đơn vị</span>
-                            </div>
-                            <div class="checkbox-wrapper" style="width: 50%">
-                                <m-checkbox
-                                    width="100%"
-                                    :default="MISA_RESOURCE.ACCOUNT_NATURE[1].optionId"
-                                    :options="MISA_RESOURCE.ACCOUNT_NATURE"
-                                    disabled
-                                />
-                            </div>
+                        <div
+                            v-if="item.isComboBox"
+                            class="checkbox-wrapper"
+                            :style="{ width: '50%', marginRight: index % 2 === 0 ? '32px' : '0' }"
+                        >
+                            <m-checkbox
+                                width="100%"
+                                :default="item.default"
+                                :options="item.options"
+                                :disabled="!isChecked"
+                            />
                         </div>
                     </div>
                 </div>
@@ -375,5 +209,9 @@ const isResize = ref(false); // Trạng thái Mở rộng/ Thu gọn
 
 .account-form__textarea:hover {
     background-color: #f6f6f6;
+}
+
+.track-text {
+    line-height: 28px;
 }
 </style>

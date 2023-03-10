@@ -173,23 +173,23 @@ export const MISA_RESOURCE = {
             optionName: "2. Trả các khoản vay",
         },
         {
-            optionId: 1,
+            optionId: 2,
             optionName: "3. Tạm ứng cho nhân viên",
         },
         {
-            optionId: 1,
+            optionId: 3,
             optionName: "4. Chi mua ngoài có hóa đơn",
         },
         {
-            optionId: 1,
+            optionId: 4,
             optionName: "5. Trả lương nhân viên",
         },
         {
-            optionId: 1,
+            optionId: 5,
             optionName: "6. Chuyển tiền cho chi nhánh khác",
         },
         {
-            optionId: 1,
+            optionId: 6,
             optionName: "7. Chi khác",
         },
     ],
@@ -197,34 +197,59 @@ export const MISA_RESOURCE = {
         {
             columnName: "#",
             width: "34px",
+            align: "left",
+            isMoney: false,
+            isSticky: true,
         },
         {
             columnName: "Diễn giải",
             width: "522px",
+            align: "left",
+            isMoney: false,
+            isSticky: false,
         },
         {
             columnName: "TK Nợ",
             width: "150px",
+            align: "left",
+            isMoney: false,
+            isSticky: false,
         },
         {
             columnName: "TK Có",
             width: "150px",
+            align: "left",
+            isMoney: false,
+            isSticky: false,
         },
         {
             columnName: "Số tiền",
             width: "150px",
+            align: "right",
+            isMoney: true,
+            isSticky: false,
         },
         {
             columnName: "Đối tượng",
             width: "150px",
+            align: "left",
+            isMoney: false,
+            isSticky: false,
         },
         {
             columnName: "Tên đối tượng",
             width: "280px",
+            align: "left",
+            isMoney: false,
+            isSticky: false,
         },
         {
             columnName: "",
             width: "35px",
+            align: "center",
+            isMoney: false,
+            isSticky: true,
+            isLast: true,
         },
     ],
     BUTTON_ACTION_SAVE: [
@@ -258,31 +283,181 @@ export const MISA_RESOURCE = {
     COLUMNS_NAME_TABLE_PAY: [
         {
             columnName: "Ngày hạch toán",
-            width: "34px",
+            width: "150px",
+            align: "center",
         },
         {
             columnName: "Ngày chứng từ",
-            width: "522px",
+            width: "150px",
+            align: "center",
         },
         {
             columnName: "Số chứng từ",
             width: "150px",
+            align: "left",
         },
         {
             columnName: "Diễn giải",
             width: "310px",
+            align: "left",
         },
         {
             columnName: "Số tiền",
             width: "150px",
+            align: "right",
         },
         {
             columnName: "Mã Đối tượng",
             width: "150px",
+            align: "left",
         },
         {
             columnName: "Đối tượng",
             width: "280px",
+            align: "left",
+        },
+        {
+            columnName: "Địa chỉ",
+            width: "280px",
+            align: "left",
+        },
+    ],
+    COLUMNS_NAME_PAYMENT_DETAIL: [
+        {
+            columnName: "#",
+            width: "34px",
+            align: "left",
+            isMoney: false,
+            isSticky: true,
+        },
+        {
+            columnName: "Diễn giải",
+            width: "320px",
+            align: "left",
+            isMoney: false,
+            isSticky: false,
+        },
+        {
+            columnName: "TK Nợ",
+            width: "150px",
+            align: "left",
+            isMoney: false,
+            isSticky: false,
+        },
+        {
+            columnName: "TK Có",
+            width: "150px",
+            align: "left",
+            isMoney: false,
+            isSticky: false,
+        },
+        {
+            columnName: "Số tiền",
+            width: "150px",
+            align: "right",
+            isMoney: true,
+            isSticky: false,
+        },
+        {
+            columnName: "Đối tượng",
+            width: "150px",
+            align: "left",
+            isMoney: false,
+            isSticky: false,
+        },
+        {
+            columnName: "Tên đối tượng",
+            width: "350px",
+            align: "left",
+            isMoney: false,
+            isSticky: false,
+        },
+    ],
+    OBJECT_TYPE: [
+        {
+            optionId: 0,
+            optionName: "Nhà cung cấp",
+        },
+        {
+            optionId: 1,
+            optionName: "Khách hàng",
+        },
+        {
+            optionId: 2,
+            optionName: "Nhân viên",
+        },
+    ],
+    TRACK_TYPE: [
+        {
+            optionId: 0,
+            optionName: "Bắt buộc nhập",
+        },
+        {
+            optionId: 1,
+            optionName: "Chỉ cảnh báo",
         },
     ],
 };
+
+export const ACCOUNT_TRACK = [
+    {
+        trackText: "Đối tượng",
+        isComboBox: true,
+        options: MISA_RESOURCE.OBJECT_TYPE,
+        default: MISA_RESOURCE.OBJECT_TYPE[1].optionId,
+    },
+    {
+        trackText: "Tài khoản ngân hàng",
+        isComboBox: false,
+        options: MISA_RESOURCE.TRACK_TYPE,
+        default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
+    },
+    {
+        trackText: "Đối tượng THCP",
+        isComboBox: true,
+        options: MISA_RESOURCE.TRACK_TYPE,
+        default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
+    },
+    {
+        trackText: "Công trình",
+        isComboBox: true,
+        options: MISA_RESOURCE.TRACK_TYPE,
+        default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
+    },
+    {
+        trackText: "Đơn đặt hàng",
+        isComboBox: true,
+        options: MISA_RESOURCE.TRACK_TYPE,
+        default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
+    },
+    {
+        trackText: "Hợp đồng bán",
+        isComboBox: true,
+        options: MISA_RESOURCE.TRACK_TYPE,
+        default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
+    },
+    {
+        trackText: "Hợp đồng mua",
+        isComboBox: true,
+        options: MISA_RESOURCE.TRACK_TYPE,
+        default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
+    },
+    {
+        trackText: "Khoản mục CP",
+        isComboBox: true,
+        options: MISA_RESOURCE.TRACK_TYPE,
+        default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
+    },
+    {
+        trackText: "Đơn vị",
+        isComboBox: true,
+        options: MISA_RESOURCE.TRACK_TYPE,
+        default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
+    },
+    {
+        trackText: "Mã thống kê",
+        isComboBox: true,
+        options: MISA_RESOURCE.TRACK_TYPE,
+        default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
+    },
+];

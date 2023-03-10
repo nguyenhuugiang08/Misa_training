@@ -115,41 +115,35 @@ const handleClickOutside = () => {
 </script>
 
 <template>
-    <tr class="tbl-row" @dblclick="handleEditEmployee(employee.EmployeeId)">
+    <tr class="tbl-row" @dblclick="handleEditEmployee(entity.PaymentId)">
         <td class="tbl-col tbl-col__first" v-if="hasCheckbox">
             <input
                 type="checkbox"
                 class="tbl-checkbox"
-                :id="employee.EmployeeId"
-                :value="employee.EmployeeId"
-                @change="handleCheckItem(employee.EmployeeId)"
-                :checked="listCheck.includes(employee.EmployeeId)"
+                :id="entity.PaymentId"
+                :value="entity.PaymentId"
+                @change="handleCheckItem(entity.PaymentId)"
             />
-            <label :for="employee.EmployeeId" class="mask">
-                <div
-                    :style="{
-                        background:
-                            'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -1225px -363px',
-                        width: '14px',
-                        height: '11px',
-                    }"
-                ></div>
+            <label :for="entity.PaymentId" class="mask">
+                <div class="mask-icon"></div>
             </label>
         </td>
-        <td class="tbl-col">
-            <span>{{ entity.BankNumber || "" }}</span>
+        <td class="tbl-col tbl-align-center">
+            <span>{{ entity.AccountingDate || "" }}</span>
         </td>
-        <td class="tbl-col tbl-col--large">{{ entity.BankName || "" }}</td>
+        <td class="tbl-col tbl-align-center">{{ entity.VouchersDate || "" }}</td>
         <td class="tbl-col">
-            {{ entity.Nature === MISA_ENUM.GENDER.OTHER ? "Khác" : entity.Nature }}
+            {{ entity.VoucherNumber || "" }}
         </td>
-        <td class="tbl-col">{{ entity.EnglishName || "" }}</td>
-        <td class="tbl-col tbl-col--large">{{ entity.Explain || "" }}</td>
-        <td class="tbl-col tbl-col--large">{{ entity.IsActive || "" }}</td>
+        <td class="tbl-col">{{ entity.Explain || "" }}</td>
+        <td class="tbl-col tbl-align-right">{{ formatMoney(entity.Money) || "" }}</td>
+        <td class="tbl-col">{{ entity.SubjectId || "" }}</td>
+        <td class="tbl-col">{{ entity.SubjectName || "" }}</td>
+        <td class="tbl-col">{{ entity.Address || "" }}</td>
         <td class="tbl-col tbl-col__last">
             <div class="tbl-col__action">
-                <label class="tbl-col__action-edit" @click="handleEditEmployee(employee.EmployeeId)"
-                    >Sửa</label
+                <label class="tbl-col__action-edit" @click="handleEditEmployee(entity.PaymentId)"
+                    >Xem</label
                 >
                 <label
                     class="sidebar-item__icon btn-dropdown"

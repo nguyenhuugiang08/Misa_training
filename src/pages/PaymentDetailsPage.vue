@@ -18,7 +18,7 @@ import MComboButton from "../components/MComboButton.vue";
                 <div class="payment-title">Phiếu chi PC001</div>
                 <div class="checkbox-wrapper">
                     <m-checkbox
-                        :default="MISA_RESOURCE.PAY_ACTIVE[1].optionId"
+                        :default="MISA_RESOURCE.PAY_ACTIVE[6].optionId"
                         :options="MISA_RESOURCE.PAY_ACTIVE"
                         :width="'290px'"
                     />
@@ -49,22 +49,22 @@ import MComboButton from "../components/MComboButton.vue";
                             width="424px"
                             :default="MISA_RESOURCE.PAY_ACTIVE[1].optionId"
                             :options="MISA_RESOURCE.PAY_ACTIVE"
-                            bottom="12px"
+                            bottom="8px"
                             marginRight="12px"
                         />
                     </div>
-                    <m-input field-text="Tên đối tượng" width="424px" bottom="12px" />
+                    <m-input field-text="Tên đối tượng" width="424px" bottom="8px" />
                 </div>
                 <div class="row">
                     <m-input
                         field-text="Người nhận"
                         width="424px"
-                        bottom="12px"
+                        bottom="8px"
                         margin-right="12px"
                     />
-                    <m-input field-text="Địa chỉ" width="424px" bottom="12px" />
+                    <m-input field-text="Địa chỉ" width="424px" bottom="8px" />
                 </div>
-                <m-input field-text="Lý do chi" width="860px" bottom="12px" />
+                <m-input field-text="Lý do chi" width="860px" bottom="8px" />
                 <div class="row">
                     <div class="checkbox-wrapper">
                         <m-checkbox
@@ -72,19 +72,19 @@ import MComboButton from "../components/MComboButton.vue";
                             width="424px"
                             :default="MISA_RESOURCE.PAY_ACTIVE[1].optionId"
                             :options="MISA_RESOURCE.PAY_ACTIVE"
-                            bottom="12px"
+                            bottom="8px"
                             marginRight="12px"
                         />
                     </div>
-                    <m-input field-text="Kèm theo" width="106px" bottom="12px" />
+                    <m-input field-text="Kèm theo" width="106px" bottom="8px" />
                     <div class="row-text">chứng từ gốc</div>
                 </div>
                 <div>Tham chiếu</div>
             </div>
             <div class="container-center">
-                <m-date-field field-text="Ngày hạch toán" bottom="12px" width="166px" />
-                <m-date-field field-text="Ngày phiếu chi" bottom="12px" width="166px" />
-                <m-input field-text="Số phiếu chi" width="166px" />
+                <m-date-field field-text="Ngày hạch toán" bottom="8px" width="166px" />
+                <m-date-field field-text="Ngày phiếu chi" bottom="8px" width="166px" />
+                <m-input field-text="Số phiếu chi" width="166px" value="PC001" />
             </div>
             <div class="container-right">
                 Tổng tiền
@@ -96,6 +96,7 @@ import MComboButton from "../components/MComboButton.vue";
             <m-table-detail
                 :entities="[1, 2, 3]"
                 :columns="MISA_RESOURCE.COLUMNS_NAME_TABLE_DETAIL"
+                :has-column-delete="true"
             />
 
             <div class="payment-action">

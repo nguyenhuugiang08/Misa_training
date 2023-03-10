@@ -1,5 +1,5 @@
 <script setup>
-import { ref, inject, watch, onMounted } from "vue";
+import { ref, inject, watch, onMounted, defineExpose } from "vue";
 import { MISA_ENUM } from "../base/enum";
 
 const selected = ref(props.default ? props.default : null); // Giá trị của item được lựa chọn.
@@ -13,7 +13,7 @@ const indexOptionSelected = ref(0); // Chỉ số của lựa chọn đã đư�
 // Định nghĩa các props nhận vào.
 const props = defineProps({
     options: { type: Array, default: [] },
-    default: String,
+    default: Number,
     textLabel: String,
     required: Boolean,
     isTop: { type: Boolean, default: false },
@@ -30,6 +30,9 @@ const props = defineProps({
 const refCheckBox = ref(null);
 const refList = ref(null);
 const isShowError = ref(false);
+const refItem = ref(null);
+
+defineExpose({ refList, refItem });
 
 // Gán giá trị ban của mảng optionSearch là danh sách tất cả các lựa chọn.
 optionSearch.value = [...props.options];
@@ -138,6 +141,15 @@ const handleSearchOption = (keyword) => {
     }
 };
 
+watch(
+    () => indexOptionSelected.value,
+    (newValue) => {
+        const liH = refItem.value[newValue].clientHeight;
+        refList.value.scrollTop = liH * indexOptionSelected.value;
+        console.log(refList.value.scrollTop);
+    }
+);
+
 /**
  * Xử lý tác vụ liên quan đến keyboard
  * @param {*} event -- object event
@@ -199,7 +211,7 @@ const handleInputKeydown = (event) => {
             style="display: flex; justify-content: center; align-items: center"
             :style="{
                 top: `${
-                    isTop ? '-16px !important' : !textLabel ? '4px !important' : '22px !important'
+                    isTop ? '-12px !important' : !textLabel ? '2px !important' : '20px !important'
                 }`,
                 borderColor: `${
                     status ? 'var(--error-color)' : isFocus ? 'var(--primary-color)' : ''
@@ -225,14 +237,15 @@ const handleInputKeydown = (event) => {
         <ul
             class="textfield-list modal-list list-departments"
             :style="{
-                top: isTop ? 'unset' : !textLabel && '38px',
-                bottom: isTop && '24px',
+                top: isTop ? 'unset' : !textLabel && '30px',
+                bottom: isTop && '14px',
                 width: width && `${width}`,
             }"
             v-if="isOpen"
             ref="refList"
         >
             <li
+                ref="refItem"
                 v-for="(option, index) of optionSearch"
                 :key="index"
                 @click="handleShowSelectedValue(option, index)"
@@ -255,7 +268,7 @@ const handleInputKeydown = (event) => {
         type="text"
         :disabled="disabled"
         class="textfield__input modal-textfield__input"
-        :class="(status ? 'checkbox--error-input' : '', disabled ? 'textfield-readonly' : '')"
+        :class="{ 'checkbox--error-input': status, 'textfield-readonly': disabled }"
         id="employee-department"
         :value="selected"
         :style="{

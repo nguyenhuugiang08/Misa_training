@@ -1,184 +1,59 @@
 <script setup>
-import MTable from "../components/MTable.vue";
 import MPagination from "../components/MPagination.vue";
-import { MISA_RESOURCE } from "../base/resource";
 import MComboButton from "../components/MComboButton.vue";
 import MAccountForm from "../components/MAccountForm.vue";
-import { DxTreeList, DxColumn } from "devextreme-vue/tree-list";
-import { ref } from "vue";
+import MFeatureDetail from "../components/MFeatureDetail.vue";
+import { DxTreeList, DxColumn, DxPaging, DxPager, DxScrolling } from "devextreme-vue/tree-list";
+import { ref, inject, watch } from "vue";
+import { useAccount } from "../composable/useAccount";
+import { useRouter, useRoute } from "vue-router";
 
 const isOpenForm = ref(false); // Trạng thái Đóng/Mở form
 const isExpandAll = ref(false); // Trạng thái Thu gọn/Mở rộng row
 const isFocus = ref(false); // Trạng thái focus ô tìm kiếm
 const expandedRowKeys = ref([]);
-const fakeData = [
-    {
-        AccountId: 1,
-        ParentAccountId: 0,
-        BankNumber: "111",
-        BankName: "Tiền mặt Việt Nam",
-        Nature: "Dư có",
-        EnglishName: "Cash in hand",
-        Explain: "diễn giải",
-        IsActive: "Ngừng sử dụng",
-    },
-    {
-        AccountId: 2,
-        ParentAccountId: 1,
-        BankNumber: "112",
-        BankName: "Tiền mặt Việt Nam",
-        Nature: "Dư có",
-        EnglishName: "Cash in hand",
-        Explain: "diễn giải",
-        IsActive: "Đang sử dụng",
-    },
-    {
-        AccountId: 3,
-        ParentAccountId: 2,
-        BankNumber: "113",
-        BankName: "Tiền mặt Việt Nam",
-        Nature: "Dư có",
-        EnglishName: "Cash in hand",
-        Explain: "diễn giải",
-        IsActive: "Đang sử dụng",
-    },
-    {
-        AccountId: 4,
-        ParentAccountId: 0,
-        BankNumber: "114",
-        BankName: "Tiền mặt Việt Nam",
-        Nature: "Dư có",
-        EnglishName: "Cash in hand",
-        Explain: "diễn giải",
-        IsActive: "Đang sử dụng",
-    },
-    {
-        AccountId: 5,
-        ParentAccountId: 0,
-        BankNumber: "115",
-        BankName: "Tiền mặt Việt Nam",
-        Nature: "Dư có",
-        EnglishName: "Cash in hand",
-        Explain: "diễn giải",
-        IsActive: "Đang sử dụng",
-    },
-    {
-        AccountId: 6,
-        ParentAccountId: 2,
-        BankNumber: "116",
-        BankName: "Tiền mặt Việt Nam",
-        Nature: "Dư có",
-        EnglishName: "Cash in hand",
-        Explain: "diễn giải",
-        IsActive: "Đang sử dụng",
-    },
-    {
-        AccountId: 7,
-        ParentAccountId: 0,
-        BankNumber: "117",
-        BankName: "Tiền mặt Việt Nam",
-        Nature: "Dư có",
-        EnglishName: "Cash in hand",
-        Explain: "diễn giải",
-        IsActive: "Đang sử dụng",
-    },
-    {
-        AccountId: 8,
-        ParentAccountId: 3,
-        BankNumber: "118",
-        BankName: "Tiền mặt Việt Nam",
-        Nature: "Dư có",
-        EnglishName: "Cash in hand",
-        Explain: "diễn giải",
-        IsActive: "Đang sử dụng",
-    },
-    {
-        AccountId: 9,
-        ParentAccountId: 0,
-        BankNumber: "119",
-        BankName: "Tiền mặt Việt Nam",
-        Nature: "Dư có",
-        EnglishName: "Cash in hand",
-        Explain: "diễn giải",
-        IsActive: "Đang sử dụng",
-    },
-    {
-        AccountId: 10,
-        ParentAccountId: 0,
-        BankNumber: "111",
-        BankName: "Tiền mặt Việt Nam",
-        Nature: "Dư có",
-        EnglishName: "Cash in hand",
-        Explain: "diễn giải",
-        IsActive: "Đang sử dụng",
-    },
-    {
-        AccountId: 11,
-        ParentAccountId: 0,
-        BankNumber: "111",
-        BankName: "Tiền mặt Việt Nam",
-        Nature: "Dư có",
-        EnglishName: "Cash in hand",
-        Explain: "diễn giải",
-        IsActive: "Đang sử dụng",
-    },
-    {
-        AccountId: 12,
-        ParentAccountId: 0,
-        BankNumber: "111",
-        BankName: "Tiền mặt Việt Nam",
-        Nature: "Dư có",
-        EnglishName: "Cash in hand",
-        Explain: "diễn giải",
-        IsActive: "Đang sử dụng",
-    },
-    {
-        AccountId: 13,
-        ParentAccountId: 0,
-        BankNumber: "111",
-        BankName: "Tiền mặt Việt Nam",
-        Nature: "Dư có",
-        EnglishName: "Cash in hand",
-        Explain: "diễn giải",
-        IsActive: "Đang sử dụng",
-    },
-    {
-        AccountId: 14,
-        ParentAccountId: 0,
-        BankNumber: "111",
-        BankName: "Tiền mặt Việt Nam",
-        Nature: "Dư có",
-        EnglishName: "Cash in hand",
-        Explain: "diễn giải",
-        IsActive: "Đang sử dụng",
-    },
-    {
-        AccountId: 15,
-        ParentAccountId: 0,
-        BankNumber: "111",
-        BankName: "Tiền mặt Việt Nam",
-        Nature: "Dư có",
-        EnglishName: "Cash in hand",
-        Explain: "diễn giải",
-        IsActive: "Đang sử dụng",
-    },
-    {
-        AccountId: 16,
-        ParentAccountId: 0,
-        BankNumber: "111",
-        BankName: "Tiền mặt Việt Nam",
-        Nature: "Dư có",
-        EnglishName: "Cash in hand",
-        Explain: "diễn giải",
-        IsActive: "Đang sử dụng",
-    },
-];
-const treeListRefKey = ref(null);
+const newExpandedRowKeys = ref([]);
+const allowedPageSizes = [10, 20, 30, 50, 100];
+const pageSize = ref(20);
 
+const router = useRouter();
+const route = useRoute();
+
+const { setTotalPage } = inject("diy");
+
+const { accounts, totalPage, getAccountsByFilter } = useAccount();
+getAccountsByFilter();
+setTotalPage(totalPage);
+
+/**
+ * Lấy ra số lượng bản ghi trên 1 trang sử dụng vue-router
+ * created by : NHGiang
+ */
+watch(
+    () => route.query.pageSize,
+    (newValue) => {
+        pageSize.value = newValue;
+        try {
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
+router.push({ path: "/account-system", query: { pageSize: pageSize.value, pageNumber: 1 } });
+
+/**
+ * Hàm thực hiện Thu gọn/Mở rộng các hàng
+ * Created by: NHGiang - (08/03/23)
+ */
 const toogleExpanded = () => {
     try {
         isExpandAll.value = !isExpandAll.value;
-        // expandedRowKeys.value = [];
+        const newList = accounts.value.map((item) => {
+            if (item.IsParent === true) {
+                return item.AccountId;
+            }
+        });
+        newExpandedRowKeys.value = [...newList];
     } catch (error) {
         console.log(error);
     }
@@ -188,7 +63,7 @@ const toogleExpanded = () => {
 <template>
     <div class="content">
         <div class="content__header">
-            <div class="content__header-text">Hệ thống tài khoản</div>
+            <div class="content__header-text account-system-title">Hệ thống tài khoản</div>
         </div>
         <div class="content-wrapper">
             <div class="content-wrapper__action">
@@ -219,14 +94,10 @@ const toogleExpanded = () => {
                         @blur="isFocus = false"
                     />
                 </div>
-                <div class="account-extend" @click="toogleExpanded">Mở rộng</div>
-                <div
-                    class="sidebar-item__icon content-wrapper__action-refresh"
-                    :style="{
-                        background:
-                            'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -425px -201px',
-                    }"
-                ></div>
+                <div class="account-extend" @click="toogleExpanded">
+                    {{ !isExpandAll ? "Mở rộng" : "Thu gọn" }}
+                </div>
+                <div class="sidebar-item__icon content-wrapper__action-refresh refresh-icon"></div>
                 <m-combo-button
                     default="Thêm"
                     class="btn-curved"
@@ -237,45 +108,34 @@ const toogleExpanded = () => {
             </div>
             <DxTreeList
                 id="tasks"
-                :data-source="fakeData"
+                :data-source="accounts"
                 :column-auto-width="true"
                 :word-wrap-enabled="true"
-                :expanded-row-keys="expandedRowKeys"
-                :autoExpandAll="isExpandAll"
+                :sorting="false"
+                :expanded-row-keys="!isExpandAll ? expandedRowKeys : newExpandedRowKeys"
                 key-expr="AccountId"
-                parent-id-expr="ParentAccountId"
+                parent-id-expr="ParentId"
             >
-                <DxColumn :width="130" data-field="BankNumber" caption="Số tài khoản" />
-                <DxColumn :width="250" data-field="BankName" caption="Tên tài khoản" />
-                <DxColumn :width="100" data-field="Nature" caption="Tính chất" />
+                <DxScrolling mode="standard" />
+                <DxPaging :enabled="false" :page-size="10" />
+                <DxPager
+                    :show-page-size-selector="true"
+                    :allowed-page-sizes="allowedPageSizes"
+                    :show-info="true"
+                />
+                <DxColumn :width="130" data-field="AccountNumber" caption="Số tài khoản" />
+                <DxColumn :width="250" data-field="AccountName" caption="Tên tài khoản" />
+                <DxColumn :width="100" data-field="Type" caption="Tính chất" />
                 <DxColumn :width="250" data-field="EnglishName" caption="Tên tiếng anh" />
-                <DxColumn :width="312" data-field="Explain" caption="Diễn giải" />
+                <DxColumn :width="316" data-field="Description" caption="Diễn giải" />
                 <DxColumn :width="120" data-field="IsActive" caption="Trạng thái" />
+                <DxColumn :width="0" data-field="IsParent" caption="cha" style="display: none" />
                 <DxColumn :width="120" caption="Chức năng" cell-template="functionTemplate" />
-                <template #functionTemplate="">
-                    <td class="tbl-col tbl-col__last">
-                        <div class="tbl-col__action">
-                            <label class="tbl-col__action-edit">Sửa</label>
-                            <label class="sidebar-item__icon btn-dropdown">
-                                <div
-                                    :style="{
-                                        background:
-                                            'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -900px -365px',
-                                        width: '8px',
-                                        height: '5px',
-                                    }"
-                                ></div>
-                            </label>
-                        </div>
-                    </td>
-                    <ul class="tbl-col__action-list textfield-list--action" v-if="false">
-                        <li class="tbl-col__action-item">Nhân bản</li>
-                        <li class="tbl-col__action-item">Xóa</li>
-                        <li class="tbl-col__action-item">Ngừng sử dụng</li>
-                    </ul>
+                <template #functionTemplate="{ data: options }">
+                    <m-feature-detail :data="options.data" />
                 </template>
             </DxTreeList>
-            <m-pagination />
+            <m-pagination path="/account-system" :func-filter="getAccountsByFilter" />
             <MAccountForm v-if="isOpenForm" @closeForm="isOpenForm = false" />
         </div>
     </div>
@@ -284,7 +144,7 @@ const toogleExpanded = () => {
 <style>
 .dx-treelist-container {
     color: #111;
-    height: calc(100vh - 48px - 71px - 68px - 68px);
+    max-height: calc(100vh - 48px - 71px - 68px - 29px);
 }
 
 .dx-treelist-headers {
@@ -303,6 +163,7 @@ const toogleExpanded = () => {
 
 .dx-treelist .dx-row > td {
     padding: 6px 10px;
+    white-space: nowrap;
 }
 
 .dx-treelist .dx-column-lines > td:last-child {
@@ -319,5 +180,26 @@ const toogleExpanded = () => {
 .dx-treelist-rowsview .dx-treelist-expanded span::before {
     content: "\f147";
     font-family: FontAwesome;
+}
+
+.dx-row:has(.dx-treelist-readonly .dx-treelist-checkbox-size input[value="true"]) {
+    font-weight: 700;
+}
+
+.dx-widget.dx-state-readonly.dx-checkbox {
+    position: absolute;
+    visibility: hidden;
+}
+
+.dx-treelist .dx-column-lines > td {
+    border-left: unset;
+}
+
+.dx-treelist-text-content {
+    padding-left: 6px;
+}
+
+.dx-text-content-alignment-left {
+    padding-left: unset;
 }
 </style>

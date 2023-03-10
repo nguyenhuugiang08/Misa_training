@@ -193,18 +193,16 @@ const hanldeSubmitFormDelete = async (event) => {
                     />
 
                     <label for="toggle" class="mask">
-                        <div
-                            style="
-                                background: url('../../src/assets/img/Sprites.64af8f61.svg')
-                                    no-repeat -1225px -363px;
-                                width: 14px;
-                                height: 11px;
-                            "
-                        ></div>
+                        <div class="mask-icon"></div>
                     </label>
                 </th>
                 <th
                     :class="`tbl-col ${column.isLarge ? 'tbl-col--large' : ''}`"
+                    :style="{
+                        width: column.width,
+                        minWidth: column.width,
+                        textAlign: column.align,
+                    }"
                     v-for="(column, index) in columns"
                     :key="index"
                 >
@@ -214,14 +212,12 @@ const hanldeSubmitFormDelete = async (event) => {
                     chức năng
                 </th>
             </tr>
-            <mrow v-for="(entity, index) in entities" :key="index" :entity="entity" />
-            <div v-if="!state.listEmployees.length" class="not-found">
-                <img
-                    src="https://actappg2.misacdn.net/img/bg_report_nodata.76e50bd8.svg"
-                    alt="logo NotFound"
-                />
-                <span>Không có dũ liệu</span>
-            </div>
+            <mrow
+                v-for="(entity, index) in entities"
+                :key="index"
+                :entity="entity"
+                :has-checkbox="hasCheckbox"
+            />
             <div class="modal-error" v-if="isPopUp.isOpenWarning">
                 <m-pop-up-warning
                     v-if="isPopUp.isOpenWarning"

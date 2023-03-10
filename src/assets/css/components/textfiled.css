@@ -21,8 +21,8 @@
 }
 
 .textfield .textfield__input {
-    height: 32px;
-    padding: 0 8px 0 12px;
+    height: 26px;
+    padding: 0 10px;
     outline: none;
     border-radius: 2px;
     border: 1px solid var(--border-color);
@@ -77,8 +77,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 32px;
-    height: 32px;
+    width: 26px;
+    height: 26px;
     background-color: #fff;
 }
 
@@ -187,7 +187,7 @@
 }
 
 .textfield-item {
-    height: 32px;
+    height: 28px;
     display: flex;
     align-items: center;
     background-color: #fff;

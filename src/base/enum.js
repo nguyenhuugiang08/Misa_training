@@ -48,4 +48,7 @@ export const MISA_ENUM = {
         BAD_REQUEST: 400, // status code 400
         INTERNAL_SERVER_ERROR: 500, // status code 500
     },
+    HEIGHT_PAYMENT_CONTENT: 647, // Chiều cao phần content trang phiếu chi
+    HEIGHT_PAYMENT_MASTER: 383, // Chiều cao phần master trang phiếu chi
+    HEIGHT_PAYMENT_DETAIL: 264, // Chiều cao phần detail trang phiếu chi
 };

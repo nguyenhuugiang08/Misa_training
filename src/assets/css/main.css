@@ -129,3 +129,15 @@ body {
     width: 23px;
     height: 20px;
 }
+
+.search-icon {
+    background:
+        url('../../src/assets/img/Sprites.64af8f61.svg') no-repeat -992px -360px;
+    width: 16px;
+    height: 16px;
+}
+
+.refresh-icon {
+    background:
+        url('../../src/assets/img/Sprites.64af8f61.svg') no-repeat -425px -201px;
+}

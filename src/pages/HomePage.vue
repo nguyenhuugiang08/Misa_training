@@ -24,12 +24,12 @@ const {
 } = useEmployee();
 const {
     state,
-    setListEmployees,
+    setEntities,
     setTitleForm,
     setIsForm,
     setEmployeeSelected,
     setTotalPage,
-    setTotalEmployee,
+    setTotalEntities,
     setIdentityForm,
     setlistAllEmployee,
     setListItemChecked,
@@ -67,8 +67,8 @@ getAllEmployees();
 setlistAllEmployee(listAllEmployees);
 
 handleFilterPage("", route.query.pageSize, 1);
-setListEmployees(listEmployees);
-setTotalEmployee(totalRecord);
+setEntities(listEmployees);
+setTotalEntities(totalRecord);
 setTotalPage(totalPage);
 const router = useRouter();
 router.push({ path: "/", query: { pageSize: pageSize.value, pageNumber: 1 } });
@@ -95,7 +95,7 @@ const debounceSearch = async (val) => {
         isLoading.value = true;
         setTimeout(async () => {
             await handleFilterPage(val, pageSize.value, 1);
-            setListEmployees(listEmployees);
+            setEntities(listEmployees);
             setTotalPage(totalPage);
             isLoading.value = false;
         }, 500);
@@ -112,7 +112,7 @@ const handleEndEditEmployee = async (event) => {
     try {
         const { isCloseForm, ...toastInfo } = event;
         await handleFilterPage("", pageSize.value, 1);
-        setListEmployees(listEmployees);
+        setEntities(listEmployees);
         if (isCloseForm) {
             setIsForm();
         } else {
@@ -137,7 +137,7 @@ const handleEndAddEmployee = async (event) => {
     try {
         const { isCloseForm, ...toastInfo } = event;
         await handleFilterPage("", pageSize.value, 1);
-        setListEmployees(listEmployees);
+        setEntities(listEmployees);
         if (isCloseForm) {
             setIsForm();
         } else {
@@ -161,7 +161,7 @@ const handleEndAddEmployee = async (event) => {
 const handleEndDeleteEmployee = async ({ event, id }) => {
     try {
         const newListEmpolyees = listEmployees.value.filter((emp) => emp.EmployeeId !== id);
-        setListEmployees(newListEmpolyees);
+        setEntities(newListEmpolyees);
         if (state.listItemChecked.includes(id)) {
             const newListChecked = state.listItemChecked.filter((item) => item !== id);
             setListItemChecked(newListChecked);
@@ -183,7 +183,7 @@ const handleRefresh = async () => {
         router.push({ path: "/", query: { pageSize: pageSize.value, pageNumber: 1 } });
         setTimeout(async () => {
             await handleFilterPage(state.keyword, pageSize.value, 1);
-            setListEmployees(listEmployees);
+            setEntities(listEmployees);
             setTotalPage(totalPage);
             isLoading.value = false;
         }, 500);
@@ -239,8 +239,8 @@ const handleBatchExecution = async () => {
         setListPageChecked([]);
         router.push({ path: "/", query: { pageSize: pageSize.value, pageNumber: 1 } });
         handleFilterPage("", route.query.pageSize, 1);
-        setListEmployees(listEmployees);
-        setTotalEmployee(totalRecord);
+        setEntities(listEmployees);
+        setTotalEntities(totalRecord);
         setTotalPage(totalPage);
         isLoading.value = false;
     } catch (error) {

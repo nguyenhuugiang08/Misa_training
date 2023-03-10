@@ -18,6 +18,7 @@
     "vue": "^3.2.45",
     "vue-click-outside-element": "^3.1.2",
     "vue-debounce": "^4.0.0",
+    "vue-resizable": "^2.1.7",
     "vue-router": "^4.1.6",
     "vuejs-paginate-next": "^1.0.2"
   },

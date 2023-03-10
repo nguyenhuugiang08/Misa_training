@@ -14,7 +14,7 @@
     display: block;
     width: calc(100%);
     overflow: auto;
-    height: calc(100vh - 48px - 71px - 68px - 68px);
+    max-height: calc(100vh - 48px - 71px - 68px - 68px);
     position: relative;
 }
 
@@ -26,7 +26,7 @@
 }
 
 .tbl .tbl-row {
-    height: 32px;
+    height: 28px;
     border-bottom: 1px solid #E0E0E0;
     position: relative;
 }
@@ -53,10 +53,11 @@
     padding-right: 0;
     width: 40px;
     min-width: 40px;
-    height: 32px;
+    height: 30px;
     position: sticky !important;
     z-index: 11;
     background-color: #fff;
+    border-right: unset;
     left: 0;
     top: 0;
 }
@@ -111,6 +112,7 @@
 
 .tbl-col__first--bg-private {
     background-color: #e5e8ec !important;
+    height: 28px !important;
 }
 
 .tbl-col__last--bg-private {
@@ -134,17 +136,23 @@ th {
 
 .tbl-col .mask {
     position: absolute;
-    height: 18px;
-    width: 18px;
+    height: 16px;
+    width: 16px;
     border: 1px solid #757575;
     border-radius: 2px;
-    left: 11px;
-    top: 13px;
+    left: 12px;
+    top: 8px;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #fff;
+    background-color: #fff;
+}
+
+.mask-icon {
+    background: url('../../src/assets/img/Sprites.64af8f61.svg') no-repeat -1225px -363px;
+    width: 14px;
+    height: 11px;
 }
 
 .tbl-col .mask div {
@@ -261,4 +269,16 @@ th {
     left: 16px;
     width: max-content;
     animation: identifier 0.3s ease-in;
+}
+
+.tbl-align-left {
+    text-align: left;
+}
+
+.tbl-align-center {
+    text-align: center;
+}
+
+.tbl-align-right {
+    text-align: right;
 }

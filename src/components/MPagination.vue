@@ -1,13 +1,17 @@
 <script setup>
 import { defineComponent, watch, inject, ref } from "vue";
 import MCheckbox from "./MCheckbox.vue";
-import { useEmployee } from "../composable/useEmployee";
 import MLoading from "./MLoading.vue";
 import Paginate from "vuejs-paginate-next";
 import { useRoute, useRouter } from "vue-router";
 import { MISA_ENUM } from "../base/enum";
 
-const { state, setListEmployees, setTotalPage } = inject("diy");
+const props = defineProps({
+    path: String,
+    funcFilter: Function,
+});
+
+const { state } = inject("diy");
 const pageSize = ref(20);
 const page = ref(1);
 const router = useRouter();
@@ -54,8 +58,6 @@ const components = defineComponent({
 // Trạng thái ẩn hiện của loading khi thực hiện tác vụ bất đồng bộ
 const isLoading = ref(false);
 
-const { handleFilterPage, listEmployees, totalPage } = useEmployee();
-
 /**
  * Xử lý thay đổi dữ liệu hiển thị trên trang khi thay đổi pageSize
  * @param {*} pageSize -- Số lượng bản ghi trên 1 trang
@@ -64,11 +66,9 @@ const { handleFilterPage, listEmployees, totalPage } = useEmployee();
  */
 const handleChangePageSize = async (pageSize, pageNumber = 1) => {
     try {
-        router.push({ path: "/", query: { pageSize: pageSize, pageNumber: pageNumber } });
+        router.push({ path: props.path, query: { pageSize: pageSize, pageNumber: pageNumber } });
         isLoading.value = true;
-        await handleFilterPage(state.keyword, pageSize, pageNumber);
-        setListEmployees(listEmployees);
-        setTotalPage(totalPage);
+        await props.funcFilter(state.keyword, pageSize, pageNumber);
         isLoading.value = false;
     } catch (error) {
         console.log(error);
@@ -82,10 +82,12 @@ const handleChangePageSize = async (pageSize, pageNumber = 1) => {
  */
 const handleChangePageNumber = async (pageNumber) => {
     try {
-        router.push({ path: "/", query: { pageSize: pageSize.value, pageNumber: pageNumber } });
+        router.push({
+            path: props.path,
+            query: { pageSize: pageSize.value, pageNumber: pageNumber },
+        });
         isLoading.value = true;
-        await handleFilterPage(state.keyword, pageSize.value, pageNumber);
-        setListEmployees(listEmployees);
+        await props.funcFilter(state.keyword, pageSize.value, pageNumber);
         isLoading.value = false;
     } catch (error) {
         console.log(error);
@@ -97,7 +99,7 @@ const handleChangePageNumber = async (pageNumber) => {
 <template>
     <div class="content-footer">
         <div class="empolyee-quantity">
-            Tổng: <strong>{{ state.totalEmployee }}</strong> bản ghi
+            Tổng: <strong>{{ state.totalEntities }}</strong> bản ghi
         </div>
         <div style="display: flex; align-items: center">
             <m-checkbox
@@ -122,10 +124,9 @@ const handleChangePageNumber = async (pageNumber) => {
                 :click-handler="handleChangePageNumber"
                 hide-prev-next
             >
-                ></paginate
-            >
+            </paginate>
         </div>
-        <div v-if="isLoading" class="modal-loading">
+        <div v-if="isLoading" class="overlay">
             <m-Loading />
         </div>
     </div>
