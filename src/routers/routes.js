@@ -62,6 +62,16 @@ export const routes = [
             {
                 path: "/category",
                 component: () => import("../pages/CategoryPage.vue"),
+                children: [
+                    {
+                        path: "transfer-account",
+                        component: () => import("../pages/FinancialAnalysisPage.vue"),
+                    },
+                    {
+                        path: "default-account",
+                        component: () => import("../pages/FinancialAnalysisPage.vue"),
+                    },
+                ],
             },
             {
                 path: "/account-system",
@@ -77,7 +87,7 @@ export const routes = [
                 path: "pay-detail",
                 component: () => import("../pages/PaymentDetailsPage.vue"),
             },
-        ]
+        ],
     },
     {
         path: "/cash",

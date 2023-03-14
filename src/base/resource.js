@@ -44,6 +44,9 @@ export const MISA_RESOURCE = {
         ADD: "Thêm nhân viên", // tiêu đề form thêm
         EDIT: "Sửa thông tin nhân viên", // tiêu đề form sửa
         DUPLICATE: "Nhân bản nhân viên", // tiêu đề form nhân bản
+        ADD_ACCOUNT: "Thêm tài khoản",
+        EDIT_ACCOUNT: "Sửa tài khoản",
+        DUPLICATE_ACCOUNT: "Nhân bản tài khoản",
     },
     MONTH_DATEPICKER: {
         "Thg 1": "Tháng 1",
@@ -397,6 +400,97 @@ export const MISA_RESOURCE = {
             optionName: "Chỉ cảnh báo",
         },
     ],
+    COLUMNS_NAME_COMBOBOX_EMPLOYEE: [
+        {
+            columnName: "Mã nhân viên",
+            width: "150px",
+            align: "left",
+            identityOption: "optionCode",
+            isWrap: false,
+        },
+        {
+            columnName: "Tên nhân viên",
+            width: "150px",
+            align: "left",
+            identityOption: "optionName",
+            isWrap: false,
+        },
+        {
+            columnName: "Đơn vị",
+            width: "200px",
+            align: "left",
+            identityOption: "optionOrganization",
+            isWrap: true,
+        },
+        {
+            columnName: "Số điện thoại",
+            width: "150px",
+            align: "left",
+            identityOption: "optionPhone",
+            isWrap: false,
+        },
+    ],
+    COLUMNS_NAME_COMBOBOX_ACCOUNT: [
+        {
+            columnName: "Số tài khoản",
+            width: "100px",
+            align: "left",
+            identityOption: "optionName",
+            isWrap: false,
+        },
+        {
+            columnName: "Tên tài khoản",
+            width: "200px",
+            align: "left",
+            identityOption: "optionDes",
+            isWrap: true,
+        },
+    ],
+    COLUMNS_NAME_COMBOBOX_OBJECT: [
+        {
+            columnName: "Đối tượng",
+            width: "150px",
+            align: "left",
+            identityOption: "optionCode",
+            isWrap: false,
+        },
+        {
+            columnName: "Tên đối tượng",
+            width: "200px",
+            align: "left",
+            identityOption: "optionName",
+            isWrap: false,
+        },
+        {
+            columnName: "Địa chỉ",
+            width: "250px",
+            align: "left",
+            identityOption: "optionAddress",
+            isWrap: true,
+        },
+        {
+            columnName: "Số điện thoại",
+            width: "150px",
+            align: "left",
+            identityOption: "optionPhone",
+            isWrap: false,
+        },
+    ],
+    TITLE: {
+        TITLE_DELETE_ACCOUNT: {
+            title: "Xác nhận xóa",
+            text: (accountNumber) =>
+                `Bạn có thực sự muốn xóa Tài khoản <${accountNumber}> đã chọn không?`,
+        },
+        TITLE_DELETE_ACCOUNT_PARENT: {
+            title: "Xóa không thành công",
+            text: "Bạn phải xóa tất cả các tài khoản con trước khi xóa tài khoản cha.",
+        },
+        TITLE_CONFIRM_ACTIVE_ACCOUNT_CHILD: {
+            title: "Xác nhận",
+            text: 'Bạn có muốn thiết lập trạng thái "Sử dụng" cho tất cả Tài khoản con không?',
+        },
+    },
 };
 
 export const ACCOUNT_TRACK = [
@@ -405,59 +499,69 @@ export const ACCOUNT_TRACK = [
         isComboBox: true,
         options: MISA_RESOURCE.OBJECT_TYPE,
         default: MISA_RESOURCE.OBJECT_TYPE[1].optionId,
+        identity: "Object",
     },
     {
         trackText: "Tài khoản ngân hàng",
         isComboBox: false,
         options: MISA_RESOURCE.TRACK_TYPE,
         default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
+        identity: "BankAccount",
     },
     {
         trackText: "Đối tượng THCP",
         isComboBox: true,
         options: MISA_RESOURCE.TRACK_TYPE,
         default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
+        identity: "Job",
     },
     {
         trackText: "Công trình",
         isComboBox: true,
         options: MISA_RESOURCE.TRACK_TYPE,
         default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
+        identity: "ProjectWork",
     },
     {
         trackText: "Đơn đặt hàng",
         isComboBox: true,
         options: MISA_RESOURCE.TRACK_TYPE,
         default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
+        identity: "Order",
     },
     {
         trackText: "Hợp đồng bán",
         isComboBox: true,
         options: MISA_RESOURCE.TRACK_TYPE,
         default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
+        identity: "PurchaseContract",
     },
     {
         trackText: "Hợp đồng mua",
         isComboBox: true,
         options: MISA_RESOURCE.TRACK_TYPE,
         default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
+        identity: "SaleContract",
     },
     {
         trackText: "Khoản mục CP",
         isComboBox: true,
         options: MISA_RESOURCE.TRACK_TYPE,
         default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
+        identity: "ExpenseItem",
     },
     {
         trackText: "Đơn vị",
         isComboBox: true,
         options: MISA_RESOURCE.TRACK_TYPE,
         default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
+        identity: "OrganizationUnit",
     },
     {
         trackText: "Mã thống kê",
         isComboBox: true,
         options: MISA_RESOURCE.TRACK_TYPE,
         default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
+        identity: "Item",
     },
 ];

@@ -295,6 +295,7 @@ const index = ref(1);
                 </div>
                 <p v-if="!state.isSidebar">Phân tích tài chính</p>
             </router-link>
+            <div class="separation-line"></div>
             <router-link
                 to="/category"
                 :class="{ 'sidebar-item--active': index === 16 }"
@@ -316,4 +317,10 @@ const index = ref(1);
     </div>
 </template>
 
-<style scoped></style>
+<style>
+.separation-line {
+    margin: 5px 20px;
+    border-top: 1px solid #fff;
+    opacity: 0.3;
+}
+</style>

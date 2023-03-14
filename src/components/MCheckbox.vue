@@ -1,6 +1,7 @@
 <script setup>
-import { ref, inject, watch, onMounted, defineExpose } from "vue";
+import { ref, inject, watch, defineExpose } from "vue";
 import { MISA_ENUM } from "../base/enum";
+import MTableCombobox from "./MTableCombobox.vue";
 
 const selected = ref(props.default ? props.default : null); // Giá trị của item được lựa chọn.
 const isOpen = ref(false); // trạng thái đóng/mở của danh sách chứa các lựa chọn.
@@ -25,6 +26,8 @@ const props = defineProps({
     textError: String,
     marginRight: String,
     disabled: Boolean,
+    isTable: Boolean,
+    columns: { type: Array, default: [] },
 });
 
 const refCheckBox = ref(null);
@@ -50,7 +53,11 @@ const handleShowSelectedValue = (option, index) => {
         selected.value = option.optionName ? option.optionName : optionSearch.value[0].optionName;
         indexOptionSelected.value = index;
         isOpen.value = false;
-        emit("select", { optionId: option.optionId, optionName: selected.value });
+        emit("select", {
+            optionId: option.optionId,
+            optionName: selected.value,
+            optionGrade: option.optionGrade,
+        });
     } catch (error) {
         console.log(error);
     }
@@ -76,20 +83,15 @@ const handleDefaultValue = (optionId) => {
  * - Nếu có ID của giá trị mặc định -> Hiển thị tên của option lên giao diện
  * - Nếu không có -> gán indexOptionSelected = -1
  */
-if (props.disabled) {
-    selected.value = "";
-    indexOptionSelected.value = -1;
+if (props.default) {
+    selected.value = handleDefaultValue(props.default);
+    indexOptionSelected.value = optionSearch.value.findIndex(
+        (option) => option?.optionId === props.default
+    );
 } else {
-    if (props.default) {
-        selected.value = handleDefaultValue(props.default);
-        indexOptionSelected.value = optionSearch.value.findIndex(
-            (option) => option?.optionId === props.default
-        );
-    } else {
-        indexOptionSelected.value = optionSearch.value.findIndex(
-            (option) => option?.optionName === selected.value
-        );
-    }
+    indexOptionSelected.value = optionSearch.value.findIndex(
+        (option) => option?.optionName === selected.value
+    );
 }
 
 /**
@@ -144,9 +146,10 @@ const handleSearchOption = (keyword) => {
 watch(
     () => indexOptionSelected.value,
     (newValue) => {
-        const liH = refItem.value[newValue].clientHeight;
-        refList.value.scrollTop = liH * indexOptionSelected.value;
-        console.log(refList.value.scrollTop);
+        if (!props.isTable) {
+            const liH = refItem.value[newValue].clientHeight;
+            refList.value.scrollTop = liH * indexOptionSelected.value;
+        }
     }
 );
 
@@ -241,7 +244,7 @@ const handleInputKeydown = (event) => {
                 bottom: isTop && '14px',
                 width: width && `${width}`,
             }"
-            v-if="isOpen"
+            v-if="!isTable && isOpen"
             ref="refList"
         >
             <li
@@ -255,6 +258,14 @@ const handleInputKeydown = (event) => {
                 {{ option.optionName }}
             </li>
         </ul>
+        <MTableCombobox
+            v-if="isTable && isOpen"
+            class="cbo-table-list"
+            :options="optionSearch"
+            :columns="columns"
+            :index-selected="indexOptionSelected"
+            @select="handleShowSelectedValue($event.option, $event.index)"
+        />
         <div
             v-if="status"
             class="error-checkbox"
@@ -270,7 +281,7 @@ const handleInputKeydown = (event) => {
         class="textfield__input modal-textfield__input"
         :class="{ 'checkbox--error-input': status, 'textfield-readonly': disabled }"
         id="employee-department"
-        :value="selected"
+        :value="!disabled ? selected : ''"
         :style="{
             minWidth: width && `${width}`,
             width: width && `${width}`,
@@ -340,5 +351,11 @@ const handleInputKeydown = (event) => {
     top: -13px;
     left: 50%;
     transform: translateX(-50%);
+}
+
+.cbo-table-list {
+    position: absolute;
+    top: 48px;
+    z-index: 99;
 }
 </style>

@@ -25,17 +25,17 @@
     left: 50%;
 }
 
-.tbl .tbl-row {
+.tbl-row {
     height: 28px;
     border-bottom: 1px solid #E0E0E0;
     position: relative;
 }
 
-.tbl .tbl-row th {
+.tbl-row th {
     font-size: 13px;
 }
 
-.tbl .tbl-col {
+.tbl-col {
     position: relative;
     width: 150px;
     min-width: 150px;
@@ -44,7 +44,7 @@
     border-bottom: 1px solid #c7c7c7;
 }
 
-.tbl .tbl-col--large {
+.tbl-col--large {
     width: 250px;
     min-width: 250px;
 }
@@ -219,6 +219,7 @@ th {
     color: #1F1F1F;
     cursor: pointer;
     padding: 5px 10px;
+    font-weight: 400;
 }
 
 .tbl-col__action-item:hover {

@@ -153,4 +153,8 @@ const handleChangePageNumber = async (pageNumber) => {
     border: 1px solid #e0e0e0;
     font-weight: 700;
 }
+
+.page-link {
+    color: #111 !important;
+}
 </style>

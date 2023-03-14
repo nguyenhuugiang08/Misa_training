@@ -1,12 +1,30 @@
 <script setup>
-import { ref } from "vue";
+import { MISA_ENUM } from "../base/enum";
+import { ref, inject } from "vue";
+import { MISA_RESOURCE } from "../base/resource";
+import { useAccount } from "../composable/useAccount";
+import MPopUpWarning from "./MPopUpWarning.vue";
+import MPopUpError from "./MPopUpError.vue";
+import accountApi from "../api/accountApi";
+import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
 
 const isShowList = ref(false); // Trạng thái ẩn hiện danh sách chức năng (Nhân bản, Xóa)
 const toDropList = ref(0); // Khoảng cách của danh sách chức năng so với top của cửa số trình duyệt
+const isShowPopup = ref(false);
+const isShowPopupActiveChild = ref(false);
 
 const props = defineProps({
     data: Object,
 });
+
+const { setIsForm, setTitleForm, setIdentityForm } = inject("diy");
+const {
+    getAccountById,
+    deleteAccount,
+    getAccountsByFilter,
+    deleteAccountChild,
+    updateIsActiveAccount,
+} = useAccount();
 
 /**
  * hàm xử lý vị trí hiển thị của danh sách chức năng
@@ -50,12 +68,97 @@ const handleDelete = (id) => {
         console.log(error);
     }
 };
+
+/**
+ * Xử lý mở form edit
+ * @param {*} accountId
+ */
+const handleOpenEditForm = async (accountId) => {
+    try {
+        setTitleForm(MISA_RESOURCE.FORM_TITLE.EDIT_ACCOUNT);
+        await getAccountById(accountId);
+        setIdentityForm(MISA_ENUM.FORM_MODE.EDIT);
+        setIsForm();
+        handleSetStatusForm();
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Xử lý mở form edit
+ * @param {*} accountId
+ */
+const handleOpenDuplicateForm = async (accountId) => {
+    try {
+        setTitleForm(MISA_RESOURCE.FORM_TITLE.DUPLICATE_ACCOUNT);
+        await getAccountById(accountId);
+        setIdentityForm(MISA_ENUM.FORM_MODE.DUPLICATE);
+        setIsForm();
+        handleSetStatusForm();
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm xóa 1 tài khoản con
+ * @param {*} accountId -- ID của tài khoản cần xóa
+ * @param {*} parentId -- ID của tài khoản cha
+ * @returns
+ */
+const handleDeleteAccount = async (accountId, parentId) => {
+    try {
+        if (parentId) {
+            await deleteAccountChild(accountId, parentId);
+        } else {
+            await deleteAccount(accountId);
+        }
+        isShowPopup.value = false;
+        await getAccountsByFilter();
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm xử lý thay đổi trạng thái tài khoản
+ * @param {*} accountId
+ * @param {*} isActive
+ * @param {*} isParent
+ */
+const handleActiveAccount = async (accountId, isActive, isParent, hasActiveChild) => {
+    try {
+        if (isParent) {
+            if (!hasActiveChild) {
+                const response = await accountApi.getChildrens();
+                const accountIds = response.map((account) => {
+                    if (account.ParentId === accountId) {
+                        return account.AccountId;
+                    }
+                });
+
+                await updateIsActiveAccount([accountId, ...accountIds], !isActive);
+            } else {
+                await updateIsActiveAccount([accountId], !isActive);
+            }
+        } else {
+            await updateIsActiveAccount([accountId], !isActive);
+        }
+        isShowPopup.value = false;
+        await getAccountsByFilter();
+    } catch (error) {
+        console.log(error);
+    }
+};
 </script>
 
 <template>
-    <td class="tbl-col tbl-col__last">
+    <td class="tbl-col tbl-col__last" style="border-bottom: unset">
         <div class="tbl-col__action">
-            <label class="tbl-col__action-edit">Sửa</label>
+            <label class="tbl-col__action-edit" @click="handleOpenEditForm(data.AccountId)"
+                >Sửa</label
+            >
             <label
                 class="sidebar-item__icon btn-dropdown"
                 :class="isShowList ? 'btn-dropdown--active' : ''"
@@ -79,10 +182,50 @@ const handleDelete = (id) => {
         v-if="isShowList"
         :style="{ top: `${toDropList}px` }"
     >
-        <li class="tbl-col__action-item">Nhân bản</li>
-        <li class="tbl-col__action-item" @click="handleDelete(data.AccountId)">Xóa</li>
-        <li class="tbl-col__action-item">Ngừng sử dụng</li>
+        <li class="tbl-col__action-item" @click="handleOpenDuplicateForm(data.AccountId)">
+            Nhân bản
+        </li>
+        <li class="tbl-col__action-item" @click="isShowPopup = true">Xóa</li>
+        <li
+            class="tbl-col__action-item"
+            @click="
+                data.IsActive
+                    ? handleActiveAccount(data.AccountId, data.IsActive, data.IsParent)
+                    : (isShowPopupActiveChild = true)
+            "
+        >
+            {{ data.IsActive ? "Ngừng sử dụng" : "Sử dụng" }}
+        </li>
     </ul>
+
+    <div class="overlay" v-if="isShowPopup">
+        <m-pop-up-warning
+            v-if="!data.IsParent"
+            :title="MISA_RESOURCE.TITLE.TITLE_DELETE_ACCOUNT.title"
+            :text-info="MISA_RESOURCE.TITLE.TITLE_DELETE_ACCOUNT.text(data.AccountNumber)"
+            @closeForm="isShowPopup = false"
+            @closeWarning="isShowPopup = false"
+            @submitForm="handleDeleteAccount(data.AccountId, data.ParentId)"
+        />
+        <m-pop-up-error
+            v-if="data.IsParent"
+            :title="MISA_RESOURCE.TITLE.TITLE_DELETE_ACCOUNT_PARENT.title"
+            :text-error="MISA_RESOURCE.TITLE.TITLE_DELETE_ACCOUNT_PARENT.text"
+            @closeError="isShowPopup = false"
+        />
+    </div>
+    <div class="overlay" v-if="isShowPopupActiveChild">
+        <m-pop-up-warning
+            :title="MISA_RESOURCE.TITLE.TITLE_CONFIRM_ACTIVE_ACCOUNT_CHILD.title"
+            :text-info="MISA_RESOURCE.TITLE.TITLE_CONFIRM_ACTIVE_ACCOUNT_CHILD.text"
+            @closeForm="
+                isShowPopupActiveChild = false;
+                handleActiveAccount(data.AccountId, data.IsActive, data.IsParent, true);
+            "
+            @closeWarning="isShowPopupActiveChild = false"
+            @submitForm="handleActiveAccount(data.AccountId, data.IsActive, data.IsParent, false)"
+        />
+    </div>
 </template>
 
 <style scoped></style>

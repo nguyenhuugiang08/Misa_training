@@ -391,6 +391,7 @@
     background-color: #fff;
     border-radius: 2px;
     position: relative;
+    font-weight: 400;
 }
 
 .modal-confirm__content {
@@ -402,6 +403,7 @@
 
 .modal-confirm__content-text {
     padding: 0 0 0 12px;
+    white-space: pre-wrap;
 }
 
 .modal-confirm__line {

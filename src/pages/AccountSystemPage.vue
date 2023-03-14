@@ -3,10 +3,14 @@ import MPagination from "../components/MPagination.vue";
 import MComboButton from "../components/MComboButton.vue";
 import MAccountForm from "../components/MAccountForm.vue";
 import MFeatureDetail from "../components/MFeatureDetail.vue";
+import MLoading from "../components/MLoading.vue";
 import { DxTreeList, DxColumn, DxPaging, DxPager, DxScrolling } from "devextreme-vue/tree-list";
 import { ref, inject, watch } from "vue";
 import { useAccount } from "../composable/useAccount";
 import { useRouter, useRoute } from "vue-router";
+import { MISA_RESOURCE } from "../base/resource";
+import { MISA_ENUM } from "../base/enum";
+import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
 
 const isOpenForm = ref(false); // Trạng thái Đóng/Mở form
 const isExpandAll = ref(false); // Trạng thái Thu gọn/Mở rộng row
@@ -15,15 +19,15 @@ const expandedRowKeys = ref([]);
 const newExpandedRowKeys = ref([]);
 const allowedPageSizes = [10, 20, 30, 50, 100];
 const pageSize = ref(20);
+const pageNumber = ref(1);
 
 const router = useRouter();
 const route = useRoute();
 
-const { setTotalPage } = inject("diy");
+const { state, setIsForm, setTitleForm, setIdentityForm } = inject("diy");
 
-const { accounts, totalPage, getAccountsByFilter } = useAccount();
+const { getAccountsByFilter } = useAccount();
 getAccountsByFilter();
-setTotalPage(totalPage);
 
 /**
  * Lấy ra số lượng bản ghi trên 1 trang sử dụng vue-router
@@ -42,18 +46,58 @@ watch(
 router.push({ path: "/account-system", query: { pageSize: pageSize.value, pageNumber: 1 } });
 
 /**
+ * Lấy ra trang thứ bao nhiêu sử dụng vue-router
+ * created by : NHGiang
+ */
+watch(
+    () => route.query.pageNumber,
+    (newValue) => {
+        pageNumber.value = newValue;
+        try {
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
+
+/**
  * Hàm thực hiện Thu gọn/Mở rộng các hàng
  * Created by: NHGiang - (08/03/23)
  */
 const toogleExpanded = () => {
     try {
         isExpandAll.value = !isExpandAll.value;
-        const newList = accounts.value.map((item) => {
+        const newList = state.Entities.map((item) => {
             if (item.IsParent === true) {
                 return item.AccountId;
             }
         });
         newExpandedRowKeys.value = [...newList];
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm xử lý tìm kiếm tài khoản theo số tài khoản, tên tài khoản
+ * @param {*} value -- Từ khỏa tìm kiếm
+ * Created By: NHGiang - (10/02/23)
+ */
+const debounceSearch = async (value) => {
+    try {
+        await getAccountsByFilter(value);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm lấy lại dữ liệu
+ * Created by: NHGiang - (14/03/23)
+ */
+const handleRefreshData = async () => {
+    try {
+        await getAccountsByFilter(state.keyword, pageSize.value, pageNumber.value);
     } catch (error) {
         console.log(error);
     }
@@ -97,24 +141,33 @@ const toogleExpanded = () => {
                 <div class="account-extend" @click="toogleExpanded">
                     {{ !isExpandAll ? "Mở rộng" : "Thu gọn" }}
                 </div>
-                <div class="sidebar-item__icon content-wrapper__action-refresh refresh-icon"></div>
+                <div
+                    class="sidebar-item__icon content-wrapper__action-refresh refresh-icon"
+                    @click="handleRefreshData"
+                ></div>
                 <m-combo-button
                     default="Thêm"
                     class="btn-curved"
                     isCurved
                     margin-top="8px"
-                    @clickBtn="isOpenForm = true"
+                    @clickBtn="
+                        setIsForm();
+                        setTitleForm(MISA_RESOURCE.FORM_TITLE.ADD_ACCOUNT);
+                        setIdentityForm(MISA_ENUM.FORM_MODE.ADD);
+                        handleSetStatusForm();
+                    "
                 />
             </div>
             <DxTreeList
                 id="tasks"
-                :data-source="accounts"
+                :data-source="state.Entities"
                 :column-auto-width="true"
                 :word-wrap-enabled="true"
                 :sorting="false"
                 :expanded-row-keys="!isExpandAll ? expandedRowKeys : newExpandedRowKeys"
                 key-expr="AccountId"
                 parent-id-expr="ParentId"
+                no-data-text="Không có dữ liệu"
             >
                 <DxScrolling mode="standard" />
                 <DxPaging :enabled="false" :page-size="10" />
@@ -125,10 +178,10 @@ const toogleExpanded = () => {
                 />
                 <DxColumn :width="130" data-field="AccountNumber" caption="Số tài khoản" />
                 <DxColumn :width="250" data-field="AccountName" caption="Tên tài khoản" />
-                <DxColumn :width="100" data-field="Type" caption="Tính chất" />
-                <DxColumn :width="250" data-field="EnglishName" caption="Tên tiếng anh" />
+                <DxColumn :width="150" data-field="Type" caption="Tính chất" />
+                <DxColumn :width="200" data-field="EnglishName" caption="Tên tiếng anh" />
                 <DxColumn :width="316" data-field="Description" caption="Diễn giải" />
-                <DxColumn :width="120" data-field="IsActive" caption="Trạng thái" />
+                <DxColumn :width="120" data-field="Active" caption="Trạng thái" />
                 <DxColumn :width="0" data-field="IsParent" caption="cha" style="display: none" />
                 <DxColumn :width="120" caption="Chức năng" cell-template="functionTemplate" />
                 <template #functionTemplate="{ data: options }">
@@ -136,7 +189,8 @@ const toogleExpanded = () => {
                 </template>
             </DxTreeList>
             <m-pagination path="/account-system" :func-filter="getAccountsByFilter" />
-            <MAccountForm v-if="isOpenForm" @closeForm="isOpenForm = false" />
+            <MAccountForm v-if="state.isForm" @closeForm="isOpenForm = false" />
+            <div class="overlay" v-if="state.isLoading"><m-loading /></div>
         </div>
     </div>
 </template>
@@ -201,5 +255,10 @@ const toogleExpanded = () => {
 
 .dx-text-content-alignment-left {
     padding-left: unset;
+}
+
+.dx-treelist-nodata {
+    font-size: 13px;
+    color: #111;
 }
 </style>

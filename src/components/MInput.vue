@@ -79,7 +79,16 @@ defineExpose({ handleFocus });
         <div class="textfield-tooltip" v-if="tooltip">
             <span>{{ tooltip }}</span>
         </div>
-        <div v-if="status" class="error-input">{{ textError }}</div>
+        <div
+            v-if="status"
+            class="error-input"
+            :style="{
+                left: width === '100%' ? '50%' : '0',
+                transform: width === '100%' ? 'translateX(-50%)' : 'translateX(0)',
+            }"
+        >
+            {{ textError }}
+        </div>
     </div>
 </template>
 
@@ -106,10 +115,8 @@ defineExpose({ handleFocus });
     border-radius: 4px;
     z-index: 99;
     text-align: center;
-    left: 50%;
-    transform: translateX(-50%);
     width: 200px;
-    top: 64px;
+    top: 52px;
     display: none;
 }
 

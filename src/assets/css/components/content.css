@@ -14,7 +14,7 @@
 .content-wrapper {
     background-color: #fff;
     box-shadow: 0 0 3px #01161e29;
-    height: calc(100vh - 48px - 71px - 10px);
+    height: calc(100vh - 48px - 71px - 6px);
     padding: 0 12px;
     position: relative;
 }

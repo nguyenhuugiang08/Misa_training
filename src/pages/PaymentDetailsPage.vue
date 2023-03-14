@@ -6,6 +6,17 @@ import MDateField from "../components/MDateField.vue";
 import { formatMoney } from "../utilities/formatMoney";
 import MTableDetail from "../components/MTableDetail.vue";
 import MComboButton from "../components/MComboButton.vue";
+import { useObject } from "../composable/useObject";
+import { useEmployee } from "../composable/useEmployee";
+import { inject } from "vue";
+
+const { state } = inject("diy");
+
+const { getObjects } = useObject();
+getObjects();
+
+const { getAllEmployees } = useEmployee();
+getAllEmployees();
 </script>
 
 <template>
@@ -47,8 +58,9 @@ import MComboButton from "../components/MComboButton.vue";
                         <m-checkbox
                             text-label="Mã đối tượng"
                             width="424px"
-                            :default="MISA_RESOURCE.PAY_ACTIVE[1].optionId"
-                            :options="MISA_RESOURCE.PAY_ACTIVE"
+                            :options="state.objects"
+                            :isTable="true"
+                            :columns="MISA_RESOURCE.COLUMNS_NAME_COMBOBOX_OBJECT"
                             bottom="8px"
                             marginRight="12px"
                         />
@@ -70,8 +82,9 @@ import MComboButton from "../components/MComboButton.vue";
                         <m-checkbox
                             text-label="Nhân viên"
                             width="424px"
-                            :default="MISA_RESOURCE.PAY_ACTIVE[1].optionId"
-                            :options="MISA_RESOURCE.PAY_ACTIVE"
+                            :options="state.employees"
+                            :isTable="true"
+                            :columns="MISA_RESOURCE.COLUMNS_NAME_COMBOBOX_EMPLOYEE"
                             bottom="8px"
                             marginRight="12px"
                         />

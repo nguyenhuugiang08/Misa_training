@@ -31,7 +31,6 @@ const {
     setTotalPage,
     setTotalEntities,
     setIdentityForm,
-    setlistAllEmployee,
     setListItemChecked,
     setListPageChecked,
     setListToast,
@@ -64,7 +63,7 @@ watch(
  * CreatedBy: NHGiang - (16/02/23)
  */
 getAllEmployees();
-setlistAllEmployee(listAllEmployees);
+setEntities(listAllEmployees);
 
 handleFilterPage("", route.query.pageSize, 1);
 setEntities(listEmployees);

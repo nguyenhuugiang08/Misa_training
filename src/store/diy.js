@@ -3,18 +3,21 @@ import { MISA_ENUM } from "../base/enum";
 
 const state = reactive({
     isSidebar: false, // Trạng thái Đóng/Mở sidebar
-    Entities: [], // Danh sách nhân viên
+    Entities: [], // Danh sách đối tượng
     titleForm: "", // Tiêu đề form
     isForm: false, // trạng thái Đóng/ Mở form
-    entitySelected: {}, // Thông tin nhân viên đang được chọn
+    entitySelected: {}, // Thông tin đối tượng đang được chọn
     totalEntities: 0, // Tổng số bản ghi
     totalPageValue: 1, // Tổng số trang
     identityForm: MISA_ENUM.FORM_MODE.ADD, // Định danh form - mặc định là form thêm
-    listAllEmployee: [], // Danh sách tất cả nhân viên
+    listAllEntities: [], // Danh sách tất cả đối tượng
     listToast: [], // Danh sách toast message
     listItemChecked: [], // Danh sách các item được chọn
     listPageChecked: [], // Danh sách các page đã được check all
     keyword: "", // Từ khóa tìm kiếm
+    isLoading: false, // Trạng thái Ẩn hiện loading
+    objects: [],
+    employees: [],
 });
 
 /**
@@ -38,8 +41,8 @@ const setIsSidebar = () => {
 };
 
 /** ------------------------------------------------
- * Set lại danh sách nhân viên
- * @param {*} list -- Danh sách nhân viên
+ * Set lại danh sách đối tượng
+ * @param {*} list -- Danh sách đối tượng
  * Created By: NHGiang - (17/02/23)
  */
 const setEntities = (list) => {
@@ -76,13 +79,13 @@ const setIsForm = () => {
 };
 
 /** ------------------------------------------------
- * lấy ra nhân viên được chọn để update thông tin
- * @param {*} employee -- Đối tượng Employee đã chọn
+ * lấy ra đối tượng được chọn để update thông tin
+ * @param {*} entity -- Đối tượng Employee đã chọn
  * Created by: NHGiang - (17/02/23)
  */
-const setEmployeeSelected = (employee) => {
+const setEntitySelected = (entity) => {
     try {
-        state.employeeSelected = employee;
+        state.entitySelected = entity;
     } catch (error) {
         console.log(error);
     }
@@ -128,10 +131,10 @@ const setIdentityForm = (val) => {
     }
 };
 
-//Lây ra danh sách nhân viên đã tồn tại
-const setlistAllEmployee = (list) => {
+//Lây ra danh sách đối tượng đã tồn tại
+const setlistAllEntities = (list) => {
     try {
-        state.listAllEmployee = list;
+        state.listAllEntities = list;
     } catch (error) {
         console.log(error);
     }
@@ -193,20 +196,59 @@ const setListPageChecked = (list) => {
     }
 };
 
+/**
+ * Hàm set trạng lại loading
+ * Created By: NHGiang - (12/02/23)
+ */
+const setIsLoading = () => {
+    try {
+        state.isLoading = !state.isLoading;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Lấy ra danh sách đối tượng
+ * @param {*} objects 
+ */
+const setObjects = (objects) => {
+    try {
+        state.objects = [...objects];
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Lấy ra danh sách nhân viên
+ * @param {*} objects 
+ */
+const setEmployees = (objects) => {
+    try {
+        state.employees = [...objects];
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 export default {
     state: readonly(state),
     setIsSidebar,
     setEntities,
     setTitleForm,
     setIsForm,
-    setEmployeeSelected,
+    setEntitySelected,
     setTotalEntities,
     setTotalPage,
     setIdentityForm,
-    setlistAllEmployee,
+    setlistAllEntities,
     setListToast,
     setListItemChecked,
     setKeyword,
     setListPageChecked,
     deleteToastHidden,
+    setIsLoading,
+    setObjects,
+    setEmployees
 };

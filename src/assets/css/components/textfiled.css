@@ -23,6 +23,7 @@
 .textfield .textfield__input {
     height: 26px;
     padding: 0 10px;
+    line-height: 28px;
     outline: none;
     border-radius: 2px;
     border: 1px solid var(--border-color);

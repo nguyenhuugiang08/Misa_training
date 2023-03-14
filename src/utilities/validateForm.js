@@ -39,6 +39,14 @@ const error = reactive({
         textError: "",
         status: false,
     },
+    AccountNumber: {
+        textError: "",
+        status: false
+    },
+    AccountName: {
+        textError: "",
+        status: false
+    },
     status: false,
 });
 

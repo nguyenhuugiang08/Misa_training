@@ -1,0 +1,37 @@
+.wrapper-cbo-tbl {
+    border: 1px solid #babec5;
+    border-radius: 2px;
+}
+
+.tbl-cbo {
+    background-color: #fff;
+    border: 1px solid #babec5;
+    border-radius: 2px;
+    overflow: auto;
+    box-shadow: 0 -8px 34px 0 rgb(0 0 0 / 5%);
+    width: max-content !important;
+    overflow: hidden;
+    font-weight: 400;
+}
+
+.tbd {
+    display: block;
+    overflow: auto;
+    max-height: 200px !important;
+    width: max-content !important;
+    position: relative;
+}
+
+.tbl-cbo th,
+.tbl-cbo td {
+    padding: 0 10px;
+    height: 28px;
+}
+
+.tbl-cbo-text {
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    display: -webkit-box;
+    overflow: hidden;
+    line-height: 28px;
+}

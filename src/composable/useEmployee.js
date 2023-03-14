@@ -4,7 +4,7 @@ import { MISA_ENUM } from "../base/enum";
 import employeeApi from "../api/employeeApi";
 import diy from "../store/diy";
 
-const { setListToast } = diy;
+const { setListToast, setEmployees } = diy;
 
 /**
  * Xử lý dữ liệu liên quan đến employee
@@ -26,7 +26,16 @@ export const useEmployee = () => {
         const getAllEmployees = async () => {
             try {
                 const response = await employeeApi.getEmployees();
-                listAllEmployees.value = [...response];
+                const Options = response.map((employee) => {
+                    return {
+                        optionId: employee.EmployeeId,
+                        optionCode: employee.EmployeeCode,
+                        optionName: employee.FullName,
+                        optionOrganization: employee.DepartmentName,
+                        optionPhone: employee.PhoneNumber,
+                    };
+                });
+                setEmployees(Options);
             } catch (error) {
                 console.log(error);
             }

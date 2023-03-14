@@ -1,14 +1,122 @@
 <script setup>
 import MInput from "./MInput.vue";
 import MCheckbox from "./MCheckbox.vue";
+import MTrackDetail from "./MTrackDetail.vue";
 import { MISA_RESOURCE, ACCOUNT_TRACK } from "../base/resource";
-import { ref } from "vue";
+import { ref, reactive, inject } from "vue";
+import { useAccount } from "../composable/useAccount";
+import { MISA_ENUM } from "../base/enum";
+import { error } from "../utilities/validateForm";
+import MToast from "../components/MToast.vue";
 
-const emit = defineEmits(["closeForm"]);
+const { state, setIsForm } = inject("diy");
+
+const { getAccounts, addAccount, getAccountsByFilter, editAccount } = useAccount();
+getAccounts();
 
 const isShowTrackDetail = ref(true); // Trạng thái Đóng/Mở của theo dõi chi tiết
 const isResize = ref(false); // Trạng thái Mở rộng/ Thu gọn
-const isChecked = ref(false);
+const account = reactive({
+    ParentId: state.entitySelected?.ParentId || "00000000-0000-0000-0000-000000000000",
+    AccountNumber: state.entitySelected?.AccountNumber || "",
+    AccountName: state.entitySelected?.AccountName || "",
+    EnglishName: state.entitySelected?.EnglishName || "",
+    Type: state.entitySelected?.Type || 1,
+    Description: state.entitySelected?.Description || "",
+    HasForeignCurrencyAccounting: state.entitySelected?.HasForeignCurrencyAccounting || false,
+    IsActive: state.entitySelected?.IsActive || true,
+    IsParent: state.entitySelected?.IsParent || false,
+    IsTrackObject: state.entitySelected?.IsTrackObject || false,
+    IsTrackJob: state.entitySelected?.IsTrackJob || false,
+    IsTrackOrder: state.entitySelected?.IsTrackOrder || false,
+    IsTrackPurchaseContract: state.entitySelected?.IsTrackPurchaseContract || false,
+    IsTrackOrganizationUnit: state.entitySelected?.IsTrackOrganizationUnit || false,
+    IsTrackBankAccount: state.entitySelected?.IsTrackBankAccount || false,
+    IsTrackProjectWork: state.entitySelected?.IsTrackProjectWork || false,
+    IsTrackSaleContract: state.entitySelected?.IsTrackSaleContract || false,
+    IsTrackExpenseItem: state.entitySelected?.IsTrackExpenseItem || false,
+    IsTrackItem: state.entitySelected?.IsTrackItem || false,
+    Object: state.entitySelected?.Object || 1,
+    Job: state.entitySelected?.Job || 1,
+    Order: state.entitySelected?.Order || 1,
+    PurchaseContract: state.entitySelected?.PurchaseContract || 1,
+    OrganizationUnit: state.entitySelected?.OrganizationUnit || 1,
+    BankAccount: state.entitySelected?.BankAccount || 1,
+    ProjectWork: state.entitySelected?.ProjectWork || 1,
+    SaleContract: state.entitySelected?.SaleContract || 1,
+    ExpenseItem: state.entitySelected?.ExpenseItem || 1,
+    Item: state.entitySelected?.Item || 1,
+    Grade: state.entitySelected?.Grade || 1,
+    CreatedBy: state.entitySelected?.CreatedBy || "Nguyễn Hữu Giang",
+    ModifiedBy: state.entitySelected?.ModifiedBy || "Nguyễn Hữu Giang",
+});
+
+/**
+ * Hàm xử lý submit form
+ */
+const handleSubmit = async () => {
+    try {
+        // xử lý thêm tài khoản
+        if (
+            state.identityForm === MISA_ENUM.FORM_MODE.ADD ||
+            state.identityForm === MISA_ENUM.FORM_MODE.DUPLICATE
+        ) {
+            await addAccount(account)
+                .then(async () => {
+                    await getAccountsByFilter();
+                })
+                .catch((isPopUp.isOpenError = true));
+        }
+
+        if (state.identityForm === MISA_ENUM.FORM_MODE.EDIT) {
+            await editAccount(account, state.entitySelected.AccountId)
+                .then(async () => {
+                    await getAccountsByFilter();
+                })
+                .catch((isPopUp.isOpenError = true));
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm xử lý binding dữ liệu khi enable ô input để thêm tiêu chí theo dõi
+ * @param {*} event
+ * Created by: NHGiang - (11/03/23)
+ */
+const handleChecked = (event) => {
+    try {
+        if (event.identity) {
+            account[`IsTrack${event.identity}`] = event.isChecked;
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm lấy ra giá trị khi chọn các lựa chọn muốn theo dõi
+ * @param {*} event
+ * Created by: NHGiang - (11/03/23)
+ */
+const handleSelected = (event) => {
+    try {
+        if (event.identity) {
+            account[`${event.identity}`] = event.option.optionId;
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+const handle = (event) => {
+    try {
+        console.log(event);
+    } catch (error) {
+        console.log(error);
+    }
+};
 </script>
 
 <template>
@@ -16,7 +124,7 @@ const isChecked = ref(false);
         <div :class="{ 'account-form': true, 'account-form--extend': isResize }">
             <div class="modal__header">
                 <div class="modal__header-left">
-                    <div class="modal__header-left-text">Thêm tài khoản</div>
+                    <div class="modal__header-left-text">{{ state.titleForm }}</div>
                 </div>
                 <div class="modal__header-right">
                     <div class="modal__close-btn">
@@ -41,6 +149,11 @@ const isChecked = ref(false);
                         width="25%"
                         bottom="12px"
                         full-width
+                        :value="account.AccountNumber"
+                        :status="error.AccountNumber.status"
+                        :statusPublic="error.status"
+                        :text-error="error.AccountNumber.textError"
+                        @inputValue="account.AccountNumber = $event"
                     />
                 </div>
                 <div class="row">
@@ -50,6 +163,11 @@ const isChecked = ref(false);
                         width="100%"
                         bottom="12px"
                         full-width
+                        :value="account.AccountName"
+                        :status="error.AccountName.status"
+                        :statusPublic="error.status"
+                        :text-error="error.AccountName.textError"
+                        @inputValue="account.AccountName = $event"
                     />
                     <m-input
                         field-text="Tên tiếng anh"
@@ -57,6 +175,8 @@ const isChecked = ref(false);
                         bottom="12px"
                         full-width
                         style="margin-left: 8px"
+                        :value="account.EnglishName"
+                        @inputValue="account.EnglishName = $event"
                     />
                 </div>
                 <div class="row">
@@ -65,8 +185,15 @@ const isChecked = ref(false);
                             text-label="Tài khoản tổng hợp"
                             width="100%"
                             bottom="12px"
-                            :default="MISA_RESOURCE.ACCOUNT_NATURE[1].optionId"
-                            :options="MISA_RESOURCE.ACCOUNT_NATURE"
+                            :options="state.listAllEntities"
+                            :isTable="true"
+                            :columns="MISA_RESOURCE.COLUMNS_NAME_COMBOBOX_ACCOUNT"
+                            :default="account.ParentId"
+                            @select="
+                                account.ParentId = $event.optionId;
+                                account.Grade = $event.optionGrade + 1;
+                                handle($event);
+                            "
                         />
                     </div>
                     <div class="checkbox-wrapper" style="width: 25%">
@@ -75,15 +202,21 @@ const isChecked = ref(false);
                             required=""
                             width="100%"
                             bottom="12px"
-                            :default="MISA_RESOURCE.ACCOUNT_NATURE[1].optionId"
+                            :default="account.Type"
                             :options="MISA_RESOURCE.ACCOUNT_NATURE"
+                            :isTable="false"
+                            @select="account.Type = $event.optionId"
                         />
                     </div>
                 </div>
                 <div class="row" style="width: 100%">
                     <div class="textarea-wrapper">
                         <label class="textfield__label modal-label"> Diễn giải</label>
-                        <textarea class="account-form__textarea"></textarea>
+                        <textarea
+                            class="account-form__textarea"
+                            :value="account.Description"
+                            @change="account.Description = $event.target.value"
+                        ></textarea>
                     </div>
                 </div>
                 <div class="row">
@@ -92,7 +225,15 @@ const isChecked = ref(false);
                         class="modal__header-left-wrapper account-checkbox"
                         tabindex="0"
                     >
-                        <input type="checkbox" id="accounting" />
+                        <input
+                            type="checkbox"
+                            id="accounting"
+                            :checked="account.HasForeignCurrencyAccounting"
+                            @change="
+                                account.HasForeignCurrencyAccounting =
+                                    !account.HasForeignCurrencyAccounting
+                            "
+                        />
                         <div class="check-icon"></div>
                     </label>
                     <span>Có hạch toán ngoại tệ</span>
@@ -114,40 +255,16 @@ const isChecked = ref(false);
                     Theo dõi chi tiết theo
                 </div>
                 <div class="track-detail" :style="{ height: !isShowTrackDetail ? '0' : '300px' }">
-                    <div
-                        class="row account-track__left-row"
+                    <m-track-detail
                         v-for="(item, index) in ACCOUNT_TRACK"
                         :key="index"
-                        style="width: 50%; float: left"
-                    >
-                        <div
-                            class="row-left"
-                            :style="{ marginLeft: index % 2 !== 0 ? '32px' : '0' }"
-                        >
-                            <label
-                                for="subject"
-                                class="modal__header-left-wrapper account-checkbox"
-                                tabindex="0"
-                                @click="isChecked = !isChecked"
-                            >
-                                <input type="checkbox" id="subject" :checked="isChecked" />
-                                <div class="check-icon"></div>
-                            </label>
-                            <span class="track-text">{{ item.trackText }}</span>
-                        </div>
-                        <div
-                            v-if="item.isComboBox"
-                            class="checkbox-wrapper"
-                            :style="{ width: '50%', marginRight: index % 2 === 0 ? '32px' : '0' }"
-                        >
-                            <m-checkbox
-                                width="100%"
-                                :default="item.default"
-                                :options="item.options"
-                                :disabled="!isChecked"
-                            />
-                        </div>
-                    </div>
+                        :standard="item"
+                        :index="index"
+                        @select="handleSelected"
+                        @onCheckInput="handleChecked"
+                        :checked="account[`IsTrack${item.identity}`]"
+                        :selected="account[`${item.identity}`]"
+                    />
                 </div>
             </div>
             <div class="modal-footer account-form__footer">
@@ -156,6 +273,7 @@ const isChecked = ref(false);
                         type="submit"
                         class="btn btn-secondary modal-btn__secondary btn-save"
                         tabindex="0"
+                        @click="handleSubmit"
                     >
                         Cất
                     </button>
@@ -168,7 +286,7 @@ const isChecked = ref(false);
                     class="btn btn-secondary modal-btn-cancel"
                     tabindex="0"
                     ref="refCancelBtn"
-                    @click="emit('closeForm')"
+                    @click="setIsForm()"
                     >Hủy</label
                 >
             </div>
@@ -176,6 +294,16 @@ const isChecked = ref(false);
             <div class="account-form__resize" @click="isResize = !isResize">
                 <div class="form-resize__icon"></div>
             </div>
+        </div>
+        <div class="toast-account">
+            <m-toast
+                v-if="state.listToast.length"
+                v-for="(toast, index) in state.listToast"
+                :key="index"
+                :toastMessage="toast.toastMessage"
+                :statusMessage="toast.statusMessage"
+                :status="toast.status"
+            />
         </div>
     </div>
 </template>
@@ -213,5 +341,12 @@ const isChecked = ref(false);
 
 .track-text {
     line-height: 28px;
+}
+
+.toast-account {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 99;
 }
 </style>

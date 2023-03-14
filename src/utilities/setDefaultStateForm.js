@@ -41,6 +41,14 @@ export const handleSetStatusForm = () => {
             textError: "",
             status: false,
         };
+        error.AccountNumber = {
+            textError: "",
+            status: false,
+        };
+        error.AccountName = {
+            textError: "",
+            status: false,
+        };
         error.status = false;
     } catch (error) {
         console.log(error);
