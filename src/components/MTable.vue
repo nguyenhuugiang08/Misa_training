@@ -10,9 +10,10 @@ const props = defineProps({
     columns: Array,
     hasCheckbox: Boolean,
     entities: { type: Array, default: [] },
+    maxHeight: Number,
 });
 
-const { listEmployees, handleDeleteEmployee } = useEmployee();
+const { handleDeleteEmployee } = useEmployee();
 const { state, setListItemChecked, setListPageChecked, setTotalEmployee, setTotalPage } =
     inject("diy");
 
@@ -37,40 +38,10 @@ watch(
     () => route.query.pageNumber,
     (newValue) => {
         try {
-            if (listTemporary.value.length === state.listEmployees.length) {
+            if (listTemporary.value.length === state.payments.length) {
                 listTemporary.value = [];
             }
             pageNumber.value = Number(newValue);
-        } catch (error) {
-            console.log(error);
-        }
-    }
-);
-
-/**
- * Lấy ra danh sách các item đã được check
- * created by: NHGiang
- */
-watch(
-    () => listCheck.value.length,
-    (newValue) => {
-        try {
-            setListItemChecked(listCheck);
-        } catch (error) {
-            console.log(error);
-        }
-    }
-);
-
-/**
- * Lấy ra danh sách các trang đã được check all
- * created by: NHGiang - (22/02/23)
- */
-watch(
-    () => listPageChecked.value.length,
-    (newValue) => {
-        try {
-            setListPageChecked(listPageChecked);
         } catch (error) {
             console.log(error);
         }
@@ -93,7 +64,7 @@ const setListCheck = (e) => {
             listTemporary.value.push(e);
         }
 
-        if (listTemporary.value.length === state.listEmployees.length) {
+        if (listTemporary.value.length === state.payments.length) {
             listPageChecked.value.push(pageNumber.value);
         } else {
             listPageChecked.value = listPageChecked.value.filter((num) => num !== pageNumber.value);
@@ -110,7 +81,7 @@ const setListCheck = (e) => {
 const handleCheckAll = () => {
     try {
         // mảng danh sách ID của các nhân viên tại trang hiện tại
-        const currentListEmployees = state.listEmployees.map((employee) => employee.EmployeeId);
+        const currentListEmployees = state.payments.map((payment) => payment.RefId);
 
         /**
          * Kiểm tra trang thứ n đã được check all
@@ -174,11 +145,45 @@ const hanldeSubmitFormDelete = async (event) => {
         console.log(err);
     }
 };
+
+/**
+ * Lấy ra danh sách các item đã được check
+ * created by: NHGiang
+ */
+watch(
+    () => listCheck.value.length,
+    (newValue) => {
+        try {
+            setListItemChecked(listCheck);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
+
+/**
+ * Lấy ra danh sách các trang đã được check all
+ * created by: NHGiang - (22/02/23)
+ */
+watch(
+    () => listPageChecked.value.length,
+    (newValue) => {
+        try {
+            setListPageChecked(listPageChecked);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
 </script>
 
 <template>
     <table class="tbl">
-        <tbody>
+        <tbody
+            :style="{
+                maxHeight: `${maxHeight - 108}px`,
+            }"
+        >
             <tr class="tbl-row">
                 <th
                     class="tbl-col tbl-col__first tbl-col__first--bg-private"
@@ -217,6 +222,8 @@ const hanldeSubmitFormDelete = async (event) => {
                 :key="index"
                 :entity="entity"
                 :has-checkbox="hasCheckbox"
+                :list-check="listCheck"
+                @check="setListCheck($event)"
             />
             <div class="modal-error" v-if="isPopUp.isOpenWarning">
                 <m-pop-up-warning

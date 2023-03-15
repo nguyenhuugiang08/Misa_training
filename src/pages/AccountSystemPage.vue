@@ -24,9 +24,9 @@ const pageNumber = ref(1);
 const router = useRouter();
 const route = useRoute();
 
-const { state, setIsForm, setTitleForm, setIdentityForm } = inject("diy");
+const { state, setIsForm, setTitleForm, setIdentityForm, setEntitySelected } = inject("diy");
 
-const { getAccountsByFilter } = useAccount();
+const { getAccountsByFilter, getAccountById } = useAccount();
 getAccountsByFilter();
 
 /**
@@ -85,7 +85,7 @@ const toogleExpanded = () => {
  */
 const debounceSearch = async (value) => {
     try {
-        await getAccountsByFilter(value);
+        await getAccountsByFilter(value, pageSize.value, pageNumber.value);
     } catch (error) {
         console.log(error);
     }
@@ -98,6 +98,23 @@ const debounceSearch = async (value) => {
 const handleRefreshData = async () => {
     try {
         await getAccountsByFilter(state.keyword, pageSize.value, pageNumber.value);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm mở form edit khi double click 1 dòng trong bảng
+ * @param {*} e
+ * Created by: NHGiang - (15/03/23)
+ */
+const handleDoubleClickRow = async (event) => {
+    try {
+        setTitleForm(MISA_RESOURCE.FORM_TITLE.EDIT_ACCOUNT);
+        await getAccountById(event.key);
+        setIdentityForm(MISA_ENUM.FORM_MODE.EDIT);
+        setIsForm();
+        handleSetStatusForm();
     } catch (error) {
         console.log(error);
     }
@@ -155,6 +172,7 @@ const handleRefreshData = async () => {
                         setTitleForm(MISA_RESOURCE.FORM_TITLE.ADD_ACCOUNT);
                         setIdentityForm(MISA_ENUM.FORM_MODE.ADD);
                         handleSetStatusForm();
+                        setEntitySelected({});
                     "
                 />
             </div>
@@ -168,6 +186,7 @@ const handleRefreshData = async () => {
                 key-expr="AccountId"
                 parent-id-expr="ParentId"
                 no-data-text="Không có dữ liệu"
+                @cellDblClick="handleDoubleClickRow"
             >
                 <DxScrolling mode="standard" />
                 <DxPaging :enabled="false" :page-size="10" />

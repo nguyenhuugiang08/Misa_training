@@ -26,7 +26,7 @@
 
 :root {
     /* color */
-    --primary-color: #50B83C;
+    --primary-color: #2ca01c;
     --secondary-color: #73C663;
     --primary-bg-color: #DCF1D8;
     --focus-color: #067933;
@@ -99,6 +99,7 @@ body {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    position: relative;
 }
 
 .export {

@@ -30,7 +30,7 @@ export const useAccount = () => {
          */
         const getAccountsByFilter = async (keyword, pageSize = 20, pageNumber = 1) => {
             try {
-                setKeyword(keyword?.trim());
+                setKeyword(keyword);
                 setIsLoading();
                 setTimeout(async () => {
                     const response = await accountApi.getAccountsByFilter(

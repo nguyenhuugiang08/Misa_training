@@ -11,8 +11,9 @@ const props = defineProps({
 
 const isChecked = ref(props.checked);
 const emit = defineEmits(["select", "onCheckInput"]);
+const isShowTooltip = ref(false);
 
-if (props.selected) {
+if (props.selected || props.selected === 0) {
     props.standard.default = props.selected;
 }
 </script>
@@ -32,7 +33,16 @@ if (props.selected) {
                 <input type="checkbox" :id="`subject_${index}`" :checked="isChecked" />
                 <div class="check-icon"></div>
             </label>
-            <span class="track-text">{{ standard.trackText }}</span>
+            <span
+                class="track-text"
+                @mouseover="isShowTooltip = true"
+                @mouseleave="isShowTooltip = false"
+            >
+                {{ standard.trackText }}
+                <div class="track-text__tooltip" v-if="standard.tooltip && isShowTooltip">
+                    {{ standard.tooltip }}
+                </div>
+            </span>
         </div>
         <div
             v-if="standard.isComboBox"
@@ -50,4 +60,20 @@ if (props.selected) {
     </div>
 </template>
 
-<style scoped></style>
+<style>
+.track-text {
+    position: relative;
+}
+
+.track-text__tooltip {
+    position: absolute;
+    width: max-content;
+    z-index: 999;
+    top: 30px;
+    background-color: #434242;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 2px;
+    animation: identifier 0.3s ease-in;
+}
+</style>

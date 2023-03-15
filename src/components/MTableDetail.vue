@@ -6,6 +6,7 @@ const props = defineProps({
     entities: Array,
     columns: Array,
     hasColumnDelete: Boolean,
+    isEdit: Boolean,
 });
 </script>
 
@@ -30,6 +31,9 @@ const props = defineProps({
                     :key="index"
                 >
                     {{ column.columnName }}
+                    <div class="tbl-detail-tooltip" v-if="column.tooltip">
+                        <span>{{ column.tooltip }}</span>
+                    </div>
                 </th>
             </tr>
             <MRowDetail
@@ -38,6 +42,7 @@ const props = defineProps({
                 :entity="entity"
                 :numerical-order="index"
                 :has-column-delete="hasColumnDelete"
+                :is-edit="isEdit"
             />
             <tr class="tbl-row">
                 <th></th>
@@ -49,19 +54,6 @@ const props = defineProps({
                 <th></th>
                 <th v-if="hasColumnDelete"></th>
             </tr>
-            <!-- <div class="modal-error" v-if="isPopUp.isOpenWarning">
-                <m-pop-up-warning
-                    v-if="isPopUp.isOpenWarning"
-                    :title="'Xác nhận xóa'"
-                    :text-info="`Bạn có thực sự muốn xóa nhân viên \<${code}\> không?`"
-                    @closeWarning="isPopUp.isOpenWarning = !isPopUp.isOpenWarning"
-                    @closeForm="isPopUp.isOpenWarning = !isPopUp.isOpenWarning"
-                    @submitForm="
-                        hanldeSubmitFormDelete($event);
-                        isPopUp.isOpenWarning = !isPopUp.isOpenWarning;
-                    "
-                />
-            </div> -->
         </tbody>
     </table>
 </template>
@@ -74,5 +66,23 @@ const props = defineProps({
 
 .tb-detail {
     height: max-content !important;
+}
+
+.tbl-detail-tooltip {
+    position: absolute;
+    font-weight: 400;
+    background-color: #434242;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    top: 20px;
+    left: 16px;
+    z-index: 99;
+    animation: identifier 0.3s ease-in;
+    display: none;
+}
+
+.tbl-col:hover .tbl-detail-tooltip {
+    display: block;
 }
 </style>

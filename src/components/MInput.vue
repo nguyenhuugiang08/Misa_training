@@ -17,6 +17,7 @@ const props = defineProps({
     textError: String,
     bottom: String,
     fullWidth: Boolean,
+    placeHolderAlign: String,
 });
 
 // biến giúp tham chiếu đến element Input trong DOM
@@ -70,6 +71,7 @@ defineExpose({ handleFocus });
                 width: width,
                 marginRight: marginRight,
                 marginBottom: bottom ? `${bottom}` : '0',
+                textAlign: placeHolderAlign,
             }"
             :value="value"
             @input="handleEmitInputValue($event.target.value)"

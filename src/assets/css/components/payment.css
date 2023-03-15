@@ -173,6 +173,7 @@
     top: 4px;
     position: relative;
     border-radius: 3px;
+    cursor: pointer;
 }
 
 .pay-bulk-delete__icon {
@@ -219,4 +220,17 @@
 
 .content-wrapper-payment {
     height: calc(100vh - 48px - 55px - 10px);
+}
+
+.pay-bulk-delete__action {
+    position: absolute;
+    padding: 4px 10px;
+    width: 100px;
+    background-color: #fff;
+    border-radius: 2px;
+    border: 1px solid #babec5;
+    top: 40px;
+    left: 112px;
+    z-index: 99;
+    cursor: pointer;
 }

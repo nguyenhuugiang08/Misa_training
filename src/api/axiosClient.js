@@ -29,7 +29,6 @@ axiosClient.interceptors.response.use(
         if (response && response.data) {
             return response.data;
         }
-        setIsLoading();
         return response;
     },
     (error) => {
@@ -52,18 +51,6 @@ axiosClient.interceptors.response.use(
                     if (keysMoreInfo.includes(keyValidate)) {
                         validateError[`${keyValidate}`].textError = MoreInfo[`${keyValidate}`];
                         validateError[`${keyValidate}`].status = true;
-                    }
-                });
-
-                keysMoreInfo.forEach((keyValidate, index) => {
-                    if (index === 0) {
-                        const errorMessage = {
-                            toastMessage: validateError[`${keyValidate}`].textError,
-                            statusMessage: MISA_RESOURCE.TOAST.SERVER_ERROR.STATUS_MESSAGE,
-                            status: MISA_RESOURCE.TOAST.SERVER_ERROR.STATUS,
-                        };
-
-                        setListToast(errorMessage);
                     }
                 });
             }

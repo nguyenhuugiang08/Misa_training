@@ -40,6 +40,20 @@ export const MISA_RESOURCE = {
         blank: "Đơn vị không được để trống.",
         notFound: "Dữ liệu <Đơn vị> không có trong danh mục.",
     },
+    AccountNumberText: {
+        blank: "Số tài khoản không được để trống.",
+        duplicate: (accountNumber) =>
+            `Số tài khoản <${accountNumber}> đã tồn tại. Xin vui lòng kiểm tra lại.`,
+        under: (length) => `Số tài khoản phải có độ dài >= ${length} ký tự.`,
+        over: (length) => `Số tài khoản phải có độ dài <= ${length} ký tự.`,
+    },
+    AccountNameText: {
+        blank: "Tên tài khoản không được để trống.",
+    },
+    TypeText: {
+        blank: "Tính chất không được để trống.",
+        notFound: "Dữ liệu <Tính chất> không có trong danh mục.",
+    },
     FORM_TITLE: {
         ADD: "Thêm nhân viên", // tiêu đề form thêm
         EDIT: "Sửa thông tin nhân viên", // tiêu đề form sửa
@@ -120,6 +134,7 @@ export const MISA_RESOURCE = {
             /^([a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s\W|_]{1,100}$)\b/,
     },
     FILE_EXCEL_NAME: "Danh_sach_nhan_vien.xlsx", // Tên file excel khi xuất.
+    FILE_EXCEL_PAYMENT_NAME: "Thu_chi_tien_mat.xlsx", // Tên file excel khi xuất.
     COLUMNS_NAME_TABLE: [
         {
             columnName: "Số tài khoản",
@@ -217,6 +232,7 @@ export const MISA_RESOURCE = {
             align: "left",
             isMoney: false,
             isSticky: false,
+            tooltip: "Tài khoản nợ",
         },
         {
             columnName: "TK Có",
@@ -224,6 +240,7 @@ export const MISA_RESOURCE = {
             align: "left",
             isMoney: false,
             isSticky: false,
+            tooltip: "Tài khoản có",
         },
         {
             columnName: "Số tiền",
@@ -407,6 +424,7 @@ export const MISA_RESOURCE = {
             align: "left",
             identityOption: "optionCode",
             isWrap: false,
+            dataShow: false,
         },
         {
             columnName: "Tên nhân viên",
@@ -414,6 +432,7 @@ export const MISA_RESOURCE = {
             align: "left",
             identityOption: "optionName",
             isWrap: false,
+            dataShow: true,
         },
         {
             columnName: "Đơn vị",
@@ -421,6 +440,7 @@ export const MISA_RESOURCE = {
             align: "left",
             identityOption: "optionOrganization",
             isWrap: true,
+            dataShow: false,
         },
         {
             columnName: "Số điện thoại",
@@ -428,6 +448,7 @@ export const MISA_RESOURCE = {
             align: "left",
             identityOption: "optionPhone",
             isWrap: false,
+            dataShow: false,
         },
     ],
     COLUMNS_NAME_COMBOBOX_ACCOUNT: [
@@ -437,6 +458,7 @@ export const MISA_RESOURCE = {
             align: "left",
             identityOption: "optionName",
             isWrap: false,
+            dataShow: true,
         },
         {
             columnName: "Tên tài khoản",
@@ -444,6 +466,7 @@ export const MISA_RESOURCE = {
             align: "left",
             identityOption: "optionDes",
             isWrap: true,
+            dataShow: false,
         },
     ],
     COLUMNS_NAME_COMBOBOX_OBJECT: [
@@ -453,6 +476,7 @@ export const MISA_RESOURCE = {
             align: "left",
             identityOption: "optionCode",
             isWrap: false,
+            dataShow: true,
         },
         {
             columnName: "Tên đối tượng",
@@ -460,6 +484,7 @@ export const MISA_RESOURCE = {
             align: "left",
             identityOption: "optionName",
             isWrap: false,
+            dataShow: false,
         },
         {
             columnName: "Địa chỉ",
@@ -467,6 +492,7 @@ export const MISA_RESOURCE = {
             align: "left",
             identityOption: "optionAddress",
             isWrap: true,
+            dataShow: false,
         },
         {
             columnName: "Số điện thoại",
@@ -474,6 +500,7 @@ export const MISA_RESOURCE = {
             align: "left",
             identityOption: "optionPhone",
             isWrap: false,
+            dataShow: false,
         },
     ],
     TITLE: {
@@ -514,6 +541,7 @@ export const ACCOUNT_TRACK = [
         options: MISA_RESOURCE.TRACK_TYPE,
         default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
         identity: "Job",
+        tooltip: "Đối tượng tập hợp chi phí"
     },
     {
         trackText: "Công trình",
@@ -549,6 +577,7 @@ export const ACCOUNT_TRACK = [
         options: MISA_RESOURCE.TRACK_TYPE,
         default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
         identity: "ExpenseItem",
+        tooltip: "Khoản mục chi phí"
     },
     {
         trackText: "Đơn vị",

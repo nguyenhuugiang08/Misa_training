@@ -36,7 +36,7 @@ watch(
                 </tr>
                 <tr
                     ref="refItem"
-                    class="tbl-cbo-row"
+                    class="tbl-cbo-row tbl-row-detail"
                     :class="{ 'row--active': index === indexSelected }"
                     v-for="(option, index) in options"
                     :key="index"
@@ -58,5 +58,11 @@ watch(
 <style>
 .row--active {
     background-color: var(--primary-color);
+    color: #fff;
+}
+
+.row--active:hover {
+    background-color: var(--primary-color) !important;
+    color: #fff!important;
 }
 </style>

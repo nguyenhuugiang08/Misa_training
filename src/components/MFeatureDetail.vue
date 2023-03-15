@@ -1,23 +1,28 @@
 <script setup>
 import { MISA_ENUM } from "../base/enum";
-import { ref, inject } from "vue";
+import { ref, inject, watch } from "vue";
 import { MISA_RESOURCE } from "../base/resource";
 import { useAccount } from "../composable/useAccount";
 import MPopUpWarning from "./MPopUpWarning.vue";
 import MPopUpError from "./MPopUpError.vue";
 import accountApi from "../api/accountApi";
 import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
+import { useRoute, useRouter } from "vue-router";
 
 const isShowList = ref(false); // Trạng thái ẩn hiện danh sách chức năng (Nhân bản, Xóa)
 const toDropList = ref(0); // Khoảng cách của danh sách chức năng so với top của cửa số trình duyệt
-const isShowPopup = ref(false);
-const isShowPopupActiveChild = ref(false);
+const isShowPopup = ref(false); // trạng thái đóng mở popup cảnh báo khi xóa
+const isShowPopupActiveChild = ref(false); // trạng thái đóng mở popup xác nhận active tài khoản con khi thực hiện active tài khoản cha
+const pageSize = ref(20);
+const pageNumber = ref(1);
 
 const props = defineProps({
     data: Object,
 });
 
-const { setIsForm, setTitleForm, setIdentityForm } = inject("diy");
+const route = useRoute();
+
+const { state, setIsForm, setTitleForm, setIdentityForm } = inject("diy");
 const {
     getAccountById,
     deleteAccount,
@@ -25,6 +30,36 @@ const {
     deleteAccountChild,
     updateIsActiveAccount,
 } = useAccount();
+
+/**
+ * Lấy ra số lượng bản ghi trên 1 trang sử dụng vue-router
+ * created by : NHGiang
+ */
+watch(
+    () => route.query.pageSize,
+    (newValue) => {
+        pageSize.value = newValue;
+        try {
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
+
+/**
+ * Lấy ra trang thứ bao nhiêu sử dụng vue-router
+ * created by : NHGiang
+ */
+watch(
+    () => route.query.pageNumber,
+    (newValue) => {
+        pageNumber.value = newValue;
+        try {
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
 
 /**
  * hàm xử lý vị trí hiển thị của danh sách chức năng
@@ -51,19 +86,6 @@ const handleDisplayHideListAction = (e) => {
 const handleClickOutside = () => {
     try {
         isShowList.value = false;
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-/**
- * Xử lý xóa đối tượng
- * @param {*} id
- * Created by: NHGiang - (08/03/23)
- */
-const handleDelete = (id) => {
-    try {
-        alert(id);
     } catch (error) {
         console.log(error);
     }
@@ -130,15 +152,22 @@ const handleDeleteAccount = async (accountId, parentId) => {
 const handleActiveAccount = async (accountId, isActive, isParent, hasActiveChild) => {
     try {
         if (isParent) {
+            console.log("first");
             if (!hasActiveChild) {
+                const accountIds = [accountId];
                 const response = await accountApi.getChildrens();
-                const accountIds = response.map((account) => {
-                    if (account.ParentId === accountId) {
-                        return account.AccountId;
+
+                response.forEach((child) => {
+                    try {
+                        if (accountIds.includes(child.ParentId)) {
+                            accountIds.push(child.AccountId);
+                        }
+                    } catch (error) {
+                        console.log(error);
                     }
                 });
 
-                await updateIsActiveAccount([accountId, ...accountIds], !isActive);
+                await updateIsActiveAccount(accountIds, !isActive);
             } else {
                 await updateIsActiveAccount([accountId], !isActive);
             }
@@ -146,7 +175,7 @@ const handleActiveAccount = async (accountId, isActive, isParent, hasActiveChild
             await updateIsActiveAccount([accountId], !isActive);
         }
         isShowPopup.value = false;
-        await getAccountsByFilter();
+        await getAccountsByFilter(state.keyword, pageSize.value, pageNumber.value);
     } catch (error) {
         console.log(error);
     }
@@ -191,7 +220,9 @@ const handleActiveAccount = async (accountId, isActive, isParent, hasActiveChild
             @click="
                 data.IsActive
                     ? handleActiveAccount(data.AccountId, data.IsActive, data.IsParent)
-                    : (isShowPopupActiveChild = true)
+                    : data.IsParent
+                    ? (isShowPopupActiveChild = true)
+                    : handleActiveAccount(data.AccountId, data.IsActive, data.IsParent)
             "
         >
             {{ data.IsActive ? "Ngừng sử dụng" : "Sử dụng" }}

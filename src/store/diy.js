@@ -18,6 +18,7 @@ const state = reactive({
     isLoading: false, // Trạng thái Ẩn hiện loading
     objects: [],
     employees: [],
+    payments: [],
 });
 
 /**
@@ -210,7 +211,7 @@ const setIsLoading = () => {
 
 /**
  * Lấy ra danh sách đối tượng
- * @param {*} objects 
+ * @param {*} objects
  */
 const setObjects = (objects) => {
     try {
@@ -222,11 +223,23 @@ const setObjects = (objects) => {
 
 /**
  * Lấy ra danh sách nhân viên
- * @param {*} objects 
+ * @param {*} objects
  */
 const setEmployees = (objects) => {
     try {
         state.employees = [...objects];
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm lấy danh sách phiếu chi
+ * @param {*} payments
+ */
+const setPayments = (payments) => {
+    try {
+        state.payments = [...payments];
     } catch (error) {
         console.log(error);
     }
@@ -250,5 +263,6 @@ export default {
     deleteToastHidden,
     setIsLoading,
     setObjects,
-    setEmployees
+    setEmployees,
+    setPayments,
 };

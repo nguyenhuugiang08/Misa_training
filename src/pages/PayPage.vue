@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref, inject, watch } from "vue";
 import { MISA_RESOURCE } from "../base/resource";
 import MComboButton from "../components/MComboButton.vue";
 import MTable from "../components/MTable.vue";
@@ -7,80 +7,25 @@ import MPagination from "../components/MPagination.vue";
 import MTableDetail from "../components/MTableDetail.vue";
 import VueResizable from "vue-resizable";
 import { MISA_ENUM } from "../base/enum";
+import { useRoute, useRouter } from "vue-router";
+import { usePayment } from "../composable/usePayment";
+import MPopUpWarning from "../components/MPopUpWarning.vue";
 
 const isFocus = ref(false); // Trạng thái focus vào ô tìm kiếm
 const heightMaster = ref(MISA_ENUM.HEIGHT_PAYMENT_MASTER); // Chiều cao phần master
 const heightDetail = ref(MISA_ENUM.HEIGHT_PAYMENT_DETAIL); // Chiều cao mặc định của phần detail
-const vueResizeRef = ref(null);
+const vueResizeRef = ref(null); // ref của component vue-resize
+const pageSize = ref(20); // số bản ghi trên 1 trang
+const pageNumber = ref(1); // trang thứ bao nhiêu
+const isShowAction = ref(false); // trạng thái đóng mở action xóa hàng loạt
+const isShowPopupWarningDelete = ref(false); // trạng thái đóng mở popup cảnh báo khi thực hiện xóa hàng loạt
 
-const fakeData = [
-    {
-        PaymentId: "PC001",
-        AccountingDate: "12/02/2022",
-        VouchersDate: "12/02/2022",
-        VoucherNumber: "PC001",
-        Explain: "Chi tiền cho Nguyễn Hữu Giang",
-        Money: "1000000",
-        SubjectId: "KH0001",
-        SubjectName: "Công ty cổ phần MISA",
-        Address: "Khu ngoại giao đoàn",
-    },
-    {
-        PaymentId: "PC002",
-        AccountingDate: "12/02/2022",
-        VouchersDate: "12/02/2022",
-        VoucherNumber: "PC001",
-        Explain: "Chi tiền cho Nguyễn Hữu Giang",
-        Money: "1000000",
-        SubjectId: "KH0001",
-        SubjectName: "Công ty cổ phần MISA",
-        Address: "Khu ngoại giao đoàn",
-    },
-    {
-        PaymentId: "PC003",
-        AccountingDate: "12/02/2022",
-        VouchersDate: "12/02/2022",
-        VoucherNumber: "PC001",
-        Explain: "Chi tiền cho Nguyễn Hữu Giang",
-        Money: "1000000",
-        SubjectId: "KH0001",
-        SubjectName: "Công ty cổ phần MISA",
-        Address: "Khu ngoại giao đoàn",
-    },
-    {
-        PaymentId: "PC004",
-        AccountingDate: "12/02/2022",
-        VouchersDate: "12/02/2022",
-        VoucherNumber: "PC001",
-        Explain: "Chi tiền cho Nguyễn Hữu Giang",
-        Money: "1000000",
-        SubjectId: "KH0001",
-        SubjectName: "Công ty cổ phần MISA",
-        Address: "Khu ngoại giao đoàn",
-    },
-    {
-        PaymentId: "PC005",
-        AccountingDate: "12/02/2022",
-        VouchersDate: "12/02/2022",
-        VoucherNumber: "PC001",
-        Explain: "Chi tiền cho Nguyễn Hữu Giang",
-        Money: "1000000",
-        SubjectId: "KH0001",
-        SubjectName: "Công ty cổ phần MISA",
-        Address: "Khu ngoại giao đoàn",
-    },
-    {
-        PaymentId: "PC006",
-        AccountingDate: "12/02/2022",
-        VouchersDate: "12/02/2022",
-        VoucherNumber: "PC001",
-        Explain: "Chi tiền cho Nguyễn Hữu Giang",
-        Money: "1000000",
-        SubjectId: "KH0001",
-        SubjectName: "Công ty cổ phần MISA",
-        Address: "Khu ngoại giao đoàn",
-    },
-];
+const router = useRouter();
+const route = useRoute();
+const { getPaymentsByFilter, handlExportExcel, handleBulkDelete } = usePayment();
+getPaymentsByFilter();
+
+const { state } = inject("diy");
 
 const fakeDataDetail = [
     {
@@ -116,6 +61,130 @@ const handleChangeHeight = (event) => {
         console.log(error);
     }
 };
+
+/**
+ * Thực hiện hiển thị form chi tiết phiếu chi
+ * Created by: NHGiang - (15/03/23)
+ */
+const handleShowPaymentDetail = () => {
+    try {
+        router.push("/pay/pay-detail");
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Lấy ra số lượng bản ghi trên 1 trang sử dụng vue-router
+ * created by : NHGiang
+ */
+watch(
+    () => route.query.pageSize,
+    (newValue) => {
+        pageSize.value = newValue;
+        try {
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
+
+/**
+ * Lấy ra trang thứ bao nhiêu sử dụng vue-router
+ * created by : NHGiang
+ */
+watch(
+    () => route.query.pageNumber,
+    (newValue) => {
+        pageNumber.value = newValue;
+        try {
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
+
+/**
+ * Hàm xử lý tìm kiếm phiếu chi
+ * @param {*} value -- Từ khỏa tìm kiếm
+ * Created By: NHGiang - (10/02/23)
+ */
+const debounceSearch = async (value) => {
+    try {
+        await getPaymentsByFilter(value, pageSize.value, pageNumber.value);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm lấy lại dữ liệu
+ * Created by: NHGiang - (15/03/23)
+ */
+const handleRefreshData = async () => {
+    {
+        try {
+            await getPaymentsByFilter(state.keyword, pageSize.value, pageNumber.value);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+};
+
+/**
+ * Xử lý xuất ra Excel
+ * Created by: NHGiang
+ */
+const onClickButtonExport = async () => {
+    try {
+        const config = {
+            keyword: state.keyword || "",
+            dataCount: state.totalEntities,
+            pageNumber: 1,
+        };
+        await handlExportExcel(config);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+watch(
+    () => state.listItemChecked.length,
+    (newValue) => {
+        try {
+            if (newValue <= 1) {
+                isShowAction.value = false;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
+
+/**
+ * Hàm thực hiện xóa nhiều bản ghi
+ * Created by: NHGiang - (16/03/23)
+ */
+const handleDeleteMultiple = async () => {
+    try {
+        await handleBulkDelete(state.listItemChecked);
+        await getPaymentsByFilter(state.keyword, pageSize.value, pageNumber.value);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm thực hiện click outside button thực hiện hàng loạt
+ * Created by: NHGiang - (16/03/23)
+ */
+const handleClickOutsideButtonBulkDelete = () => {
+    try {
+        isShowAction.value = false;
+    } catch (error) {
+        console.log(error);
+    }
+};
 </script>
 
 <template>
@@ -129,9 +198,21 @@ const handleChangeHeight = (event) => {
         >
             <div class="content-wrapper__action">
                 <div class="m-icon check-all"><div class="arrow-check-all"></div></div>
-                <div class="pay-bulk-delete">
+                <div
+                    class="pay-bulk-delete"
+                    :class="{ 'pay-bulk-delete--active': state.listItemChecked.length > 1 }"
+                    @click="isShowAction = !isShowAction"
+                    v-click-outside-element="handleClickOutsideButtonBulkDelete"
+                >
                     Thực hiện hàng loạt
                     <div class="m-icon"><div class="pay-bulk-delete__icon"></div></div>
+                </div>
+                <div
+                    class="pay-bulk-delete__action"
+                    v-if="isShowAction && state.listItemChecked.length > 1"
+                    @click="isShowPopupWarningDelete = true"
+                >
+                    Xóa
                 </div>
                 <div class="textfield">
                     <label for="" class="textfield__label">
@@ -146,18 +227,16 @@ const handleChangeHeight = (event) => {
                         type="text"
                         class="textfield__input"
                         id="search-input"
-                        placeholder="Tìm kiếm theo số, tên tài khoản"
+                        placeholder="Tìm kiếm"
                         autocomplete="off"
                         @focus="isFocus = true"
                         @blur="isFocus = false"
+                        v-debounce:600="debounceSearch"
                     />
                 </div>
                 <div
-                    class="sidebar-item__icon content-wrapper__action-refresh"
-                    :style="{
-                        background:
-                            'url(../../src/assets/img/Sprites.64af8f61.svg) no-repeat -425px -201px',
-                    }"
+                    class="sidebar-item__icon content-wrapper__action-refresh refresh-icon"
+                    @click="handleRefreshData"
                 ></div>
                 <div class="sidebar-item__icon export" @click="onClickButtonExport">
                     <div class="export-icon"></div>
@@ -167,15 +246,16 @@ const handleChangeHeight = (event) => {
                     class="btn-curved"
                     isCurved
                     margin-top="8px"
-                    @clickBtn="isOpenForm = true"
+                    @clickBtn="handleShowPaymentDetail"
                 />
             </div>
             <m-table
                 :columns="MISA_RESOURCE.COLUMNS_NAME_TABLE_PAY"
                 hasCheckbox
-                :entities="fakeData"
+                :entities="state.payments"
+                :max-height="heightMaster"
             />
-            <m-pagination />
+            <m-pagination path="/cash/pay" :func-filter="getPaymentsByFilter" />
         </vue-resizable>
         <div class="detail-payment" :style="{ height: heightDetail + 'px' }">
             <div class="detail-payment__title">Chi tiết</div>
@@ -184,6 +264,29 @@ const handleChangeHeight = (event) => {
                 :entities="fakeDataDetail"
             />
             <div class="detail-payment__paging"><m-pagination /></div>
+        </div>
+        <div class="overlay" v-if="state.isLoading"><m-loading /></div>
+        <div class="toast-account">
+            <m-toast
+                v-if="state.listToast.length"
+                v-for="(toast, index) in state.listToast"
+                :key="index"
+                :toastMessage="toast.toastMessage"
+                :statusMessage="toast.statusMessage"
+                :status="toast.status"
+            />
+        </div>
+        <div class="modal-error" v-if="isShowPopupWarningDelete">
+            <m-pop-up-warning
+                :title="'Xác nhận xóa'"
+                :text-info="`Bạn có muốn xóa những chứng từ này không?`"
+                @closeWarning="isShowPopupWarningDelete = !isShowPopupWarningDelete"
+                @closeForm="isShowPopupWarningDelete = !isShowPopupWarningDelete"
+                @submitForm="
+                    handleDeleteMultiple();
+                    isShowPopupWarningDelete = !isShowPopupWarningDelete;
+                "
+            />
         </div>
     </div>
 </template>
@@ -223,5 +326,10 @@ const handleChangeHeight = (event) => {
     justify-content: center;
     align-items: center;
     cursor: pointer;
+}
+
+.pay-bulk-delete--active {
+    border: 1px solid #3b3c3f;
+    color: #111;
 }
 </style>

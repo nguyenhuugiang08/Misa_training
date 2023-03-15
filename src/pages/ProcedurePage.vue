@@ -6,7 +6,7 @@
             <div class="procedure-title">nghiệp vụ tiền mặt</div>
             <div class="procedure-content">
                 <img src="https://actappg2.misacdn.net/img/qt_TienMat.1f64b87b.svg" alt="ảnh" />
-                <router-link to="/cash/pay" class="revice"> Thu tiền </router-link>
+                <router-link to="/cash/procedure" class="revice"> Thu tiền </router-link>
                 <router-link to="/pay/pay-detail" class="payment"> Chi tiền </router-link>
                 <router-link to="/cash/procedure" class="audit"> Kiểm kê quỹ </router-link>
             </div>

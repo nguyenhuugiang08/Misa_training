@@ -1,13 +1,11 @@
 <script setup>
-import { ref, inject, watch, defineExpose } from "vue";
+import { ref, watch, defineExpose } from "vue";
 import { MISA_ENUM } from "../base/enum";
 import MTableCombobox from "./MTableCombobox.vue";
 
 const selected = ref(props.default ? props.default : null); // Giá trị của item được lựa chọn.
 const isOpen = ref(false); // trạng thái đóng/mở của danh sách chứa các lựa chọn.
 const isFocus = ref(false); // trạng thái Focus vào ô input.
-const { state, setEmployeeSelected } = inject("diy"); // Lấy dữ liệu trong store.
-const { employeeSelected } = state; // Lấy ra biến employeeSelected từ object state trong store.
 const optionSearch = ref([]); // Mảng lưu các lựa chọn phù hợp khi thực hiện tìm kiếm.
 const indexOptionSelected = ref(0); // Chỉ số của lựa chọn đã được chọn trong mảng danh sách các lựa chọn.
 
@@ -28,6 +26,7 @@ const props = defineProps({
     disabled: Boolean,
     isTable: Boolean,
     columns: { type: Array, default: [] },
+    tooltip: String,
 });
 
 const refCheckBox = ref(null);
@@ -39,6 +38,7 @@ defineExpose({ refList, refItem });
 
 // Gán giá trị ban của mảng optionSearch là danh sách tất cả các lựa chọn.
 optionSearch.value = [...props.options];
+const dataShow = props.columns.find((option) => option.dataShow === true)?.identityOption;
 
 // Emit các sự kiện ra ngoài component cha
 const emit = defineEmits(["select", "changeValue"]);
@@ -50,13 +50,23 @@ const emit = defineEmits(["select", "changeValue"]);
  */
 const handleShowSelectedValue = (option, index) => {
     try {
-        selected.value = option.optionName ? option.optionName : optionSearch.value[0].optionName;
+        if (props.isTable) {
+            selected.value = option[`${dataShow}`]
+                ? option[`${dataShow}`]
+                : optionSearch.value[0]?.[`${dataShow}`];
+        } else {
+            selected.value = option.optionName
+                ? option.optionName
+                : optionSearch.value[0]?.optionName;
+        }
         indexOptionSelected.value = index;
         isOpen.value = false;
         emit("select", {
             optionId: option.optionId,
-            optionName: selected.value,
+            optionSelected: selected.value,
+            optionName: option.optionName,
             optionGrade: option.optionGrade,
+            optionAddress: option.optionAddress,
         });
     } catch (error) {
         console.log(error);
@@ -73,6 +83,9 @@ const handleShowSelectedValue = (option, index) => {
 const handleDefaultValue = (optionId) => {
     try {
         const optionSelected = optionSearch.value.filter((option) => option?.optionId === optionId);
+        if (props.isTable) {
+            return optionSelected[0]?.[`${dataShow}`];
+        }
         return optionSelected[0]?.optionName;
     } catch (error) {
         console.log(error);
@@ -83,7 +96,7 @@ const handleDefaultValue = (optionId) => {
  * - Nếu có ID của giá trị mặc định -> Hiển thị tên của option lên giao diện
  * - Nếu không có -> gán indexOptionSelected = -1
  */
-if (props.default) {
+if (props.default || props.default === 0) {
     selected.value = handleDefaultValue(props.default);
     indexOptionSelected.value = optionSearch.value.findIndex(
         (option) => option?.optionId === props.default
@@ -134,7 +147,7 @@ const handleSearchOption = (keyword) => {
             emit("select", { optionId: newOptionId, optionName: keyword });
         } else {
             emit("select", {
-                optionId: props.options[indexOptionSelected.value].optionId,
+                optionId: -1,
                 optionName: keyword,
             });
         }
@@ -146,7 +159,7 @@ const handleSearchOption = (keyword) => {
 watch(
     () => indexOptionSelected.value,
     (newValue) => {
-        if (!props.isTable) {
+        if (!props.isTable && newValue) {
             const liH = refItem.value[newValue].clientHeight;
             refList.value.scrollTop = liH * indexOptionSelected.value;
         }
@@ -274,6 +287,9 @@ const handleInputKeydown = (event) => {
             {{ textError }}
         </div>
     </label>
+    <div class="textfield-tooltip" v-if="tooltip">
+        <span>{{ tooltip }}</span>
+    </div>
     <input
         ref="refCheckBox"
         type="text"
@@ -291,7 +307,6 @@ const handleInputKeydown = (event) => {
         @focus="
             isFocus = status ? false : true;
             emit('changeValue', true);
-            isOpen = true;
         "
         @blur="isFocus = false"
         @input="handleSearchOption($event.target.value)"
@@ -336,7 +351,7 @@ const handleInputKeydown = (event) => {
     left: 50%;
     transform: translateX(-50%);
     width: 200px;
-    top: 64px;
+    top: 52px;
     font-weight: 400;
     display: none;
 }

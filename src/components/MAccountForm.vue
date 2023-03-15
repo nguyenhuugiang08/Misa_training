@@ -3,17 +3,25 @@ import MInput from "./MInput.vue";
 import MCheckbox from "./MCheckbox.vue";
 import MTrackDetail from "./MTrackDetail.vue";
 import { MISA_RESOURCE, ACCOUNT_TRACK } from "../base/resource";
-import { ref, reactive, inject } from "vue";
+import { ref, reactive, inject, onMounted, onUnmounted } from "vue";
 import { useAccount } from "../composable/useAccount";
 import { MISA_ENUM } from "../base/enum";
 import { error } from "../utilities/validateForm";
 import MToast from "../components/MToast.vue";
+import MPopUpInfo from "./MPopUpInfo.vue";
+import MPopUpError from "./MPopUpError.vue";
+import { useValidate } from "../utilities/validateForm";
 
 const { state, setIsForm } = inject("diy");
 
 const { getAccounts, addAccount, getAccountsByFilter, editAccount } = useAccount();
 getAccounts();
 
+const isOpenError = ref(false); // trạng thái đóng mở popup error khi có lỗi xảy ra
+const refCancelBtn = ref(null); // ref của button Hủy
+const refSaveAndAddBtn = ref(null); // ref của button cất và thêm
+const refAccountNumber = ref(null); // ref của ô input số tài khoản
+const isShowNote = ref(false); // Trạng thái Đóng Mở thông báo dữ liệu form đã thay
 const isShowTrackDetail = ref(true); // Trạng thái Đóng/Mở của theo dõi chi tiết
 const isResize = ref(false); // Trạng thái Mở rộng/ Thu gọn
 const account = reactive({
@@ -22,6 +30,7 @@ const account = reactive({
     AccountName: state.entitySelected?.AccountName || "",
     EnglishName: state.entitySelected?.EnglishName || "",
     Type: state.entitySelected?.Type || 1,
+    TypeName: MISA_RESOURCE.ACCOUNT_NATURE[1].optionName,
     Description: state.entitySelected?.Description || "",
     HasForeignCurrencyAccounting: state.entitySelected?.HasForeignCurrencyAccounting || false,
     IsActive: state.entitySelected?.IsActive || true,
@@ -37,18 +46,43 @@ const account = reactive({
     IsTrackExpenseItem: state.entitySelected?.IsTrackExpenseItem || false,
     IsTrackItem: state.entitySelected?.IsTrackItem || false,
     Object: state.entitySelected?.Object || 1,
-    Job: state.entitySelected?.Job || 1,
-    Order: state.entitySelected?.Order || 1,
-    PurchaseContract: state.entitySelected?.PurchaseContract || 1,
-    OrganizationUnit: state.entitySelected?.OrganizationUnit || 1,
-    BankAccount: state.entitySelected?.BankAccount || 1,
-    ProjectWork: state.entitySelected?.ProjectWork || 1,
-    SaleContract: state.entitySelected?.SaleContract || 1,
-    ExpenseItem: state.entitySelected?.ExpenseItem || 1,
-    Item: state.entitySelected?.Item || 1,
+    Job:
+        state.entitySelected?.Job === 0
+            ? MISA_RESOURCE.TRACK_TYPE[0].optionId
+            : MISA_RESOURCE.TRACK_TYPE[1].optionId,
+    Order:
+        state.entitySelected?.Order === 0
+            ? MISA_RESOURCE.TRACK_TYPE[0].optionId
+            : MISA_RESOURCE.TRACK_TYPE[1].optionId,
+    PurchaseContract:
+        state.entitySelected?.PurchaseContract === 0
+            ? MISA_RESOURCE.TRACK_TYPE[0].optionId
+            : MISA_RESOURCE.TRACK_TYPE[1].optionId,
+    OrganizationUnit:
+        state.entitySelected?.OrganizationUnit === 0
+            ? MISA_RESOURCE.TRACK_TYPE[0].optionId
+            : MISA_RESOURCE.TRACK_TYPE[1].optionId,
+    BankAccount:
+        state.entitySelected?.BankAccount === 0
+            ? MISA_RESOURCE.TRACK_TYPE[0].optionId
+            : MISA_RESOURCE.TRACK_TYPE[1].optionId,
+    ProjectWork:
+        state.entitySelected?.ProjectWork === 0
+            ? MISA_RESOURCE.TRACK_TYPE[0].optionId
+            : MISA_RESOURCE.TRACK_TYPE[1].optionId,
+    SaleContract:
+        state.entitySelected?.SaleContract === 0
+            ? MISA_RESOURCE.TRACK_TYPE[0].optionId
+            : MISA_RESOURCE.TRACK_TYPE[1].optionId,
+    ExpenseItem:
+        state.entitySelected?.ExpenseItem === 0
+            ? MISA_RESOURCE.TRACK_TYPE[0].optionId
+            : MISA_RESOURCE.TRACK_TYPE[1].optionId,
+    Item:
+        state.entitySelected?.Item === 0
+            ? MISA_RESOURCE.TRACK_TYPE[0].optionId
+            : MISA_RESOURCE.TRACK_TYPE[1].optionId,
     Grade: state.entitySelected?.Grade || 1,
-    CreatedBy: state.entitySelected?.CreatedBy || "Nguyễn Hữu Giang",
-    ModifiedBy: state.entitySelected?.ModifiedBy || "Nguyễn Hữu Giang",
 });
 
 /**
@@ -56,24 +90,31 @@ const account = reactive({
  */
 const handleSubmit = async () => {
     try {
-        // xử lý thêm tài khoản
-        if (
-            state.identityForm === MISA_ENUM.FORM_MODE.ADD ||
-            state.identityForm === MISA_ENUM.FORM_MODE.DUPLICATE
-        ) {
-            await addAccount(account)
-                .then(async () => {
-                    await getAccountsByFilter();
-                })
-                .catch((isPopUp.isOpenError = true));
-        }
+        const status = useValidate({ account });
+        const { TypeName, ...accountRest } = account;
 
-        if (state.identityForm === MISA_ENUM.FORM_MODE.EDIT) {
-            await editAccount(account, state.entitySelected.AccountId)
-                .then(async () => {
-                    await getAccountsByFilter();
-                })
-                .catch((isPopUp.isOpenError = true));
+        if (!status) {
+            // xử lý thêm tài khoản
+            if (
+                state.identityForm === MISA_ENUM.FORM_MODE.ADD ||
+                state.identityForm === MISA_ENUM.FORM_MODE.DUPLICATE
+            ) {
+                await addAccount(accountRest)
+                    .then(async () => {
+                        await getAccountsByFilter();
+                    })
+                    .catch((isOpenError.value = true));
+            }
+
+            if (state.identityForm === MISA_ENUM.FORM_MODE.EDIT) {
+                await editAccount(accountRest, state.entitySelected.AccountId)
+                    .then(async () => {
+                        await getAccountsByFilter();
+                    })
+                    .catch((isOpenError.value = true));
+            }
+        } else {
+            isOpenError.value = true;
         }
     } catch (error) {
         console.log(error);
@@ -110,9 +151,150 @@ const handleSelected = (event) => {
     }
 };
 
-const handle = (event) => {
+/**
+ * Hàm thực hiện đóng form khi nhấn nút close(x)
+ * Created by: NHGiang - (14/03/23)
+ */
+const handleCloseForm = () => {
     try {
-        console.log(event);
+        let accountToCompare = {};
+        if (state.identityForm === MISA_ENUM.FORM_MODE.ADD) {
+            accountToCompare = {
+                ParentId: "00000000-0000-0000-0000-000000000000",
+                AccountNumber: "",
+                AccountName: "",
+                EnglishName: "",
+                Type: 1,
+                Description: "",
+                HasForeignCurrencyAccounting: false,
+                IsActive: true,
+                IsParent: false,
+                IsTrackObject: false,
+                IsTrackJob: false,
+                IsTrackOrder: false,
+                IsTrackPurchaseContract: false,
+                IsTrackOrganizationUnit: false,
+                IsTrackBankAccount: false,
+                IsTrackProjectWork: false,
+                IsTrackSaleContract: false,
+                IsTrackExpenseItem: false,
+                IsTrackItem: false,
+                Object: 1,
+                Job: 1,
+                Order: 1,
+                PurchaseContract: 1,
+                OrganizationUnit: 1,
+                BankAccount: 1,
+                ProjectWork: 1,
+                SaleContract: 1,
+                ExpenseItem: 1,
+                Item: 1,
+                Grade: 1,
+            };
+        }
+
+        if (
+            state.identityForm === MISA_ENUM.FORM_MODE.EDIT ||
+            state.identityForm === MISA_ENUM.FORM_MODE.DUPLICATE
+        ) {
+            const { CreatedDate, ModifiedDate, CreatedBy, ModifiedBy, AccountId, Active, ...rest } =
+                state.entitySelected;
+            accountToCompare = rest;
+        }
+
+        if (JSON.stringify(accountToCompare) !== JSON.stringify(account)) {
+            isShowNote.value = true;
+        } else {
+            setIsForm();
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Xử lý focus input employee code
+ * Created by: NHGiang - (20/02/23)
+ */
+onMounted(() => {
+    try {
+        refAccountNumber.value.handleFocus();
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+/**
+ * Xử lý set lại tabindex khi hết
+ * @param {*} e event object
+ * Created by: NHGiang - (20/02/23)
+ */
+const handleSetTabindex = (e) => {
+    try {
+        if (e.keyCode === MISA_ENUM.KEY_CODE.TAB) {
+            e.preventDefault();
+            refAccountNumber.value.handleFocus();
+        }
+        if (e.shiftKey && e.keyCode === MISA_ENUM.KEY_CODE.TAB) {
+            refSaveAndAddBtn.value.focus();
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm xử lỹ phím tắt
+ * @param {*} e
+ * Created by: NHGiang - (24/02/23)
+ */
+const docKeyDown = (e) => {
+    // Cất form với phím tắt ctrl + S
+    if (e.ctrlKey && e.key === "s") {
+        e.preventDefault();
+        e.stopPropagation();
+        handleSubmit();
+    }
+
+    // Cất form và mở form thêm với phím tắt ctrl + shift + S
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        e.stopPropagation();
+        handleSubmit();
+    }
+
+    // Đóng form với phím tắt ESC
+    if (e.keyCode === MISA_ENUM.KEY_CODE.ESCAPE) {
+        handleCloseForm();
+    }
+};
+
+/**
+ * Hàm thêm event keydown
+ * Created by: NHGiang - (24/02/23)
+ */
+onMounted(() => {
+    document.addEventListener("keydown", docKeyDown, false);
+});
+
+/**
+ * Hàm xử lý remove event
+ * Created by: NHGiang - (24/02/23)
+ */
+onUnmounted(() => {
+    document.removeEventListener("keydown", docKeyDown);
+});
+
+/**
+ * Hàm set lại Tabindex khi nhấn Shift + Tab
+ * Created by: NHGiang - (26/02/23)
+ */
+const handleSetReverseTabindex = (e) => {
+    try {
+        if (e.shiftKey && e.keyCode === MISA_ENUM.KEY_CODE.TAB) {
+            e.preventDefault();
+            refCancelBtn.value.focus();
+        }
     } catch (error) {
         console.log(error);
     }
@@ -127,7 +309,7 @@ const handle = (event) => {
                     <div class="modal__header-left-text">{{ state.titleForm }}</div>
                 </div>
                 <div class="modal__header-right">
-                    <div class="modal__close-btn">
+                    <div class="modal__close-btn" @click="handleCloseForm">
                         <label
                             for="show-modal"
                             :style="{
@@ -144,6 +326,7 @@ const handle = (event) => {
             <div class="account-main">
                 <div class="row">
                     <m-input
+                        ref="refAccountNumber"
                         field-text="Số tài khoản"
                         required
                         width="25%"
@@ -154,6 +337,7 @@ const handle = (event) => {
                         :statusPublic="error.status"
                         :text-error="error.AccountNumber.textError"
                         @inputValue="account.AccountNumber = $event"
+                        @keydown="handleSetReverseTabindex"
                     />
                 </div>
                 <div class="row">
@@ -192,7 +376,6 @@ const handle = (event) => {
                             @select="
                                 account.ParentId = $event.optionId;
                                 account.Grade = $event.optionGrade + 1;
-                                handle($event);
                             "
                         />
                     </div>
@@ -205,7 +388,13 @@ const handle = (event) => {
                             :default="account.Type"
                             :options="MISA_RESOURCE.ACCOUNT_NATURE"
                             :isTable="false"
-                            @select="account.Type = $event.optionId"
+                            :status="error.Type.status"
+                            :statusPublic="error.status"
+                            :text-error="error.Type.textError"
+                            @select="
+                                account.Type = $event.optionId;
+                                account.TypeName = $event.optionName;
+                            "
                         />
                     </div>
                 </div>
@@ -277,7 +466,11 @@ const handle = (event) => {
                     >
                         Cất
                     </button>
-                    <button class="btn btn-primary btn-save-add" tabindex="0" ref="refSaveBtn">
+                    <button
+                        class="btn btn-primary btn-save-add"
+                        tabindex="0"
+                        ref="refSaveAndAddBtn"
+                    >
                         Cất và thêm
                     </button>
                 </div>
@@ -287,6 +480,7 @@ const handle = (event) => {
                     tabindex="0"
                     ref="refCancelBtn"
                     @click="setIsForm()"
+                    @keydown="handleSetTabindex"
                     >Hủy</label
                 >
             </div>
@@ -303,6 +497,29 @@ const handle = (event) => {
                 :toastMessage="toast.toastMessage"
                 :statusMessage="toast.statusMessage"
                 :status="toast.status"
+            />
+        </div>
+        <div class="modal-error" v-if="isShowNote">
+            <m-pop-up-info
+                :title="'Thông báo'"
+                text-info="Dữ liệu đã bị thay đổi. Bạn có muốn cất không?"
+                @closeInfo="isShowNote = !isShowNote"
+                @closeForm="setIsForm()"
+                @submitForm="
+                    handleSubmit();
+                    isShowNote = !isShowNote;
+                "
+            />
+        </div>
+        <div class="modal-error" v-if="isOpenError">
+            <m-pop-up-error
+                :title="'Lỗi'"
+                :text-error="
+                    error.AccountName.textError ||
+                    error.AccountNumber.textError ||
+                    error.Type.textError
+                "
+                @closeError="isOpenError = !isOpenError"
             />
         </div>
     </div>

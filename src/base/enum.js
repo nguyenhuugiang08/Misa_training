@@ -51,4 +51,6 @@ export const MISA_ENUM = {
     HEIGHT_PAYMENT_CONTENT: 647, // Chiều cao phần content trang phiếu chi
     HEIGHT_PAYMENT_MASTER: 383, // Chiều cao phần master trang phiếu chi
     HEIGHT_PAYMENT_DETAIL: 264, // Chiều cao phần detail trang phiếu chi
+    MAX_LENGTH_ACCOUNTNUMBER: 20,
+    MIN_LENGTH_ACCOUNTNUMBER: 3,
 };

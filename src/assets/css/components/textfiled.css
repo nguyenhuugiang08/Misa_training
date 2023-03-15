@@ -16,7 +16,7 @@
     cursor: grab;
 }
 
-.textfield .textfield__label:hover~.textfield-tooltip {
+.textfield__label:hover~.textfield-tooltip {
     display: block;
 }
 
@@ -320,7 +320,7 @@
     color: #fff;
     padding: 2px 6px;
     border-radius: 4px;
-    top: 24px;
+    top: 20px;
     left: 16px;
     z-index: 99;
     animation: identifier 0.3s ease-in;
