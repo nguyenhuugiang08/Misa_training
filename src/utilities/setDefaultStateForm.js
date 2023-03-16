@@ -49,6 +49,10 @@ export const handleSetStatusForm = () => {
             textError: "",
             status: false,
         };
+        error.Type = {
+            textError: "",
+            status: false,
+        };
         error.status = false;
     } catch (error) {
         console.log(error);

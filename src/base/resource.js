@@ -117,6 +117,41 @@ export const MISA_RESOURCE = {
             STATUS_MESSAGE: "Thành công! ",
             STATUS: MISA_ENUM.STATUS_TOAST.SUCCESS,
         },
+        DELETE_MULTIPLE_PAYMENT_SUCCESS: {
+            TOAST_MESSAGE: "Xóa thành công các chứng từ đã chọn.",
+            STATUS_MESSAGE: "Thành công! ",
+            STATUS: MISA_ENUM.STATUS_TOAST.SUCCESS,
+        },
+        ADD_ACCOUNT_SUCCESS: {
+            TOAST_MESSAGE: "Tài khoản đã được thêm.",
+            STATUS_MESSAGE: "Thành công! ",
+            STATUS: MISA_ENUM.STATUS_TOAST.SUCCESS,
+        },
+        EDIT_ACCOUNT_SUCCESS: {
+            TOAST_MESSAGE: "Thông tin tài khoản đã được cập nhật.",
+            STATUS_MESSAGE: "Thành công! ",
+            STATUS: MISA_ENUM.STATUS_TOAST.SUCCESS,
+        },
+        DELETE_ACCOUNT_SUCCESS: {
+            TOAST_MESSAGE: "Tài khoản đã được xóa.",
+            STATUS_MESSAGE: "Thành công! ",
+            STATUS: MISA_ENUM.STATUS_TOAST.SUCCESS,
+        },
+        ADD_PAYMENT_SUCCESS: {
+            TOAST_MESSAGE: "Chứng từ đã được thêm.",
+            STATUS_MESSAGE: "Thành công! ",
+            STATUS: MISA_ENUM.STATUS_TOAST.SUCCESS,
+        },
+        EDIT_PAYMENT_SUCCESS: {
+            TOAST_MESSAGE: "Thông tin chứng từ đã được cập nhật.",
+            STATUS_MESSAGE: "Thành công! ",
+            STATUS: MISA_ENUM.STATUS_TOAST.SUCCESS,
+        },
+        DELETE_PAYMENT_SUCCESS: {
+            TOAST_MESSAGE: "Chứng từ đã được xóa.",
+            STATUS_MESSAGE: "Thành công! ",
+            STATUS: MISA_ENUM.STATUS_TOAST.SUCCESS,
+        },
     },
     REGEX: {
         // biếu thức chính quy validate ngày tháng.
@@ -541,7 +576,7 @@ export const ACCOUNT_TRACK = [
         options: MISA_RESOURCE.TRACK_TYPE,
         default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
         identity: "Job",
-        tooltip: "Đối tượng tập hợp chi phí"
+        tooltip: "Đối tượng tập hợp chi phí",
     },
     {
         trackText: "Công trình",
@@ -577,7 +612,7 @@ export const ACCOUNT_TRACK = [
         options: MISA_RESOURCE.TRACK_TYPE,
         default: MISA_RESOURCE.TRACK_TYPE[1].optionId,
         identity: "ExpenseItem",
-        tooltip: "Khoản mục chi phí"
+        tooltip: "Khoản mục chi phí",
     },
     {
         trackText: "Đơn vị",

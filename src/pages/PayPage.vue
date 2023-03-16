@@ -1,7 +1,6 @@
 <script setup>
 import { ref, inject, watch } from "vue";
 import { MISA_RESOURCE } from "../base/resource";
-import MComboButton from "../components/MComboButton.vue";
 import MTable from "../components/MTable.vue";
 import MPagination from "../components/MPagination.vue";
 import MTableDetail from "../components/MTableDetail.vue";
@@ -10,6 +9,7 @@ import { MISA_ENUM } from "../base/enum";
 import { useRoute, useRouter } from "vue-router";
 import { usePayment } from "../composable/usePayment";
 import MPopUpWarning from "../components/MPopUpWarning.vue";
+import MToast from "../components/MToast.vue";
 
 const isFocus = ref(false); // Trạng thái focus vào ô tìm kiếm
 const heightMaster = ref(MISA_ENUM.HEIGHT_PAYMENT_MASTER); // Chiều cao phần master
@@ -25,7 +25,7 @@ const route = useRoute();
 const { getPaymentsByFilter, handlExportExcel, handleBulkDelete } = usePayment();
 getPaymentsByFilter();
 
-const { state } = inject("diy");
+const { state, setEntitySelected, setIdentityForm } = inject("diy");
 
 const fakeDataDetail = [
     {
@@ -68,7 +68,9 @@ const handleChangeHeight = (event) => {
  */
 const handleShowPaymentDetail = () => {
     try {
+        setEntitySelected({});
         router.push("/pay/pay-detail");
+        setIdentityForm(MISA_ENUM.FORM_MODE.ADD);
     } catch (error) {
         console.log(error);
     }
@@ -241,13 +243,9 @@ const handleClickOutsideButtonBulkDelete = () => {
                 <div class="sidebar-item__icon export" @click="onClickButtonExport">
                     <div class="export-icon"></div>
                 </div>
-                <m-combo-button
-                    default="Chi tiền"
-                    class="btn-curved"
-                    isCurved
-                    margin-top="8px"
-                    @clickBtn="handleShowPaymentDetail"
-                />
+                <button class="btn btn-primary btn-pay" @click="handleShowPaymentDetail">
+                    Chi tiền
+                </button>
             </div>
             <m-table
                 :columns="MISA_RESOURCE.COLUMNS_NAME_TABLE_PAY"
@@ -266,16 +264,6 @@ const handleClickOutsideButtonBulkDelete = () => {
             <div class="detail-payment__paging"><m-pagination /></div>
         </div>
         <div class="overlay" v-if="state.isLoading"><m-loading /></div>
-        <div class="toast-account">
-            <m-toast
-                v-if="state.listToast.length"
-                v-for="(toast, index) in state.listToast"
-                :key="index"
-                :toastMessage="toast.toastMessage"
-                :statusMessage="toast.statusMessage"
-                :status="toast.status"
-            />
-        </div>
         <div class="modal-error" v-if="isShowPopupWarningDelete">
             <m-pop-up-warning
                 :title="'Xác nhận xóa'"
@@ -286,6 +274,16 @@ const handleClickOutsideButtonBulkDelete = () => {
                     handleDeleteMultiple();
                     isShowPopupWarningDelete = !isShowPopupWarningDelete;
                 "
+            />
+        </div>
+        <div class="toast-container">
+            <m-toast
+                v-if="state.listToast.length"
+                v-for="(toast, index) in state.listToast"
+                :key="index"
+                :toastMessage="toast.toastMessage"
+                :statusMessage="toast.statusMessage"
+                :status="toast.status"
             />
         </div>
     </div>
@@ -331,5 +329,11 @@ const handleClickOutsideButtonBulkDelete = () => {
 .pay-bulk-delete--active {
     border: 1px solid #3b3c3f;
     color: #111;
+}
+
+.btn-pay {
+    position: relative;
+    top: 4px;
+    margin-left: 8px;
 }
 </style>

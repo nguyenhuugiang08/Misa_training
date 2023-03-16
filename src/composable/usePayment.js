@@ -10,6 +10,7 @@ const {
     setKeyword,
     setListItemChecked,
     setListToast,
+    setEntitySelected,
 } = diy;
 
 export const usePayment = () => {
@@ -100,7 +101,47 @@ export const usePayment = () => {
             }
         };
 
-        return { getPayments, getPaymentsByFilter, handlExportExcel, handleBulkDelete };
+        /**
+         * Hàm lấy thông tin phiếu chi theo ID
+         * @param {*} paymentId -- ID của phiếu chi
+         * Created by: NHGiang - (16/03/23)
+         */
+        const getPaymentById = async (paymentId) => {
+            try {
+                const response = await paymentApi.getPaymentById(paymentId);
+                setEntitySelected(response);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        /**
+         * Hàm thêm phiếu chi
+         * @param {*} payment -- thông tin phiếu chi
+         * @returns
+         */
+        const addPayment = async (payment) => {
+            try {
+                await paymentApi.addPayment(payment);
+                const toastMessage = {
+                    toastMessage: MISA_RESOURCE.TOAST.ADD_PAYMENT_SUCCESS.TOAST_MESSAGE,
+                    statusMessage: MISA_RESOURCE.TOAST.ADD_PAYMENT_SUCCESS.STATUS_MESSAGE,
+                    status: MISA_RESOURCE.TOAST.ADD_PAYMENT_SUCCESS.STATUS,
+                };
+                setListToast(toastMessage);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        return {
+            getPayments,
+            getPaymentsByFilter,
+            handlExportExcel,
+            handleBulkDelete,
+            getPaymentById,
+            addPayment,
+        };
     } catch (error) {
         console.log(error);
     }

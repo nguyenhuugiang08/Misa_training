@@ -380,13 +380,6 @@ const handleDisplayWraningPopUp = (e) => {
     align-items: center;
 }
 
-.toast-container {
-    position: fixed;
-    right: 0;
-    top: 0;
-    z-index: 999;
-}
-
 .batch-execution {
     margin-right: auto;
     position: relative;

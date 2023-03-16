@@ -53,4 +53,9 @@ export const MISA_ENUM = {
     HEIGHT_PAYMENT_DETAIL: 264, // Chiều cao phần detail trang phiếu chi
     MAX_LENGTH_ACCOUNTNUMBER: 20,
     MIN_LENGTH_ACCOUNTNUMBER: 3,
+    STATUS_SAVE_PAYMENT: {
+        SAVE: 0, // Cất - không thực hiện đóng form -> hiển thị dữ liệu người dùng vừa nhập, disable các trường nhập dữ liệu
+        SAVE_ADD: 1, // Cất và thêm
+        SAVE_CLOSE: 2, // Cất và đóng
+    },
 };

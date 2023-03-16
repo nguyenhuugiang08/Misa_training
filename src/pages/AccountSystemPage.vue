@@ -1,6 +1,5 @@
 <script setup>
 import MPagination from "../components/MPagination.vue";
-import MComboButton from "../components/MComboButton.vue";
 import MAccountForm from "../components/MAccountForm.vue";
 import MFeatureDetail from "../components/MFeatureDetail.vue";
 import MLoading from "../components/MLoading.vue";
@@ -11,6 +10,7 @@ import { useRouter, useRoute } from "vue-router";
 import { MISA_RESOURCE } from "../base/resource";
 import { MISA_ENUM } from "../base/enum";
 import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
+import MToast from "../components/MToast.vue";
 
 const isOpenForm = ref(false); // Trạng thái Đóng/Mở form
 const isExpandAll = ref(false); // Trạng thái Thu gọn/Mở rộng row
@@ -85,7 +85,7 @@ const toogleExpanded = () => {
  */
 const debounceSearch = async (value) => {
     try {
-        await getAccountsByFilter(value, pageSize.value, pageNumber.value);
+        await getAccountsByFilter(value, pageSize.value, 1);
     } catch (error) {
         console.log(error);
     }
@@ -162,19 +162,18 @@ const handleDoubleClickRow = async (event) => {
                     class="sidebar-item__icon content-wrapper__action-refresh refresh-icon"
                     @click="handleRefreshData"
                 ></div>
-                <m-combo-button
-                    default="Thêm"
-                    class="btn-curved"
-                    isCurved
-                    margin-top="8px"
-                    @clickBtn="
+                <button
+                    class="btn btn-primary btn-add-account"
+                    @click="
                         setIsForm();
                         setTitleForm(MISA_RESOURCE.FORM_TITLE.ADD_ACCOUNT);
                         setIdentityForm(MISA_ENUM.FORM_MODE.ADD);
                         handleSetStatusForm();
                         setEntitySelected({});
                     "
-                />
+                >
+                    Thêm
+                </button>
             </div>
             <DxTreeList
                 id="tasks"
@@ -210,6 +209,16 @@ const handleDoubleClickRow = async (event) => {
             <m-pagination path="/account-system" :func-filter="getAccountsByFilter" />
             <MAccountForm v-if="state.isForm" @closeForm="isOpenForm = false" />
             <div class="overlay" v-if="state.isLoading"><m-loading /></div>
+        </div>
+        <div class="toast-container">
+            <m-toast
+                v-if="state.listToast.length"
+                v-for="(toast, index) in state.listToast"
+                :key="index"
+                :toastMessage="toast.toastMessage"
+                :statusMessage="toast.statusMessage"
+                :status="toast.status"
+            />
         </div>
     </div>
 </template>
@@ -279,5 +288,11 @@ const handleDoubleClickRow = async (event) => {
 .dx-treelist-nodata {
     font-size: 13px;
     color: #111;
+}
+
+.btn-add-account {
+    position: relative;
+    top: 4px;
+    margin-left: 8px;
 }
 </style>

@@ -1,11 +1,12 @@
 <script setup>
 import { formatDate } from "../utilities/formatDate";
 import { formatMoney } from "../utilities/formatMoney";
-import { useEmployee } from "../composable/useEmployee";
 import { inject, ref } from "vue";
 import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
 import { MISA_ENUM } from "../base/enum";
 import { MISA_RESOURCE } from "../base/resource";
+import { usePayment } from "../composable/usePayment";
+import { useRouter } from "vue-router";
 
 // Định nghĩa các props nhận vào
 const props = defineProps({
@@ -14,12 +15,13 @@ const props = defineProps({
     hasCheckbox: Boolean,
 });
 
-const { getAnEmployee, editEmployee } = useEmployee();
+const { getPaymentById } = usePayment();
 
 const emit = defineEmits(["check", "displayWarning"]);
 const isShowList = ref(false); // Trạng thái ẩn hiện danh sách chức năng (Nhân bản, Xóa)
 const toDropList = ref(0); // Khoảng cách của danh sách chức năng so với top của cửa số trình duyệt
-const isOpen = ref(false); // Trạng thái popup thông báo chức năng chưa thi công
+
+const router = useRouter();
 
 const { state, setIsForm, setTitleForm, setEntitySelected, setIdentityForm } = inject("diy");
 
@@ -37,14 +39,10 @@ const handleCheckItem = (itemId) => {
  * @param {String} employeeId -- Id của nhân viên được chọn
  * Created by: NHGiang - (20/02/23)
  */
-const handleEditEmployee = async (employeeId) => {
+const handleEditPayment = async (PaymentId) => {
     try {
-        await getAnEmployee(employeeId);
-        setEntitySelected(editEmployee);
-        setTitleForm(MISA_RESOURCE.FORM_TITLE.EDIT);
-        setIsForm();
-        setIdentityForm(MISA_ENUM.FORM_MODE.EDIT);
-        handleSetStatusForm();
+        await getPaymentById(PaymentId);
+        router.push("/pay/pay-detail");
     } catch (error) {
         console.log(error);
     }
@@ -114,17 +112,17 @@ const handleClickOutside = () => {
 </script>
 
 <template>
-    <tr class="tbl-row" @dblclick="handleEditEmployee(entity.RefId)">
+    <tr class="tbl-row" @dblclick="handleEditPayment(entity.PaymentId)">
         <td class="tbl-col tbl-col__first" v-if="hasCheckbox">
             <input
                 type="checkbox"
                 class="tbl-checkbox"
-                :id="entity.RefId"
-                :value="entity.RefId"
-                :checked="listCheck.includes(entity.RefId)"
-                @change="handleCheckItem(entity.RefId)"
+                :id="entity.PaymentId"
+                :value="entity.PaymentId"
+                :checked="listCheck.includes(entity.PaymentId)"
+                @change="handleCheckItem(entity.PaymentId)"
             />
-            <label :for="entity.RefId" class="mask">
+            <label :for="entity.PaymentId" class="mask">
                 <div class="mask-icon"></div>
             </label>
         </td>
@@ -142,7 +140,7 @@ const handleClickOutside = () => {
         <td class="tbl-col">{{ entity.Address || "" }}</td>
         <td class="tbl-col tbl-col__last">
             <div class="tbl-col__action">
-                <label class="tbl-col__action-edit" @click="handleEditEmployee(entity.PaymentId)"
+                <label class="tbl-col__action-edit" @click="handleEditPayment(entity.PaymentId)"
                     >Xem</label
                 >
                 <label

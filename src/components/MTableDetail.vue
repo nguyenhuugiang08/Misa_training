@@ -1,12 +1,19 @@
 <script setup>
-import MPopUpWarning from "./MPopUpWarning.vue";
 import MRowDetail from "./MRowDetail.vue";
+import { ref, onMounted } from "vue";
 
 const props = defineProps({
     entities: Array,
     columns: Array,
     hasColumnDelete: Boolean,
     isEdit: Boolean,
+    editable: Boolean,
+});
+
+const refRowDetail = ref(null);
+const emit = defineEmits(["focusRowDetail"]);
+onMounted(() => {
+    emit("focusRowDetail", refRowDetail.value?.[0].handleFocus);
 });
 </script>
 
@@ -43,6 +50,8 @@ const props = defineProps({
                 :numerical-order="index"
                 :has-column-delete="hasColumnDelete"
                 :is-edit="isEdit"
+                :editable="editable"
+                ref="refRowDetail"
             />
             <tr class="tbl-row">
                 <th></th>

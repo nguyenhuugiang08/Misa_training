@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, watch } from "vue";
 
 // Định nghĩa các props nhận vào
 const props = defineProps({
@@ -25,6 +25,27 @@ const refInput = ref(null);
 
 // Định nghĩa các hàm emit ra ngoài
 const emit = defineEmits(["inputValue", "changeValue"]);
+
+onMounted(() => {
+    try {
+        if (props.value) {
+            emit("inputValue", props.value);
+        }
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+watch(
+    () => props.value,
+    (newValue) => {
+        try {
+            emit("inputValue", newValue);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
 
 /**
  * Xử lý gửi giá trị thay đổi của ô input ra ngoài

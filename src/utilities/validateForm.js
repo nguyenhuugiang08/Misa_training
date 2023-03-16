@@ -120,6 +120,7 @@ const useValidate = ({
     employeeSelectedIdentityNumber,
     listDepartments,
     account,
+    payment,
 }) => {
     try {
         if (employee) {

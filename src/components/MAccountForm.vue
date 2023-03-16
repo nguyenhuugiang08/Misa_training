@@ -7,7 +7,6 @@ import { ref, reactive, inject, onMounted, onUnmounted } from "vue";
 import { useAccount } from "../composable/useAccount";
 import { MISA_ENUM } from "../base/enum";
 import { error } from "../utilities/validateForm";
-import MToast from "../components/MToast.vue";
 import MPopUpInfo from "./MPopUpInfo.vue";
 import MPopUpError from "./MPopUpError.vue";
 import { useValidate } from "../utilities/validateForm";
@@ -99,6 +98,7 @@ const handleSubmit = async () => {
                 state.identityForm === MISA_ENUM.FORM_MODE.ADD ||
                 state.identityForm === MISA_ENUM.FORM_MODE.DUPLICATE
             ) {
+                accountRest.IsParent = false;
                 await addAccount(accountRest)
                     .then(async () => {
                         await getAccountsByFilter();
@@ -489,16 +489,6 @@ const handleSetReverseTabindex = (e) => {
                 <div class="form-resize__icon"></div>
             </div>
         </div>
-        <div class="toast-account">
-            <m-toast
-                v-if="state.listToast.length"
-                v-for="(toast, index) in state.listToast"
-                :key="index"
-                :toastMessage="toast.toastMessage"
-                :statusMessage="toast.statusMessage"
-                :status="toast.status"
-            />
-        </div>
         <div class="modal-error" v-if="isShowNote">
             <m-pop-up-info
                 :title="'Thông báo'"
@@ -513,6 +503,7 @@ const handleSetReverseTabindex = (e) => {
         </div>
         <div class="modal-error" v-if="isOpenError">
             <m-pop-up-error
+                v-if="isOpenError"
                 :title="'Lỗi'"
                 :text-error="
                     error.AccountName.textError ||

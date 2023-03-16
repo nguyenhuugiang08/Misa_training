@@ -81,7 +81,7 @@ const setListCheck = (e) => {
 const handleCheckAll = () => {
     try {
         // mảng danh sách ID của các nhân viên tại trang hiện tại
-        const currentListEmployees = state.payments.map((payment) => payment.RefId);
+        const currentListEmployees = state.payments.map((payment) => payment.PaymentId);
 
         /**
          * Kiểm tra trang thứ n đã được check all

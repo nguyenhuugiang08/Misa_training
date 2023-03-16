@@ -1,7 +1,7 @@
 <script setup>
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
-import { computed, ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { formatDate } from "../utilities/formatDate";
 import { MISA_RESOURCE } from "../base/resource";
 import { convertDatetime } from "../utilities/convertDatetime";
@@ -29,6 +29,16 @@ const isShowError = ref(false); // Trạng thái ẩn/hiện message lỗi
 
 // Định nghĩa các hàm emit lên component cha
 const emit = defineEmits(["dateField", "changeValue"]);
+
+onMounted(() => {
+    try {
+        if (props.value) {
+            emit("dateField", formatDate(date.value));
+        }
+    } catch (error) {
+        console.log(error);
+    }
+});
 
 /**
  * Khi thay đổi giá trị ô input

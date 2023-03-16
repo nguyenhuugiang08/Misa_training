@@ -71,7 +71,7 @@ const paymentApi = {
 
     /**
      * Hàm xóa nhiều nhân viên
-     * @param {*} paymentIds -- danh sách ID nhân viên cần xóa
+     * @param {*} paymentIds -- danh sách ID phiếu chi cần xóa
      * @returns response
      */
     deleteMultiplePayments: (paymentIds) => {
@@ -79,6 +79,32 @@ const paymentApi = {
             return axiosClient.delete(`${baseUrl}/deleteMultiple`, {
                 data: paymentIds,
             });
+        } catch (error) {
+            console.log(error);
+        }
+    },
+
+    /**
+     * Hàm lấy thông tin phiếu chi theo ID
+     * @param {*} paymentId -- ID của phiếu chi
+     * Created by: NHGiang - (16/03/23)
+     */
+    getPaymentById: (paymentId) => {
+        try {
+            return axiosClient.get(`${baseUrl}/${paymentId}`);
+        } catch (error) {
+            console.log(error);
+        }
+    },
+
+    /**
+     * Hàm thêm phiếu chi
+     * @param {*} payment -- thông tin phiếu chi
+     * @returns 
+     */
+    addPayment: (payment) => {
+        try {
+            return axiosClient.post(`${baseUrl}`, payment);
         } catch (error) {
             console.log(error);
         }

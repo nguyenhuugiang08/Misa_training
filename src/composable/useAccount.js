@@ -13,6 +13,7 @@ const {
     setlistAllEntities,
     setEntitySelected,
     setIsForm,
+    setListToast,
 } = diy;
 
 export const useAccount = () => {
@@ -39,16 +40,17 @@ export const useAccount = () => {
                         pageNumber
                     );
 
+                    const totalAccount = await accountApi.getAccounts();
                     const res = await accountApi.getChildrens();
                     const { Data, TotalRecord, TotalPage } = response;
                     accounts.value = [...Data];
 
-                    // lấy ra danh sách các AccountId
+                    // lấy ra danh sách các AccountId của tài khoản cha
                     let accountIds = accounts.value.map((account) => account.AccountId);
-                    // Lấy ra số tài khoản cha được tìm thấy tương ứng với các tài khoản cha
+                    // Lấy ra số tài khoản con được tìm thấy tương ứng với các tài khoản cha
                     let countRecords = 0;
 
-                    // Xử lý lấy ra những tài khoản con
+                    // Xử lý lấy ra những tài khoản con tương ứng với các tài khoản cha đang có tại trang hiện tại -> thêm vào danh sách tài khoản
                     res.forEach((child) => {
                         try {
                             if (accountIds.includes(child.ParentId)) {
@@ -71,9 +73,13 @@ export const useAccount = () => {
                         );
                         element.Type = MISA_RESOURCE.ACCOUNT_NATURE[indexType].optionName;
                     });
-                    totalRecord.value = countRecords
-                        ? TotalRecord + countRecords
-                        : state.listAllEntities.length;
+                    setlistAllEntities(totalAccount);
+
+                    if (state.keyword) {
+                        totalRecord.value = TotalRecord + countRecords;
+                    } else {
+                        totalRecord.value = state.listAllEntities.length;
+                    }
                     totalPage.value = TotalPage;
                     setEntities(accounts);
                     setTotalPage(totalPage);
@@ -115,6 +121,12 @@ export const useAccount = () => {
         const addAccount = async (account) => {
             try {
                 await accountApi.addAccount(account);
+                const toastMessage = {
+                    toastMessage: MISA_RESOURCE.TOAST.ADD_ACCOUNT_SUCCESS.TOAST_MESSAGE,
+                    statusMessage: MISA_RESOURCE.TOAST.ADD_ACCOUNT_SUCCESS.STATUS_MESSAGE,
+                    status: MISA_RESOURCE.TOAST.ADD_ACCOUNT_SUCCESS.STATUS,
+                };
+                setListToast(toastMessage);
                 setIsForm();
             } catch (error) {
                 console.log(error);
@@ -145,6 +157,12 @@ export const useAccount = () => {
             try {
                 await accountApi.editAccount(account, accountId);
                 setIsForm();
+                const toastMessage = {
+                    toastMessage: MISA_RESOURCE.TOAST.EDIT_ACCOUNT_SUCCESS.TOAST_MESSAGE,
+                    statusMessage: MISA_RESOURCE.TOAST.EDIT_ACCOUNT_SUCCESS.STATUS_MESSAGE,
+                    status: MISA_RESOURCE.TOAST.EDIT_ACCOUNT_SUCCESS.STATUS,
+                };
+                setListToast(toastMessage);
             } catch (error) {
                 console.log(error);
             }
@@ -159,6 +177,12 @@ export const useAccount = () => {
         const deleteAccountChild = async (accountId, parentId) => {
             try {
                 await accountApi.deleteAccountChild(accountId, parentId);
+                const toastMessage = {
+                    toastMessage: MISA_RESOURCE.TOAST.DELETE_ACCOUNT_SUCCESS.TOAST_MESSAGE,
+                    statusMessage: MISA_RESOURCE.TOAST.DELETE_ACCOUNT_SUCCESS.STATUS_MESSAGE,
+                    status: MISA_RESOURCE.TOAST.DELETE_ACCOUNT_SUCCESS.STATUS,
+                };
+                setListToast(toastMessage);
             } catch (error) {
                 console.log(error);
             }
@@ -172,6 +196,12 @@ export const useAccount = () => {
         const deleteAccount = async (accountId) => {
             try {
                 await accountApi.deleteAccount(accountId);
+                const toastMessage = {
+                    toastMessage: MISA_RESOURCE.TOAST.DELETE_ACCOUNT_SUCCESS.TOAST_MESSAGE,
+                    statusMessage: MISA_RESOURCE.TOAST.DELETE_ACCOUNT_SUCCESS.STATUS_MESSAGE,
+                    status: MISA_RESOURCE.TOAST.DELETE_ACCOUNT_SUCCESS.STATUS,
+                };
+                setListToast(toastMessage);
             } catch (error) {
                 console.log(error);
             }
