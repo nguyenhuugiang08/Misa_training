@@ -1,19 +1,21 @@
 <script setup>
-import { ref, inject, reactive, watch } from "vue";
+import { ref, inject, reactive, watch, onMounted } from "vue";
 import Mrow from "./MRow.vue";
 import MLoading from "../components/MLoading.vue";
 import MPopUpWarning from "./MPopUpWarning.vue";
-import { useEmployee } from "../composable/useEmployee";
 import { useRoute } from "vue-router";
+import { usePayment } from "../composable/usePayment";
+import { formatMoney } from "../utilities/formatMoney";
 
 const props = defineProps({
     columns: Array,
     hasCheckbox: Boolean,
     entities: { type: Array, default: [] },
     maxHeight: Number,
+    totalPayment: String,
 });
 
-const { handleDeleteEmployee } = useEmployee();
+const { deletePaymentById, getPaymentsByFilter } = usePayment();
 const { state, setListItemChecked, setListPageChecked, setTotalEmployee, setTotalPage } =
     inject("diy");
 
@@ -23,10 +25,10 @@ const isPopUp = reactive({
 
 const route = useRoute(); // Object route lấy từ vue-router
 const pageNumber = ref(1); // Trang thứ bao nhiêu
+const pageSize = ref(20); // Số bản ghi trên 1 trang
 const listPageChecked = ref([]); // Mảng chứa các số trang thứ bao nhiêu đã được check all
 const id = ref(null); // Id của nhân viên muốn xóa
 const code = ref(null); // Mã của nhân viên muôn xóa
-const isShowTooltip = ref(false); // Trạng thái Ẩn/Hiện của tooltip
 const listCheck = ref([]); // mảng chứa các ID của các nhân viên đã được check
 const listTemporary = ref([]); // mảng tạm lưu thông tin của các ID của các nhân viên đã được check trong trang
 
@@ -42,6 +44,17 @@ watch(
                 listTemporary.value = [];
             }
             pageNumber.value = Number(newValue);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
+
+watch(
+    () => route.query.pageSize,
+    (newValue) => {
+        try {
+            pageSize.value = newValue;
         } catch (error) {
             console.log(error);
         }
@@ -136,11 +149,8 @@ const handleShowWarning = (event) => {
  */
 const hanldeSubmitFormDelete = async (event) => {
     try {
-        emit("startDelete");
-        await handleDeleteEmployee(id.value);
-        setTotalEmployee(state.totalEmployee - 1);
-        setTotalPage(Math.ceil((state.totalEmployee - 1) / route.query.pageSize));
-        emit("endDelete", { event: event, id: id.value });
+        await deletePaymentById(id.value);
+        await getPaymentsByFilter(state.keyword, pageSize.value, pageNumber.value);
     } catch (err) {
         console.log(err);
     }
@@ -224,12 +234,22 @@ watch(
                 :has-checkbox="hasCheckbox"
                 :list-check="listCheck"
                 @check="setListCheck($event)"
+                @displayWarning="handleShowWarning($event)"
             />
+            <tr class="tbl-row">
+                <th class="row-last" style="z-index: 99"></th>
+                <th class="row-last" style="text-align: center">Tổng</th>
+                <th class="row-last" colspan="3"></th>
+                <th class="row-last tbl-col" style="text-align: right">
+                    {{ formatMoney(totalPayment) }}
+                </th>
+                <th class="row-last" colspan="4"></th>
+            </tr>
             <div class="modal-error" v-if="isPopUp.isOpenWarning">
                 <m-pop-up-warning
                     v-if="isPopUp.isOpenWarning"
                     :title="'Xác nhận xóa'"
-                    :text-info="`Bạn có thực sự muốn xóa nhân viên \<${code}\> không?`"
+                    :text-info="`Bạn có thực sự muốn xóa chứng từ \<${code}\> không?`"
                     @closeWarning="isPopUp.isOpenWarning = !isPopUp.isOpenWarning"
                     @closeForm="isPopUp.isOpenWarning = !isPopUp.isOpenWarning"
                     @submitForm="

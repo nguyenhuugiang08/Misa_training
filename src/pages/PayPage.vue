@@ -19,13 +19,34 @@ const pageSize = ref(20); // số bản ghi trên 1 trang
 const pageNumber = ref(1); // trang thứ bao nhiêu
 const isShowAction = ref(false); // trạng thái đóng mở action xóa hàng loạt
 const isShowPopupWarningDelete = ref(false); // trạng thái đóng mở popup cảnh báo khi thực hiện xóa hàng loạt
+const totalPayment = ref(0);
 
 const router = useRouter();
 const route = useRoute();
-const { getPaymentsByFilter, handlExportExcel, handleBulkDelete } = usePayment();
+router.push({ path: "/cash/pay", query: { pageSize: pageSize.value, pageNumber: 1 } });
+
+const { getPaymentsByFilter, handlExportExcel, handleBulkDelete, getPayments } = usePayment();
 getPaymentsByFilter();
+getPayments();
 
 const { state, setEntitySelected, setIdentityForm } = inject("diy");
+
+watch(
+    () => state.listAllEntities,
+    (newValue) => {
+        try {
+            totalPayment.value = newValue?.reduce((result, cur) => {
+                try {
+                    return (result += cur.TotalAmount);
+                } catch (error) {
+                    console.log(error);
+                }
+            }, 0);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
 
 const fakeDataDetail = [
     {
@@ -252,6 +273,7 @@ const handleClickOutsideButtonBulkDelete = () => {
                 hasCheckbox
                 :entities="state.payments"
                 :max-height="heightMaster"
+                :total-payment="totalPayment"
             />
             <m-pagination path="/cash/pay" :func-filter="getPaymentsByFilter" />
         </vue-resizable>

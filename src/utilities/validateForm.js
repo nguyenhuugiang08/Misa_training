@@ -51,6 +51,18 @@ const error = reactive({
         textError: "",
         status: false,
     },
+    RefNo: {
+        textError: "",
+        status: false,
+    },
+    PostedDate: {
+        textError: "",
+        status: false,
+    },
+    RefDate: {
+        textError: "",
+        status: false,
+    },
     status: false,
 });
 
@@ -356,6 +368,33 @@ const useValidate = ({
             }
         }
 
+        if (payment) {
+            // Validate số phiếu chi
+            if (!payment.RefNo) {
+                setError("RefNo", "blank");
+            } else {
+                setDataValid("RefNo");
+            }
+
+            // Validate ngày phiếu chi
+            if (!payment.RefDate) {
+                setError("RefDate", "blank");
+            } else {
+                setDataValid("RefDate");
+            }
+
+            // Validate ngày hạch toán
+            if (!payment.PostedDate) {
+                setError("PostedDate", "blank");
+            } else {
+                if (payment.PostedDate < payment.RefDate) {
+                    setError("PostedDate", "under");
+                } else {
+                    setDataValid("PostedDate");
+                }
+            }
+        }
+
         error.status =
             error.EmployeeCode.status ||
             error.FullName.status ||
@@ -366,6 +405,10 @@ const useValidate = ({
             error.Email.status ||
             error.DepartmentId.status ||
             error.IdentityNumber.status ||
+            error.AccountName.status ||
+            error.PostedDate.status ||
+            error.RefDate.status ||
+            error.RefNo.status ||
             error.AccountNumber.status;
 
         return error.status;

@@ -53,7 +53,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="modal-confirm">
+    <div class="modal-confirm" v-if="textError">
         <div class="modal-confirm__title">{{ title }}</div>
         <div class="modal-confirm__close-btn modal__close-btn">
             <div

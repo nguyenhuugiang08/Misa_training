@@ -1,6 +1,8 @@
 import paymentApi from "../api/paymentApi";
 import diy from "../store/diy";
 import { MISA_RESOURCE } from "../base/resource";
+import { convertDatetime } from "../utilities/convertDatetime";
+import { formatDate } from "../utilities/formatDate";
 
 const {
     setPayments,
@@ -11,6 +13,7 @@ const {
     setListItemChecked,
     setListToast,
     setEntitySelected,
+    setlistAllEntities,
 } = diy;
 
 export const usePayment = () => {
@@ -22,6 +25,7 @@ export const usePayment = () => {
         const getPayments = async () => {
             try {
                 const response = await paymentApi.getPayments();
+                setlistAllEntities(response);
             } catch (error) {
                 console.log(error);
             }
@@ -122,11 +126,35 @@ export const usePayment = () => {
          */
         const addPayment = async (payment) => {
             try {
+                // payment.RefDate = new Date(convertDatetime(formatDate(payment.RefDate), true));
+                // payment.PostedDate = new Date(
+                //     convertDatetime(formatDate(payment.PostedDate), true)
+                // );
                 await paymentApi.addPayment(payment);
                 const toastMessage = {
                     toastMessage: MISA_RESOURCE.TOAST.ADD_PAYMENT_SUCCESS.TOAST_MESSAGE,
                     statusMessage: MISA_RESOURCE.TOAST.ADD_PAYMENT_SUCCESS.STATUS_MESSAGE,
                     status: MISA_RESOURCE.TOAST.ADD_PAYMENT_SUCCESS.STATUS,
+                };
+                setListToast(toastMessage);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        /**
+         * Hàm xóa phiếu chi theo ID
+         * @param {*} paymentId
+         * @returns
+         * Created by: NHGiang - (18/03/23)
+         */
+        const deletePaymentById = async (paymentId) => {
+            try {
+                await paymentApi.deletePaymentById(paymentId);
+                const toastMessage = {
+                    toastMessage: MISA_RESOURCE.TOAST.DELETE_PAYMENT_SUCCESS.TOAST_MESSAGE,
+                    statusMessage: MISA_RESOURCE.TOAST.DELETE_PAYMENT_SUCCESS.STATUS_MESSAGE,
+                    status: MISA_RESOURCE.TOAST.DELETE_PAYMENT_SUCCESS.STATUS,
                 };
                 setListToast(toastMessage);
             } catch (error) {
@@ -141,6 +169,7 @@ export const usePayment = () => {
             handleBulkDelete,
             getPaymentById,
             addPayment,
+            deletePaymentById,
         };
     } catch (error) {
         console.log(error);

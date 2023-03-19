@@ -1,20 +1,29 @@
 <script setup>
 import MRowDetail from "./MRowDetail.vue";
-import { ref, onMounted } from "vue";
+import { ref, defineExpose } from "vue";
 
 const props = defineProps({
-    entities: Array,
+    entities: { type: Array, default: [] },
     columns: Array,
     hasColumnDelete: Boolean,
     isEdit: Boolean,
-    editable: Boolean,
+    reason: String,
 });
 
 const refRowDetail = ref(null);
+const editable = ref(false);
 const emit = defineEmits(["focusRowDetail"]);
-onMounted(() => {
-    emit("focusRowDetail", refRowDetail.value?.[0].handleFocus);
-});
+
+const focusTableDetail = () => {
+    try {
+        editable.value = true;
+        refRowDetail.value?.[0].handleFocus();
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+defineExpose({ focusTableDetail });
 </script>
 
 <template>
@@ -51,6 +60,8 @@ onMounted(() => {
                 :has-column-delete="hasColumnDelete"
                 :is-edit="isEdit"
                 :editable="editable"
+                :reason="reason"
+                tabindex="0"
                 ref="refRowDetail"
             />
             <tr class="tbl-row">

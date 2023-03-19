@@ -20,11 +20,13 @@ const newExpandedRowKeys = ref([]);
 const allowedPageSizes = [10, 20, 30, 50, 100];
 const pageSize = ref(20);
 const pageNumber = ref(1);
+const rowIndex = ref(null);
 
 const router = useRouter();
 const route = useRoute();
 
-const { state, setIsForm, setTitleForm, setIdentityForm, setEntitySelected } = inject("diy");
+const { state, setIsForm, setTitleForm, setIdentityForm, setEntitySelected, setParentId } =
+    inject("diy");
 
 const { getAccountsByFilter, getAccountById } = useAccount();
 getAccountsByFilter();
@@ -119,6 +121,20 @@ const handleDoubleClickRow = async (event) => {
         console.log(error);
     }
 };
+
+/**
+ * Hàm xử lý khi click vào 1 dòng
+ * @param {} event
+ * Created by: NHGiang - (17/03/23)
+ */
+const handleClickRow = async (event) => {
+    try {
+        setParentId(event.data.AccountId); 
+        event.rowElement.classList.add("row-selected");
+    } catch (error) {
+        console.log(error);
+    }
+};
 </script>
 
 <template>
@@ -186,6 +202,8 @@ const handleDoubleClickRow = async (event) => {
                 parent-id-expr="ParentId"
                 no-data-text="Không có dữ liệu"
                 @cellDblClick="handleDoubleClickRow"
+                @rowClick="handleClickRow"
+                @rowPrepared="rowIndex && hanlde"
             >
                 <DxScrolling mode="standard" />
                 <DxPaging :enabled="false" :page-size="10" />
@@ -294,5 +312,17 @@ const handleDoubleClickRow = async (event) => {
     position: relative;
     top: 4px;
     margin-left: 8px;
+}
+
+.dx-row:hover {
+    background-color: var(--table-bg-color-hover);
+}
+
+.row-selected {
+    background-color: var(--table-bg-color);
+}
+
+.dx-treelist .dx-header-row {
+    background-color: #e5e8ec;
 }
 </style>

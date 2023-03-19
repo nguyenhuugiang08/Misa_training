@@ -1,3 +1,4 @@
+import { MISA_RESOURCE } from "../base/resource";
 import { reactive, readonly } from "vue";
 import { MISA_ENUM } from "../base/enum";
 
@@ -19,6 +20,8 @@ const state = reactive({
     objects: [],
     employees: [],
     payments: [],
+    parentId: MISA_RESOURCE.GUID_EMPTY,
+    objectSelected: {},
 });
 
 /**
@@ -245,6 +248,31 @@ const setPayments = (payments) => {
     }
 };
 
+/**
+ * Hàm lấy ra tài khoản tổng hợp khi click vào 1 dòng trene bảng hệ thống tài khoản
+ * @param {} parentId
+ * Created by: NHGiang - (17/03/23)
+ */
+const setParentId = (parentId) => {
+    try {
+        state.parentId = parentId;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm lấy ra đối tượng
+ * @param {*} obj
+ */
+const setObjectSelected = (obj) => {
+    try {
+        state.objectSelected = { ...obj };
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 export default {
     state: readonly(state),
     setIsSidebar,
@@ -265,4 +293,6 @@ export default {
     setObjects,
     setEmployees,
     setPayments,
+    setParentId,
+    setObjectSelected,
 };

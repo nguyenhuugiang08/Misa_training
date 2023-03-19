@@ -2,7 +2,9 @@
 import MInput from "./MInput.vue";
 import MCheckbox from "./MCheckbox.vue";
 import MInputMoney from "./MInputMoney.vue";
-import { ref, reactive } from "vue";
+import { ref, reactive, inject, watch } from "vue";
+import { MISA_RESOURCE } from "../base/resource";
+import { useAccount } from "../composable/useAccount";
 
 const props = defineProps({
     numericalOrder: Number,
@@ -10,7 +12,12 @@ const props = defineProps({
     hasColumnDelete: Boolean,
     isEdit: Boolean,
     editable: Boolean,
+    reason: String,
 });
+
+const { state } = inject("diy");
+const { getAccounts } = useAccount();
+getAccounts();
 
 const isEditable = ref(props.editable);
 const isSelectRow = ref(false);
@@ -18,7 +25,8 @@ const refRowDetail = ref(null);
 const paymentDetail = reactive({
     PaymentId: "",
     ObjectId: "",
-    ObjectName: "",
+    ObjectCode: state.objectSelected?.optionCode || "",
+    ObjectName: state.objectSelected?.optionName || "",
     Amount: "",
     DebitAccount: "",
     CreditAccount: "",
@@ -40,12 +48,32 @@ const handle = () => {
 const handleFocus = () => {
     try {
         if (refRowDetail.value) {
-            refRowDetail.value.focus();
+            isEditable.value = true;
+            refRowDetail.value.handleFocusInput();
         }
     } catch (error) {
         console.log(error);
     }
 };
+
+watch(
+    () => state.objectSelected,
+    (newValue) => {
+        try {
+            paymentDetail.ObjectId = newValue.optionId;
+            paymentDetail.ObjectName = newValue.optionName;
+            paymentDetail.ObjectCode = newValue.optionCode;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
+watch(
+    () => props.reason,
+    (newValue) => {
+        paymentDetail.Description = newValue;
+    }
+);
 
 defineExpose({ handleFocus });
 </script>
@@ -59,18 +87,18 @@ defineExpose({ handleFocus });
         "
         v-click-outside-element="handle"
         :style="{ background: isSelectRow ? 'var(--table-bg-color)' : '#fff' }"
-        ref="refRowDetail"
     >
         <td class="tbl-col tbl-col__first">
             <span class="tbl-detail-text">{{ numericalOrder + 1 || "" }}</span>
         </td>
         <td class="tbl-col">
-            <span class="tbl-detail-text" v-show="isEdit && isEditable">
+            <span class="tbl-detail-text" v-if="isEdit && isEditable">
                 <m-input
+                    ref="refRowDetail"
                     width="500px"
                     bottom="2px"
                     :value="
-                        paymentDetail.Description
+                        reason
                             ? paymentDetail.Description
                             : `Chi tiền cho ${paymentDetail.ObjectName}`
                     "
@@ -85,35 +113,66 @@ defineExpose({ handleFocus });
         </td>
         <td class="tbl-col">
             <span class="tbl-detail-text">
-                <div class="checkbox-wrapper" v-show="isEdit && isEditable">
-                    <m-checkbox width="130px" bottom="2px" />
+                <div class="checkbox-wrapper" v-if="isEdit && isEditable">
+                    <m-checkbox
+                        v-if="state.listAllEntities.length"
+                        width="130px"
+                        bottom="2px"
+                        :default="paymentDetail.DebitAccount"
+                        :options="state.listAllEntities"
+                        :isTable="true"
+                        :columns="MISA_RESOURCE.COLUMNS_NAME_COMBOBOX_ACCOUNT"
+                        @select="paymentDetail.DebitAccount = $event.optionId"
+                    />
                 </div>
             </span>
         </td>
         <td class="tbl-col">
             <span class="tbl-detail-text">
-                <div class="checkbox-wrapper" v-show="isEdit && isEditable">
-                    <m-checkbox width="130px" bottom="2px" />
+                <div class="checkbox-wrapper" v-if="isEdit && isEditable">
+                    <m-checkbox
+                        v-if="state.listAllEntities.length"
+                        width="130px"
+                        bottom="2px"
+                        :default="paymentDetail.CreditAccount"
+                        :options="state.listAllEntities"
+                        :isTable="true"
+                        :columns="MISA_RESOURCE.COLUMNS_NAME_COMBOBOX_ACCOUNT"
+                        @select="paymentDetail.CreditAccount = $event.optionId"
+                    />
                 </div>
             </span>
         </td>
         <td class="tbl-col tbl-align-right">
             <span class="tbl-detail-text">
-                <m-input-money v-show="isEdit && isEditable" width="130px" bottom="2px" />
+                <m-input-money v-if="isEdit && isEditable" width="130px" bottom="2px" />
             </span>
         </td>
         <td class="tbl-col">
             <span class="tbl-detail-text">
-                <div class="checkbox-wrapper" v-show="isEdit && isEditable">
-                    <m-checkbox width="130px" bottom="2px" />
+                <div class="checkbox-wrapper" v-if="isEdit && isEditable">
+                    <m-checkbox
+                        width="130px"
+                        bottom="2px"
+                        :columns="MISA_RESOURCE.COLUMNS_NAME_COMBOBOX_OBJECT"
+                        :default="state.objectSelected.optionId || paymentDetail.ObjectId"
+                        :options="state.objects"
+                        :isTable="true"
+                        @select="
+                            paymentDetail.ObjectId = $event.optionId;
+                            paymentDetail.ObjectCode = $event.optionCode;
+                            paymentDetail.ObjectName = $event.optionName;
+                        "
+                    />
                 </div>
+                <span v-if="isEdit && !isEditable">{{ paymentDetail.ObjectCode }}</span>
             </span>
         </td>
         <td class="tbl-col">
-            <span class="tbl-detail-text">{{ entity.SubjectName || "" }}</span>
+            <span class="tbl-detail-text">{{ paymentDetail.ObjectName }}</span>
         </td>
         <td
-            v-show="hasColumnDelete"
+            v-if="hasColumnDelete"
             class="tbl-col tbl-col-delete tbl-col__last"
             style="width: 34px; min-width: 34px"
         >

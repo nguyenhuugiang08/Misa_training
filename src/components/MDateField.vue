@@ -1,7 +1,7 @@
 <script setup>
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch, inject } from "vue";
 import { formatDate } from "../utilities/formatDate";
 import { MISA_RESOURCE } from "../base/resource";
 import { convertDatetime } from "../utilities/convertDatetime";
@@ -13,15 +13,19 @@ const props = defineProps({
     required: { type: Boolean, default: false },
     width: String,
     marginRight: String,
-    value: String,
+    value: String || Date,
     status: Boolean,
     statusPublic: Boolean,
     textError: String,
     type: { type: String, default: "text" },
     bottom: String,
+    disable: Boolean,
+    id: String,
 });
 
-const date = ref(convertDatetime(props.value)); // Giá trị ngày tháng được hiển thị
+const { state } = inject("diy");
+
+const date = ref(props.value); // Giá trị ngày tháng được hiển thị
 const isFocus = ref(false); // Trạng focus của ô input
 const datepicker = ref(null); // Tham chiếu đến component DatePicker
 const isOpenDatepicker = ref(false); // Trạng thái Đóng /Mở của date picker
@@ -30,41 +34,88 @@ const isShowError = ref(false); // Trạng thái ẩn/hiện message lỗi
 // Định nghĩa các hàm emit lên component cha
 const emit = defineEmits(["dateField", "changeValue"]);
 
-onMounted(() => {
-    try {
-        if (props.value) {
-            emit("dateField", formatDate(date.value));
-        }
-    } catch (error) {
-        console.log(error);
-    }
-});
+watch(
+    () => props.value,
+    (newValue) => {
+        try {
+            if (props.value) {
+                emit("dateField", newValue);
 
-/**
- * Khi thay đổi giá trị ô input
- * - Kiểm tra nếu ngày tháng nhập vào hợp lệ -> gán lại giá trị biến date -> hiển thị lên giao diện
- * - Kiểm tra nếu ngày tháng nhập vào không hợp lệ -> gán lại giá trị biến date là ngày hiện tại -> hiển thị lên giao diện
- * @param {*} value -- Giá trị ô input
- * Created by: NHGiang - (20/02/23)
- */
-const handleEmitInputValue = (value) => {
-    try {
-        if (value.length === 10) {
-            if (handleCheckFormat(MISA_RESOURCE.REGEX.DATE, value)) {
-                date.value = convertDatetime(value);
-            } else {
-                date.value = convertDatetime(formatDate(new Date()));
+                date.value = newValue;
             }
-            emit("dateField", value);
+        } catch (error) {
+            console.log(error);
         }
-
-        if (value.length === 0) {
-            datepicker.value.clearValue();
-        }
-    } catch (error) {
-        console.log(error);
     }
+);
+
+watch(
+    () => state.today,
+    (newValue) => {
+        try {
+            emit("dateField", newValue);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
+
+const checkValue = (str, max) => {
+    if (str.charAt(0) !== "0" || str == "00") {
+        var num = parseInt(str);
+        if (isNaN(num) || num <= 0 || num > max) num = 1;
+        str =
+            num > parseInt(max.toString().charAt(0)) && num.toString().length == 1
+                ? "0" + num
+                : num.toString();
+    }
+    return str;
 };
+
+onMounted(() => {
+    const dateInput = document.getElementById(props.id);
+
+    /**
+     * Khi thay đổi giá trị ô input
+     * - Kiểm tra nếu ngày tháng nhập vào hợp lệ -> gán lại giá trị biến date -> hiển thị lên giao diện
+     * - Kiểm tra nếu ngày tháng nhập vào không hợp lệ -> gán lại giá trị biến date là ngày hiện tại -> hiển thị lên giao diện
+     * @param {*} value -- Giá trị ô input
+     * Created by: NHGiang - (20/02/23)
+     */
+    dateInput.addEventListener("input", function (e) {
+        if (e.inputType !== "deleteContentBackward") {
+            var input = this.value;
+            if (/\D\/$/.test(input)) input = input.substr(0, input.length - 3);
+            var values = input.split("/").map(function (v) {
+                return v.replace(/\D/g, "");
+            });
+            if (values[0]) values[0] = checkValue(values[0], 31);
+            if (values[1]) values[1] = checkValue(values[1], 12);
+            var output = values.map(function (v, i) {
+                return v.length == 2 && i < 2 ? v + "/" : v;
+            });
+
+            this.value = output.join("").substr(0, 10);
+
+            if (this.value.length === 10) {
+                if (handleCheckFormat(MISA_RESOURCE.REGEX.DATE, this.value)) {
+                    date.value = new Date(convertDatetime(this.value));
+                } else {
+                    date.value = new Date();
+                }
+                emit("dateField", date.value);
+            }
+
+            if (this.value.length === 0) {
+                datepicker.value.clearValue();
+            }
+        } else {
+            if (this.value.length === 0) {
+                datepicker.value.clearValue();
+            }
+        }
+    });
+});
 
 /**
  * Xử lý logic liên quan datepicker
@@ -72,7 +123,7 @@ const handleEmitInputValue = (value) => {
  */
 const handleDatepicker = () => {
     try {
-        if (datepicker) {
+        if (datepicker && !props.disable) {
             isOpenDatepicker.value = !isOpenDatepicker.value;
             if (!isOpenDatepicker.value) {
                 datepicker.value.openMenu();
@@ -85,15 +136,15 @@ const handleDatepicker = () => {
     }
 };
 
-/**
- * Theo dõi giá trị biến date -> emit giá trị ra ngoài
- * Created by: NHGiang
- */
+// /**
+//  * Theo dõi giá trị biến date -> emit giá trị ra ngoài
+//  * Created by: NHGiang
+//  */
 watch(
     () => date.value,
     (newValue) => {
         try {
-            emit("dateField", formatDate(newValue));
+            emit("dateField", newValue);
         } catch (error) {
             console.log(error);
         }
@@ -106,7 +157,9 @@ watch(
  */
 const handleClearValue = () => {
     try {
-        datepicker.value.clearValue();
+        if (!props.disable) {
+            datepicker.value.clearValue();
+        }
     } catch (error) {
         console.log(error);
     }
@@ -124,13 +177,14 @@ const handleClearValue = () => {
             show-now-button=""
             locale="vi"
             :day-names="['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']"
+            :disabled="disable"
         >
             <template #dp-input="{ value }">
                 <label for="" class="textfield__label modal-label">
                     {{ fieldText }}
                     <label
-                        v-if="!value"
                         class="modal-icon textfield__icon datepicker__wrapper"
+                        :class="{ datepicker_disable: disable }"
                         @click.self="handleDatepicker"
                         :style="{
                             borderColor: `${
@@ -144,27 +198,13 @@ const handleClearValue = () => {
                     >
                         <div class="datepicker__wrapper-icon"></div>
                     </label>
-                    <label
-                        v-if="value"
-                        class="modal-icon textfield__icon datepicker__wrapper"
-                        @click="handleClearValue"
-                        :style="{
-                            borderColor: `${
-                                status
-                                    ? 'var(--error-color)'
-                                    : isFocus
-                                    ? 'var(--primary-color)'
-                                    : ''
-                            }`,
-                        }"
-                    >
-                        <div class="datepicker__wrapper-icon-close"></div>
-                    </label>
                 </label>
                 <input
+                    :id="id"
                     :type="type"
+                    :disabled="disable"
                     class="textfield__input"
-                    :class="status ? 'textfield--error-input' : ''"
+                    :class="{ 'textfield--error-input': status, 'textfield-readonly': disable }"
                     :style="{
                         minWidth: width,
                         width: width,
@@ -173,15 +213,15 @@ const handleClearValue = () => {
                     }"
                     placeholder="DD/MM/YYYY"
                     :value="value"
-                    @input="handleEmitInputValue($event.target.value)"
+                    @blur="isFocus = false"
                     @focus="
                         isFocus = status ? false : true;
                         emit('changeValue', true);
                     "
-                    @blur="isFocus = false"
                     @mouseover="isShowError = true"
                     @mouseleave="isShowError = false"
                     @keydown.tab="datepicker.closeMenu()"
+                    :autocomplete="true"
                 />
             </template>
             <template #month="{ text }">
@@ -260,5 +300,15 @@ const handleClearValue = () => {
     justify-content: center;
     align-items: center;
     cursor: pointer;
+}
+
+.datepicker_disable {
+    background-color: #eff0f2 !important;
+    border: 1px solid #babec5 !important;
+    border-left: unset !important;
+}
+
+.datepicker_disable:hover {
+    background-color: #e0e0e0 !important;
 }
 </style>

@@ -19,8 +19,6 @@ const {
 export const useAccount = () => {
     try {
         const accounts = ref([]);
-        const totalPage = ref(1);
-        const totalRecord = ref(0);
 
         /**
          * Hàm lấy danh sách tài khoản theo bộ lọc và phân trang
@@ -40,7 +38,7 @@ export const useAccount = () => {
                         pageNumber
                     );
 
-                    const totalAccount = await accountApi.getAccounts();
+                    const allAccounts = await accountApi.getAccounts();
                     const res = await accountApi.getChildrens();
                     const { Data, TotalRecord, TotalPage } = response;
                     accounts.value = [...Data];
@@ -73,17 +71,22 @@ export const useAccount = () => {
                         );
                         element.Type = MISA_RESOURCE.ACCOUNT_NATURE[indexType].optionName;
                     });
-                    setlistAllEntities(totalAccount);
 
                     if (state.keyword) {
-                        totalRecord.value = TotalRecord + countRecords;
+                        setTotalEntities(TotalRecord + countRecords);
                     } else {
-                        totalRecord.value = state.listAllEntities.length;
+                        const Options = allAccounts.map((account) => {
+                            return {
+                                optionId: account.AccountId,
+                                optionName: account.AccountNumber,
+                                optionDes: account.AccountName,
+                                optionGrade: account.Grade,
+                            };
+                        });
+                        setTotalEntities(Options.length);
                     }
-                    totalPage.value = TotalPage;
                     setEntities(accounts);
-                    setTotalPage(totalPage);
-                    setTotalEntities(totalRecord);
+                    setTotalPage(TotalPage);
                     setIsLoading();
                 }, 500);
             } catch (error) {
@@ -222,8 +225,6 @@ export const useAccount = () => {
 
         return {
             accounts,
-            totalRecord,
-            totalPage,
             getAccountsByFilter,
             getAccounts,
             addAccount,

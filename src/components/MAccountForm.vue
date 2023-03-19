@@ -23,8 +23,9 @@ const refAccountNumber = ref(null); // ref của ô input số tài khoản
 const isShowNote = ref(false); // Trạng thái Đóng Mở thông báo dữ liệu form đã thay
 const isShowTrackDetail = ref(true); // Trạng thái Đóng/Mở của theo dõi chi tiết
 const isResize = ref(false); // Trạng thái Mở rộng/ Thu gọn
+
 const account = reactive({
-    ParentId: state.entitySelected?.ParentId || "00000000-0000-0000-0000-000000000000",
+    ParentId: state.entitySelected?.ParentId || state.parentId,
     AccountNumber: state.entitySelected?.AccountNumber || "",
     AccountName: state.entitySelected?.AccountName || "",
     EnglishName: state.entitySelected?.EnglishName || "",
@@ -91,6 +92,7 @@ const handleSubmit = async () => {
     try {
         const status = useValidate({ account });
         const { TypeName, ...accountRest } = account;
+        console.log(isOpenError.value);
 
         if (!status) {
             // xử lý thêm tài khoản
@@ -366,13 +368,14 @@ const handleSetReverseTabindex = (e) => {
                 <div class="row">
                     <div class="checkbox-wrapper" style="width: 25%; margin-right: 8px">
                         <m-checkbox
+                            v-if="state.listAllEntities.length"
                             text-label="Tài khoản tổng hợp"
                             width="100%"
                             bottom="12px"
+                            :default="account.ParentId"
                             :options="state.listAllEntities"
                             :isTable="true"
                             :columns="MISA_RESOURCE.COLUMNS_NAME_COMBOBOX_ACCOUNT"
-                            :default="account.ParentId"
                             @select="
                                 account.ParentId = $event.optionId;
                                 account.Grade = $event.optionGrade + 1;
@@ -503,7 +506,6 @@ const handleSetReverseTabindex = (e) => {
         </div>
         <div class="modal-error" v-if="isOpenError">
             <m-pop-up-error
-                v-if="isOpenError"
                 :title="'Lỗi'"
                 :text-error="
                     error.AccountName.textError ||

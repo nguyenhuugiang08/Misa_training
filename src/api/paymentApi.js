@@ -100,11 +100,25 @@ const paymentApi = {
     /**
      * Hàm thêm phiếu chi
      * @param {*} payment -- thông tin phiếu chi
-     * @returns 
+     * @returns
      */
     addPayment: (payment) => {
         try {
             return axiosClient.post(`${baseUrl}`, payment);
+        } catch (error) {
+            console.log(error);
+        }
+    },
+
+    /**
+     * Hàm xóa phiếu chi theo ID
+     * @param {*} paymentId
+     * @returns
+     * Created by: NHGiang - (18/03/23)
+     */
+    deletePaymentById: (paymentId) => {
+        try {
+            return axiosClient.delete(`${baseUrl}/${paymentId}`);
         } catch (error) {
             console.log(error);
         }

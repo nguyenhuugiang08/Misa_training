@@ -54,6 +54,16 @@ export const MISA_RESOURCE = {
         blank: "Tính chất không được để trống.",
         notFound: "Dữ liệu <Tính chất> không có trong danh mục.",
     },
+    RefNoText: {
+        blank: "Số phiếu chi không được để trống.",
+    },
+    PostedDateText: {
+        blank: "Ngày hạch toán không được để trống.",
+        under: "Ngày hạch toán phải lớn hơn hoặc bằng Ngày chứng từ. Xin vui lòng kiểm tra lại.",
+    },
+    RefDateText: {
+        blank: "Ngày phiếu chi không được để trống.",
+    },
     FORM_TITLE: {
         ADD: "Thêm nhân viên", // tiêu đề form thêm
         EDIT: "Sửa thông tin nhân viên", // tiêu đề form sửa
@@ -553,6 +563,8 @@ export const MISA_RESOURCE = {
             text: 'Bạn có muốn thiết lập trạng thái "Sử dụng" cho tất cả Tài khoản con không?',
         },
     },
+    GUID_EMPTY: "00000000-0000-0000-0000-000000000000",
+    REASON_PAYMENT_DEFAULT: "Chi tiền cho ",
 };
 
 export const ACCOUNT_TRACK = [

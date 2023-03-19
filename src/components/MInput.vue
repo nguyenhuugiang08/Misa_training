@@ -18,6 +18,8 @@ const props = defineProps({
     bottom: String,
     fullWidth: Boolean,
     placeHolderAlign: String,
+    onlyNumber: Boolean,
+    disable: Boolean,
 });
 
 // biến giúp tham chiếu đến element Input trong DOM
@@ -65,7 +67,7 @@ const handleEmitInputValue = (value) => {
  * Xử lý focus ô input
  * created by: NHGiang
  */
-const handleFocus = () => {
+const handleFocusInput = () => {
     try {
         if (refInput.value) {
             refInput.value.focus();
@@ -75,7 +77,27 @@ const handleFocus = () => {
     }
 };
 
-defineExpose({ handleFocus });
+/**
+ * Xử lý chỉ cho nhập số
+ * CreatedBy: NHGiang
+ */
+const handleCheckIsNumber = (evt) => {
+    try {
+        if (props.onlyNumber) {
+            evt = evt ? evt : window.event;
+            var charCode = evt.which ? evt.which : evt.keyCode;
+            if (charCode > 31 && (charCode < 48 || charCode > 57) && charCode !== 46) {
+                evt.preventDefault();
+            } else {
+                return true;
+            }
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+defineExpose({ handleFocusInput });
 </script>
 
 <template>
@@ -86,7 +108,7 @@ defineExpose({ handleFocus });
         <input
             :type="type"
             class="textfield__input"
-            :class="status ? 'textfield--error-input' : ''"
+            :class="{ 'textfield--error-input': status, 'textfield-readonly': disable }"
             :style="{
                 minWidth: width,
                 width: width,
@@ -96,8 +118,10 @@ defineExpose({ handleFocus });
             }"
             :value="value"
             @input="handleEmitInputValue($event.target.value)"
+            @keydown="handleCheckIsNumber($event)"
             :placeHolder="placeHolder"
             ref="refInput"
+            :disabled="disable"
         />
         <div class="textfield-tooltip" v-if="tooltip">
             <span>{{ tooltip }}</span>

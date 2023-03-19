@@ -23,7 +23,7 @@
 .textfield .textfield__input {
     height: 26px;
     padding: 0 10px;
-    line-height: 28px;
+    line-height: 18px;
     outline: none;
     border-radius: 2px;
     border: 1px solid var(--border-color);
@@ -329,6 +329,7 @@
 
 .textfield-readonly {
     background-color: #eff0f2 !important;
+    border: 1px solid #babec5 !important;
 }
 
 @keyframes identifier {

@@ -4,7 +4,6 @@ import { formatMoney } from "../utilities/formatMoney";
 import { inject, ref } from "vue";
 import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
 import { MISA_ENUM } from "../base/enum";
-import { MISA_RESOURCE } from "../base/resource";
 import { usePayment } from "../composable/usePayment";
 import { useRouter } from "vue-router";
 
@@ -39,10 +38,11 @@ const handleCheckItem = (itemId) => {
  * @param {String} employeeId -- Id của nhân viên được chọn
  * Created by: NHGiang - (20/02/23)
  */
-const handleEditPayment = async (PaymentId) => {
+const handleEditPayment = async (paymentId) => {
     try {
-        await getPaymentById(PaymentId);
+        await getPaymentById(paymentId);
         router.push("/pay/pay-detail");
+        setIdentityForm(MISA_ENUM.FORM_MODE.EDIT);
     } catch (error) {
         console.log(error);
     }
@@ -53,14 +53,10 @@ const handleEditPayment = async (PaymentId) => {
  * @param {String} employeeId -- Id của nhân viên được chọn
  * Created by: NHGiang - (20/02/23)
  */
-const handleDuplicateEmployee = async (employeeId) => {
+const handleDuplicateEmployee = async (paymentId) => {
     try {
-        await getAnEmployee(employeeId);
-        setEntitySelected({ ...editEmployee.value, EmployeeCode: "" });
-        setTitleForm(MISA_RESOURCE.FORM_TITLE.DUPLICATE);
-        setIsForm();
-        setIdentityForm(MISA_ENUM.FORM_MODE.DUPLICATE);
-        handleSetStatusForm();
+        await getPaymentById(paymentId);
+        router.push("/pay/pay-detail");
     } catch (error) {
         console.log(error);
     }
@@ -170,7 +166,7 @@ const handleClickOutside = () => {
                 class="tbl-col__action-item"
                 @click="
                     isShowList = false;
-                    handleDuplicateEmployee(employee.EmployeeId);
+                    handleDuplicateEmployee(entity.PaymentId);
                 "
             >
                 Nhân bản
@@ -179,8 +175,8 @@ const handleClickOutside = () => {
                 class="tbl-col__action-item"
                 @click="
                     handleDisplayPopUpWarning({
-                        id: employee.EmployeeId,
-                        code: employee.EmployeeCode,
+                        id: entity.PaymentId,
+                        code: entity.RefNo,
                     })
                 "
             >

@@ -29,6 +29,7 @@
     height: 28px;
     border-bottom: 1px solid #E0E0E0;
     position: relative;
+    outline: none;
 }
 
 .tbl-row th {
@@ -282,4 +283,9 @@ th {
 
 .tbl-align-right {
     text-align: right;
+}
+
+.row-last {
+    top: unset !important;
+    bottom: 0;
 }

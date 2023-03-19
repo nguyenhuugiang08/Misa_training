@@ -8,11 +8,13 @@ const isOpen = ref(false); // trạng thái đóng/mở của danh sách chứa 
 const isFocus = ref(false); // trạng thái Focus vào ô input.
 const optionSearch = ref([]); // Mảng lưu các lựa chọn phù hợp khi thực hiện tìm kiếm.
 const indexOptionSelected = ref(0); // Chỉ số của lựa chọn đã được chọn trong mảng danh sách các lựa chọn.
+const topTableCombobox = ref(0); // khoảng cách combobox dạng table đến top của trình duyệt
+const leftTableCombobox = ref(0); // khoảng cách combox dạng table đến left trình duyệt
 
 // Định nghĩa các props nhận vào.
 const props = defineProps({
     options: { type: Array, default: [] },
-    default: Number,
+    default: String,
     textLabel: String,
     required: Boolean,
     isTop: { type: Boolean, default: false },
@@ -24,6 +26,7 @@ const props = defineProps({
     textError: String,
     marginRight: String,
     disabled: Boolean,
+    hasDisplayDataDisable: Boolean, // hiển thị dữ liệu khi ở trạng thái disable
     isTable: Boolean,
     columns: { type: Array, default: [] },
     tooltip: String,
@@ -67,6 +70,7 @@ const handleShowSelectedValue = (option, index) => {
             optionName: option.optionName,
             optionGrade: option.optionGrade,
             optionAddress: option.optionAddress,
+            optionCode: option.optionCode,
         });
     } catch (error) {
         console.log(error);
@@ -82,7 +86,7 @@ const handleShowSelectedValue = (option, index) => {
  */
 const handleDefaultValue = (optionId) => {
     try {
-        const optionSelected = optionSearch.value.filter((option) => option?.optionId === optionId);
+        const optionSelected = props.options.filter((option) => option?.optionId === optionId);
         if (props.isTable) {
             return optionSelected[0]?.[`${dataShow}`];
         }
@@ -96,6 +100,7 @@ const handleDefaultValue = (optionId) => {
  * - Nếu có ID của giá trị mặc định -> Hiển thị tên của option lên giao diện
  * - Nếu không có -> gán indexOptionSelected = -1
  */
+
 if (props.default || props.default === 0) {
     selected.value = handleDefaultValue(props.default);
     indexOptionSelected.value = optionSearch.value.findIndex(
@@ -160,8 +165,10 @@ watch(
     () => indexOptionSelected.value,
     (newValue) => {
         if (!props.isTable && newValue) {
-            const liH = refItem.value[newValue].clientHeight;
-            refList.value.scrollTop = liH * indexOptionSelected.value;
+            if (refItem.value) {
+                const liH = refItem.value?.[`${newValue}`].clientHeight;
+                refList.value.scrollTop = liH * indexOptionSelected.value;
+            }
         }
     }
 );
@@ -208,6 +215,26 @@ const handleInputKeydown = (event) => {
         console.log(error);
     }
 };
+/**
+ * Hàm xử lý hiển thị vị trí combobox dạng table
+ * @param {*} e
+ * Created by: NHGiang - (19/03/23)
+ */
+const handleClickDropButton = (e) => {
+    try {
+        isOpen.value = !props.disabled ? !isOpen.value : false;
+        optionSearch.value = [...props.options];
+        topTableCombobox.value = e.target.getBoundingClientRect().y + 28;
+
+        if (e.target.getBoundingClientRect().x < 860) {
+            leftTableCombobox.value = e.target.getBoundingClientRect().x - props.width;
+        } else {
+            leftTableCombobox.value = e.target.getBoundingClientRect().x - 646;
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
 </script>
 
 <template>
@@ -224,6 +251,7 @@ const handleInputKeydown = (event) => {
         {{ textLabel }} <span v-if="required" class="required">*</span>
         <div
             class="modal-icon textfield__icon drop-department"
+            :class="{ 'drop-disable': disabled }"
             style="display: flex; justify-content: center; align-items: center"
             :style="{
                 top: `${
@@ -233,10 +261,7 @@ const handleInputKeydown = (event) => {
                     status ? 'var(--error-color)' : isFocus ? 'var(--primary-color)' : ''
                 }`,
             }"
-            @click="
-                isOpen = !disabled ? !isOpen : false;
-                optionSearch = [...options];
-            "
+            @click="handleClickDropButton"
             @keydown="handleInputKeydown"
             v-click-outside-element="handleClickOutside"
         >
@@ -273,6 +298,7 @@ const handleInputKeydown = (event) => {
         </ul>
         <MTableCombobox
             v-if="isTable && isOpen"
+            :style="{ top: `${topTableCombobox}px`, left: `${leftTableCombobox}px` }"
             class="cbo-table-list"
             :options="optionSearch"
             :columns="columns"
@@ -297,7 +323,7 @@ const handleInputKeydown = (event) => {
         class="textfield__input modal-textfield__input"
         :class="{ 'checkbox--error-input': status, 'textfield-readonly': disabled }"
         id="employee-department"
-        :value="!disabled ? selected : ''"
+        :value="!disabled ? selected : hasDisplayDataDisable ? selected : ''"
         :style="{
             minWidth: width && `${width}`,
             width: width && `${width}`,
@@ -334,6 +360,12 @@ const handleInputKeydown = (event) => {
     border-bottom-right-radius: 2px;
     border: 1px solid var(--border-color);
     border-left: none;
+}
+
+.drop-disable:hover {
+    background-color: #e0e0e0 !important;
+    border: 1px solid #babec5 !important;
+    border-left: unset !important;
 }
 
 .checkbox--error-input {
