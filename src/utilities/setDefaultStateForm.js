@@ -53,6 +53,18 @@ export const handleSetStatusForm = () => {
             textError: "",
             status: false,
         };
+        error.RefDate = {
+            textError: "",
+            status: false,
+        };
+        error.RefNo = {
+            textError: "",
+            status: false,
+        };
+        error.PostedDate = {
+            textError: "",
+            status: false,
+        };
         error.status = false;
     } catch (error) {
         console.log(error);

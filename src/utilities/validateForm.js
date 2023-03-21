@@ -63,8 +63,23 @@ const error = reactive({
         textError: "",
         status: false,
     },
+    ObjectId: {
+        textError: "",
+        status: false,
+    },
+    DebitAccount: {
+        textError: "",
+        status: false,
+    },
+    CreditAccount: {
+        textError: "",
+        status: false,
+    },
     status: false,
 });
+
+let paymentDetailErrors = [];
+let statusPayemtnDetail = false;
 
 const {
     EmployeeCodeText,
@@ -133,6 +148,7 @@ const useValidate = ({
     listDepartments,
     account,
     payment,
+    paymentDetails,
 }) => {
     try {
         if (employee) {
@@ -395,6 +411,51 @@ const useValidate = ({
             }
         }
 
+        if (paymentDetails?.length > 0) {
+            paymentDetailErrors = [];
+            paymentDetails.forEach((element, index) => {
+                debugger;
+
+                // Validate đối tượng detail
+                if (!element.ObjectId) {
+                    setError("ObjectId", "blank");
+                } else {
+                    setDataValid("ObjectId");
+                }
+
+                // Validate tài khoản có
+                if (!element.DebitAccount) {
+                    setError("DebitAccount", "blank");
+                } else {
+                    setDataValid("DebitAccount");
+                }
+
+                // Validate tài khoản nợ
+                if (!element.CreditAccount) {
+                    setError("CreditAccount", "blank");
+                } else {
+                    setDataValid("CreditAccount");
+                }
+
+                const ObjectId = {...error.ObjectId};
+                const DebitAccount = {...error.DebitAccount};
+                const CreditAccount = {...error.CreditAccount};
+                const errorPaymentDetail = {
+                    ObjectId,
+                    DebitAccount,
+                    CreditAccount,
+                    status: ObjectId.status || DebitAccount.status || CreditAccount.status,
+                };
+                paymentDetailErrors.push(errorPaymentDetail);
+
+                paymentDetailErrors?.forEach((error) => {
+                    if (error.status) {
+                        statusPayemtnDetail = true;
+                    }
+                });
+            });
+        }
+
         error.status =
             error.EmployeeCode.status ||
             error.FullName.status ||
@@ -409,6 +470,7 @@ const useValidate = ({
             error.PostedDate.status ||
             error.RefDate.status ||
             error.RefNo.status ||
+            statusPayemtnDetail ||
             error.AccountNumber.status;
 
         return error.status;
@@ -417,4 +479,4 @@ const useValidate = ({
     }
 };
 
-export { error, useValidate };
+export { error, useValidate, paymentDetailErrors };

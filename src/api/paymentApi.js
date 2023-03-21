@@ -123,6 +123,33 @@ const paymentApi = {
             console.log(error);
         }
     },
+
+    /**
+     * Hàm lấy ra Số phiếu chi mới
+     * Created by: NHGiang - (20/03/23)
+     * @returns
+     */
+    getNewRefNo: () => {
+        try {
+            return axiosClient.get(`${baseUrl}/newRefNo`);
+        } catch (error) {
+            console.log(error);
+        }
+    },
+
+    /**
+     * Hàm sửa phiếu chi
+     * @param {*} payment -- thông tin phiếu chi
+     * @returns
+     * Created by: NHGiang - (20/03/23)
+     */
+    editPayement: (payment, paymentId) => {
+        try {
+            return axiosClient.put(`${baseUrl}/${paymentId}`, payment);
+        } catch (error) {
+            console.log(error);
+        }
+    },
 };
 
 export default paymentApi;

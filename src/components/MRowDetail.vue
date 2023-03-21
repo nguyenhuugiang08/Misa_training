@@ -5,6 +5,8 @@ import MInputMoney from "./MInputMoney.vue";
 import { ref, reactive, inject, watch } from "vue";
 import { MISA_RESOURCE } from "../base/resource";
 import { useAccount } from "../composable/useAccount";
+import { formatMoney } from "../utilities/formatMoney";
+import { paymentDetailErrors, error } from "../utilities/validateForm";
 
 const props = defineProps({
     numericalOrder: Number,
@@ -13,42 +15,34 @@ const props = defineProps({
     isEdit: Boolean,
     editable: Boolean,
     reason: String,
+    index: Number,
 });
 
-const { state } = inject("diy");
+const { state, setPaymentDetail, setPaymentDetails, setIndexRowEditable } = inject("diy");
 const { getAccounts } = useAccount();
 getAccounts();
 
-const isEditable = ref(props.editable);
-const isSelectRow = ref(false);
 const refRowDetail = ref(null);
 const paymentDetail = reactive({
     PaymentId: "",
-    ObjectId: "",
-    ObjectCode: state.objectSelected?.optionCode || "",
-    ObjectName: state.objectSelected?.optionName || "",
-    Amount: "",
-    DebitAccount: "",
-    CreditAccount: "",
-    Description: "",
+    ObjectId: state.paymentDetail?.ObjectId || state.objectSelected?.optionId || "",
+    ObjectCode: state.paymentDetail?.ObjectCode || state.objectSelected?.optionCode || "",
+    ObjectName: state.paymentDetail?.ObjectName || state.objectSelected?.optionName || "",
+    Amount: state.paymentDetail?.Amount || 0,
+    DebitAccount: state.paymentDetail?.DebitAccount || "",
+    DebitAccountName: state.paymentDetail?.DebitAccountName || "",
+    CreditAccount: state.paymentDetail?.CreditAccount || "",
+    CreditAccountName: state.paymentDetail?.CreditAccountName || "",
+    Description: props.reason || MISA_RESOURCE.REASON_PAYMENT_DEFAULT,
 });
-/**
- * Hàm thực hiện chọn dòng
- * Created by: NHGiang - (14/03/23)
- */
-const handle = () => {
-    try {
-        isEditable.value = false;
-        isSelectRow.value = false;
-    } catch (error) {
-        console.log(error);
-    }
-};
 
+/**
+ * Hàm xử lý focus Table detail
+ * Created by: NHGiang - (21/03/23)
+ */
 const handleFocus = () => {
     try {
         if (refRowDetail.value) {
-            isEditable.value = true;
             refRowDetail.value.handleFocusInput();
         }
     } catch (error) {
@@ -75,24 +69,30 @@ watch(
     }
 );
 
+watch(
+    () => JSON.stringify(paymentDetail),
+    () => {
+        setPaymentDetail(paymentDetail);
+        setPaymentDetails(state.paymentDetail, props.index);
+    }
+);
+
 defineExpose({ handleFocus });
 </script>
 
 <template>
     <tr
         class="tbl-row"
-        @click="
-            isEditable = true;
-            isSelectRow = true;
-        "
-        v-click-outside-element="handle"
-        :style="{ background: isSelectRow ? 'var(--table-bg-color)' : '#fff' }"
+        @click="setIndexRowEditable(index)"
+        :style="{
+            background: state.indexRowEditable === index ? 'var(--table-bg-color)' : '#fff',
+        }"
     >
         <td class="tbl-col tbl-col__first">
             <span class="tbl-detail-text">{{ numericalOrder + 1 || "" }}</span>
         </td>
         <td class="tbl-col">
-            <span class="tbl-detail-text" v-if="isEdit && isEditable">
+            <span class="tbl-detail-text" v-if="isEdit && index === state.indexRowEditable">
                 <m-input
                     ref="refRowDetail"
                     width="500px"
@@ -105,7 +105,7 @@ defineExpose({ handleFocus });
                     @inputValue="paymentDetail.Description = $event"
                 />
             </span>
-            <span v-if="isEdit && !isEditable">{{
+            <span v-if="isEdit && !(index === state.indexRowEditable)">{{
                 paymentDetail.Description
                     ? paymentDetail.Description
                     : `Chi tiền cho ${paymentDetail.ObjectName}`
@@ -113,51 +113,85 @@ defineExpose({ handleFocus });
         </td>
         <td class="tbl-col">
             <span class="tbl-detail-text">
-                <div class="checkbox-wrapper" v-if="isEdit && isEditable">
+                <div class="checkbox-wrapper" v-if="isEdit && index === state.indexRowEditable">
                     <m-checkbox
                         v-if="state.listAllEntities.length"
                         width="130px"
                         bottom="2px"
                         :default="paymentDetail.DebitAccount"
-                        :options="state.listAllEntities"
+                        :options="
+                            state.listAllEntities.filter((account) => account.optionGrade !== 1)
+                        "
                         :isTable="true"
+                        :status="paymentDetailErrors?.[index]?.DebitAccount.status"
+                        :textError="paymentDetailErrors?.[index]?.DebitAccount.textError"
+                        :statusPublic="error.status"
                         :columns="MISA_RESOURCE.COLUMNS_NAME_COMBOBOX_ACCOUNT"
-                        @select="paymentDetail.DebitAccount = $event.optionId"
+                        @select="
+                            paymentDetail.DebitAccount = $event.optionId;
+                            paymentDetail.DebitAccountName = $event.optionName;
+                        "
                     />
                 </div>
+                <span v-if="isEdit && !(index === state.indexRowEditable)">{{
+                    paymentDetail.DebitAccountName
+                }}</span>
             </span>
         </td>
         <td class="tbl-col">
             <span class="tbl-detail-text">
-                <div class="checkbox-wrapper" v-if="isEdit && isEditable">
+                <div class="checkbox-wrapper" v-if="isEdit && index === state.indexRowEditable">
                     <m-checkbox
                         v-if="state.listAllEntities.length"
                         width="130px"
                         bottom="2px"
                         :default="paymentDetail.CreditAccount"
-                        :options="state.listAllEntities"
+                        :options="
+                            state.listAllEntities.filter((account) => account.optionGrade !== 1)
+                        "
                         :isTable="true"
+                        :status="paymentDetailErrors?.[index]?.CreditAccount.status"
+                        :textError="paymentDetailErrors?.[index]?.CreditAccount.textError"
+                        :statusPublic="error.status"
                         :columns="MISA_RESOURCE.COLUMNS_NAME_COMBOBOX_ACCOUNT"
-                        @select="paymentDetail.CreditAccount = $event.optionId"
+                        @select="
+                            paymentDetail.CreditAccount = $event.optionId;
+                            paymentDetail.CreditAccountName = $event.optionName;
+                        "
                     />
                 </div>
+                <span v-if="isEdit && !(index === state.indexRowEditable)">{{
+                    paymentDetail.CreditAccountName
+                }}</span>
             </span>
         </td>
         <td class="tbl-col tbl-align-right">
             <span class="tbl-detail-text">
-                <m-input-money v-if="isEdit && isEditable" width="130px" bottom="2px" />
+                <m-input-money
+                    v-if="isEdit && index === state.indexRowEditable"
+                    width="130px"
+                    bottom="2px"
+                    v-model="paymentDetail.Amount"
+                    @update:model-value="paymentDetail.Amount = $event"
+                />
+                <span v-if="isEdit && !(index === state.indexRowEditable)">{{
+                    formatMoney(paymentDetail.Amount)
+                }}</span>
             </span>
         </td>
         <td class="tbl-col">
             <span class="tbl-detail-text">
-                <div class="checkbox-wrapper" v-if="isEdit && isEditable">
+                <div class="checkbox-wrapper" v-if="isEdit && index === state.indexRowEditable">
                     <m-checkbox
                         width="130px"
                         bottom="2px"
                         :columns="MISA_RESOURCE.COLUMNS_NAME_COMBOBOX_OBJECT"
-                        :default="state.objectSelected.optionId || paymentDetail.ObjectId"
+                        :default="paymentDetail.ObjectId"
                         :options="state.objects"
                         :isTable="true"
+                        :status="paymentDetailErrors?.[index]?.ObjectId.status"
+                        :textError="paymentDetailErrors?.[index]?.ObjectId.textError"
+                        :statusPublic="error.status"
                         @select="
                             paymentDetail.ObjectId = $event.optionId;
                             paymentDetail.ObjectCode = $event.optionCode;
@@ -165,7 +199,9 @@ defineExpose({ handleFocus });
                         "
                     />
                 </div>
-                <span v-if="isEdit && !isEditable">{{ paymentDetail.ObjectCode }}</span>
+                <span v-if="isEdit && !(index === state.indexRowEditable)">{{
+                    paymentDetail.ObjectCode
+                }}</span>
             </span>
         </td>
         <td class="tbl-col">

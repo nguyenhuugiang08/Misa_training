@@ -22,6 +22,36 @@ const state = reactive({
     payments: [],
     parentId: MISA_RESOURCE.GUID_EMPTY,
     objectSelected: {},
+    newRefNo: "",
+    paymentDetails: [
+        {
+            PaymentId: "",
+            ObjectId: "",
+            ObjectCode: "",
+            ObjectName: "",
+            Amount: 0,
+            DebitAccount: "",
+            DebitAccountName: "",
+            CreditAccount: "",
+            CreditAccountName: "",
+            Description: "",
+        },
+    ],
+    paymentDetail: {
+        PaymentId: "",
+        ObjectId: "",
+        ObjectCode: "",
+        ObjectName: "",
+        Amount: 0,
+        DebitAccount: "",
+        DebitAccountName: "",
+        CreditAccount: "",
+        CreditAccountName: "",
+        Description: "",
+    },
+    gradeAccountSelected: MISA_ENUM.GRADE_DEFAULT,
+    totalPayment: 0,
+    indexRowEditable: 0,
 });
 
 /**
@@ -273,6 +303,98 @@ const setObjectSelected = (obj) => {
     }
 };
 
+/**
+ * Hàm lấy ra số phiếu chi mới
+ * Created by: NHGiang - (20/03/23)
+ * @param {} newRefNo
+ */
+const setNewRefNo = (newRefNo) => {
+    try {
+        state.newRefNo = newRefNo;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm gán lại item mảng paymentDetails
+ * @param {*} paymentDetail
+ * @param {*} index
+ * Created by: NHGiang - (21/03/23)
+ */
+const setPaymentDetails = (paymentDetail, index) => {
+    try {
+        state.paymentDetails[index] = paymentDetail;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm thêm 1 item vào mảng paymentDetails khi click thêm dòng
+ * @param {*} paymentDetail
+ * Created by: NHGiang - (21/03/23)
+ */
+const addPaymentDetails = (paymentDetail) => {
+    try {
+        state.paymentDetails.push(paymentDetail);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm gán lại object paymentDetail khi thực hiện nhập dữ liệu
+ * @param {*} paymentDetail
+ * Created by: NHGiang - (21/03/23)
+ */
+const setPaymentDetail = (paymentDetail) => {
+    try {
+        state.paymentDetail = paymentDetail;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm lấy ra bậc của tài khoản khi click chọn 1 dòng trong bảng tài khoản
+ * @param {*} grade
+ *  Created by: NHGiang - (21/03/23)
+ */
+const setGradeAccountSelected = (grade) => {
+    try {
+        state.gradeAccountSelected = grade;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm lấy ra tổng tiền phiếu chi
+ * @param {*} totalPayment
+ * Created by: NHGiang - (21/03/23)
+ */
+const setTotalPayment = (totalPayment) => {
+    try {
+        state.totalPayment = totalPayment;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm đặt lại index cho dòng có trạng thái edit trên UI detail
+ * Created by: NHGiang - (21/03/23)
+ * @param {*} index
+ */
+const setIndexRowEditable = (index) => {
+    try {
+        state.indexRowEditable = index;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 export default {
     state: readonly(state),
     setIsSidebar,
@@ -295,4 +417,11 @@ export default {
     setPayments,
     setParentId,
     setObjectSelected,
+    setNewRefNo,
+    setPaymentDetails,
+    setPaymentDetail,
+    addPaymentDetails,
+    setGradeAccountSelected,
+    setTotalPayment,
+    setIndexRowEditable,
 };

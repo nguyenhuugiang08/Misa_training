@@ -14,20 +14,29 @@ import { useRouter } from "vue-router";
 import { MISA_ENUM } from "../base/enum";
 import { error, useValidate } from "../utilities/validateForm";
 import MToast from "../components/MToast.vue";
+import MPopUpError from "../components/MPopUpError.vue";
+import { usePaymentDeatil } from "../composable/usePaymentDetail";
 
-const { state, setObjectSelected } = inject("diy");
+const { state, setObjectSelected, addPaymentDetails, setTotalPayment } = inject("diy");
 const router = useRouter();
-const refTableDetail = ref(null);
-const disable = ref(false);
-const today = ref(null);
+const refTableDetail = ref(null); // Tham chiếu tới bảng detail
+const disable = ref(false); // trạng thái disable các ô nhập liệu khi cất
+const today = ref(null); // lấy ra ngày hiện tại
+const isOpenError = ref(false); // trạng thái đóng mở của popup hiển thị khi có lỗi xả ra
 
 onMounted(() => {
     try {
         today.value = new Date();
+        if (state.newRefNo && state.identityForm === MISA_ENUM.FORM_MODE.ADD) {
+            payment.RefNo = state.newRefNo;
+        }
     } catch (error) {
         console.log(error);
     }
 });
+
+const { addPayment, getPaymentsByFilter, editPayement } = usePayment();
+const { insertPaymentDetails } = usePaymentDeatil();
 
 const payment = reactive({
     Address: state.entitySelected?.Address || "",
@@ -42,7 +51,10 @@ const payment = reactive({
     Receiver: state.entitySelected?.Receiver || "",
     RefDate: state.entitySelected?.RefDate ? state.entitySelected?.RefDate : new Date(),
     RefNo: state.entitySelected?.RefNo || "",
-    TotalAmount: state.entitySelected?.TotalAmount || 0,
+    TotalAmount:
+        state.entitySelected?.TotalAmount || state.entitySelected?.TotalAmount === 0
+            ? state.entitySelected?.TotalAmount
+            : state.totalPayment || 0,
 });
 
 const paymentDetails = ref([
@@ -64,8 +76,6 @@ getObjects();
 const { getAllEmployees } = useEmployee();
 getAllEmployees();
 
-const { addPayment, getPaymentsByFilter } = usePayment();
-
 /**
  * Hàm đóng form chi tiết phiếu chi
  * Created by: NHGiang - (16/03/23)
@@ -84,7 +94,8 @@ const handleCloseForm = () => {
  */
 const handleSubmit = async (identityButton) => {
     try {
-        const status = useValidate({ payment });
+        const paymentDetails = state.paymentDetails;
+        const status = useValidate({ payment, paymentDetails });
 
         if (!status) {
             // xử lý thêm tài khoản
@@ -92,23 +103,35 @@ const handleSubmit = async (identityButton) => {
                 state.identityForm === MISA_ENUM.FORM_MODE.ADD ||
                 state.identityForm === MISA_ENUM.FORM_MODE.DUPLICATE
             ) {
-                await addPayment(payment).then(() => {
-                    if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE) {
-                        // disable.value = true;
-                    }
-                });
-                // .catch((isOpenError.value = true));
+                payment.RefDate.setHours(payment.RefDate.getHours() + 7);
+                payment.PostedDate.setHours(payment.PostedDate.getHours() + 7);
+                await addPayment(payment)
+                    .then(async (data) => {
+                        if (data) {
+                            const payementDetails = state.paymentDetails?.map((element) => {
+                                return { ...element, PaymentId: data };
+                            });
+                            await insertPaymentDetails(payementDetails);
+                            await getPaymentsByFilter();
+                            if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE) {
+                                // disable.value = true;
+                                isOpenError.value = false;
+                            }
+                        }
+                    })
+                    .catch((isOpenError.value = true));
             }
 
             if (state.identityForm === MISA_ENUM.FORM_MODE.EDIT) {
-                await editAccount(accountRest, state.entitySelected.AccountId);
-                // .then(async () => {
-                //     await getAccountsByFilter();
-                // })
-                // .catch((isOpenError.value = true));
+                await editPayement(payment, state.entitySelected.PaymentId)
+                    .then(async () => {
+                        await getPaymentsByFilter();
+                        isOpenError.value = false;
+                    })
+                    .catch((isOpenError.value = true));
             }
         } else {
-            // isOpenError.value = true;
+            isOpenError.value = true;
         }
     } catch (error) {
         console.log(error);
@@ -218,7 +241,37 @@ watch(
     () => payment.PostedDate,
     (newValue) => {
         try {
-            payment.RefDate = newValue;
+            if (newValue) payment.RefDate = newValue;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
+
+/**
+ * Hàm xử lý thêm dòng UI detail
+ * Created by: NHGiang - (21/03/23)
+ */
+const handleAddRowDetail = () => {
+    try {
+        addPaymentDetails(state.paymentDetail);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+watch(
+    () => JSON.stringify(state.paymentDetails),
+    () => {
+        try {
+            const totalPayment = state.paymentDetails?.reduce((result, cur) => {
+                try {
+                    return result + cur.Amount;
+                } catch (error) {
+                    console.log(error);
+                }
+            }, 0);
+            setTotalPayment(totalPayment);
         } catch (error) {
             console.log(error);
         }
@@ -241,6 +294,7 @@ watch(
                         :width="'290px'"
                         :disabled="disable"
                         has-display-data-disable
+                        @select="payment.ReasonType = $event.optionId"
                     />
                 </div>
             </div>
@@ -408,7 +462,7 @@ watch(
         <div class="payment-detail">
             <div class="payment-detail-title">Hạch toán</div>
             <m-table-detail
-                :entities="[1]"
+                :entities="state.paymentDetails"
                 :columns="MISA_RESOURCE.COLUMNS_NAME_TABLE_DETAIL"
                 :has-column-delete="true"
                 :reason="payment.Reason"
@@ -417,7 +471,9 @@ watch(
             />
 
             <div class="payment-action">
-                <button class="btn btn-secondary payment-action__btn">Thêm dòng</button>
+                <button class="btn btn-secondary payment-action__btn" @click="handleAddRowDetail">
+                    Thêm dòng
+                </button>
                 <button class="btn btn-secondary payment-action__btn">Xóa hết dòng</button>
             </div>
         </div>
@@ -451,6 +507,15 @@ watch(
                 :toastMessage="toast.toastMessage"
                 :statusMessage="toast.statusMessage"
                 :status="toast.status"
+            />
+        </div>
+        <div class="modal-error" v-if="isOpenError">
+            <m-pop-up-error
+                :title="'Lỗi'"
+                :text-error="
+                    error.RefDate.textError || error.RefNo.textError || error.PostedDate.textError
+                "
+                @closeError="isOpenError = !isOpenError"
             />
         </div>
     </div>

@@ -1,6 +1,7 @@
 <script setup>
 import MRowDetail from "./MRowDetail.vue";
-import { ref, defineExpose } from "vue";
+import { ref, defineExpose, inject } from "vue";
+import { formatMoney } from "../utilities/formatMoney";
 
 const props = defineProps({
     entities: { type: Array, default: [] },
@@ -9,6 +10,8 @@ const props = defineProps({
     isEdit: Boolean,
     reason: String,
 });
+
+const { state } = inject("diy");
 
 const refRowDetail = ref(null);
 const editable = ref(false);
@@ -61,6 +64,7 @@ defineExpose({ focusTableDetail });
                 :is-edit="isEdit"
                 :editable="editable"
                 :reason="reason"
+                :index="index"
                 tabindex="0"
                 ref="refRowDetail"
             />
@@ -69,7 +73,7 @@ defineExpose({ focusTableDetail });
                 <th style="padding-left: 16px; border-left: unset">Tổng</th>
                 <th></th>
                 <th></th>
-                <th class="tbl-col--money">0</th>
+                <th class="tbl-col--money">{{ formatMoney(state.totalPayment) }}</th>
                 <th></th>
                 <th></th>
                 <th v-if="hasColumnDelete"></th>

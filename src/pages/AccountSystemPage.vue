@@ -20,13 +20,19 @@ const newExpandedRowKeys = ref([]);
 const allowedPageSizes = [10, 20, 30, 50, 100];
 const pageSize = ref(20);
 const pageNumber = ref(1);
-const rowIndex = ref(null);
 
 const router = useRouter();
 const route = useRoute();
 
-const { state, setIsForm, setTitleForm, setIdentityForm, setEntitySelected, setParentId } =
-    inject("diy");
+const {
+    state,
+    setIsForm,
+    setTitleForm,
+    setIdentityForm,
+    setEntitySelected,
+    setParentId,
+    setGradeAccountSelected,
+} = inject("diy");
 
 const { getAccountsByFilter, getAccountById } = useAccount();
 getAccountsByFilter();
@@ -45,7 +51,7 @@ watch(
         }
     }
 );
-router.push({ path: "/account-system", query: { pageSize: pageSize.value, pageNumber: 1 } });
+router.push({ path: "/account-system", query: { pageSize: pageSize.value, pageNumber: MISA_ENUM.PAGENUMBER_DEFAULT } });
 
 /**
  * Lấy ra trang thứ bao nhiêu sử dụng vue-router
@@ -75,6 +81,7 @@ const toogleExpanded = () => {
             }
         });
         newExpandedRowKeys.value = [...newList];
+        console.log(newExpandedRowKeys.value);
     } catch (error) {
         console.log(error);
     }
@@ -100,6 +107,8 @@ const debounceSearch = async (value) => {
 const handleRefreshData = async () => {
     try {
         await getAccountsByFilter(state.keyword, pageSize.value, pageNumber.value);
+        setParentId(MISA_RESOURCE.GUID_EMPTY);
+        setGradeAccountSelected(MISA_ENUM.GRADE_DEFAULT);
     } catch (error) {
         console.log(error);
     }
@@ -129,8 +138,8 @@ const handleDoubleClickRow = async (event) => {
  */
 const handleClickRow = async (event) => {
     try {
-        setParentId(event.data.AccountId); 
-        event.rowElement.classList.add("row-selected");
+        setParentId(event.data.AccountId);
+        setGradeAccountSelected(event.data.Grade);
     } catch (error) {
         console.log(error);
     }
@@ -203,7 +212,6 @@ const handleClickRow = async (event) => {
                 no-data-text="Không có dữ liệu"
                 @cellDblClick="handleDoubleClickRow"
                 @rowClick="handleClickRow"
-                @rowPrepared="rowIndex && hanlde"
             >
                 <DxScrolling mode="standard" />
                 <DxPaging :enabled="false" :page-size="10" />

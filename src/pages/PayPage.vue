@@ -10,9 +10,10 @@ import { useRoute, useRouter } from "vue-router";
 import { usePayment } from "../composable/usePayment";
 import MPopUpWarning from "../components/MPopUpWarning.vue";
 import MToast from "../components/MToast.vue";
+import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
 
 const isFocus = ref(false); // Trạng thái focus vào ô tìm kiếm
-const heightMaster = ref(MISA_ENUM.HEIGHT_PAYMENT_MASTER); // Chiều cao phần master
+const heightMaster = ref(MISA_ENUM.HEIGHT_PAYMENT_CONTENT); // Chiều cao phần master
 const heightDetail = ref(MISA_ENUM.HEIGHT_PAYMENT_DETAIL); // Chiều cao mặc định của phần detail
 const vueResizeRef = ref(null); // ref của component vue-resize
 const pageSize = ref(20); // số bản ghi trên 1 trang
@@ -23,9 +24,10 @@ const totalPayment = ref(0);
 
 const router = useRouter();
 const route = useRoute();
-router.push({ path: "/cash/pay", query: { pageSize: pageSize.value, pageNumber: 1 } });
+router.push({ path: "/cash/pay", query: { pageSize: pageSize.value, pageNumber: MISA_ENUM.PAGENUMBER_DEFAULT } });
 
-const { getPaymentsByFilter, handlExportExcel, handleBulkDelete, getPayments } = usePayment();
+const { getPaymentsByFilter, handlExportExcel, handleBulkDelete, getPayments, getNewRefNo } =
+    usePayment();
 getPaymentsByFilter();
 getPayments();
 
@@ -87,11 +89,13 @@ const handleChangeHeight = (event) => {
  * Thực hiện hiển thị form chi tiết phiếu chi
  * Created by: NHGiang - (15/03/23)
  */
-const handleShowPaymentDetail = () => {
+const handleShowPaymentDetail = async () => {
     try {
         setEntitySelected({});
-        router.push("/pay/pay-detail");
+        await getNewRefNo();
         setIdentityForm(MISA_ENUM.FORM_MODE.ADD);
+        handleSetStatusForm();
+        router.push("/pay/pay-detail");
     } catch (error) {
         console.log(error);
     }

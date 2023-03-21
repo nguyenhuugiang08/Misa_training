@@ -148,7 +148,7 @@ export const useEmployee = () => {
          * @param {*} pageNumber -- trang thứ bao nhiêu, mặc định là trang đầu tiên
          * Created by: NHGiang - (20/02/23)
          */
-        const handleFilterPage = async (keyword, pageSize = 20, pageNumber = 1) => {
+        const handleFilterPage = async (keyword, pageSize = 20, pageNumber = MISA_ENUM.PAGENUMBER_DEFAULT) => {
             try {
                 const response = await employeeApi.getEmployeesByFilterAndPaging(
                     keyword,

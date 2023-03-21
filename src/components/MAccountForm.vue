@@ -3,13 +3,14 @@ import MInput from "./MInput.vue";
 import MCheckbox from "./MCheckbox.vue";
 import MTrackDetail from "./MTrackDetail.vue";
 import { MISA_RESOURCE, ACCOUNT_TRACK } from "../base/resource";
-import { ref, reactive, inject, onMounted, onUnmounted } from "vue";
+import { ref, reactive, inject, onMounted, onUnmounted, watch } from "vue";
 import { useAccount } from "../composable/useAccount";
 import { MISA_ENUM } from "../base/enum";
 import { error } from "../utilities/validateForm";
 import MPopUpInfo from "./MPopUpInfo.vue";
 import MPopUpError from "./MPopUpError.vue";
 import { useValidate } from "../utilities/validateForm";
+import { useRoute } from "vue-router";
 
 const { state, setIsForm } = inject("diy");
 
@@ -23,6 +24,9 @@ const refAccountNumber = ref(null); // ref của ô input số tài khoản
 const isShowNote = ref(false); // Trạng thái Đóng Mở thông báo dữ liệu form đã thay
 const isShowTrackDetail = ref(true); // Trạng thái Đóng/Mở của theo dõi chi tiết
 const isResize = ref(false); // Trạng thái Mở rộng/ Thu gọn
+const pageSize = ref(20);
+
+const route = useRoute();
 
 const account = reactive({
     ParentId: state.entitySelected?.ParentId || state.parentId,
@@ -33,7 +37,7 @@ const account = reactive({
     TypeName: MISA_RESOURCE.ACCOUNT_NATURE[1].optionName,
     Description: state.entitySelected?.Description || "",
     HasForeignCurrencyAccounting: state.entitySelected?.HasForeignCurrencyAccounting || false,
-    IsActive: state.entitySelected?.IsActive || true,
+    IsActive: state.entitySelected?.IsActive ? true : false,
     IsParent: state.entitySelected?.IsParent || false,
     IsTrackObject: state.entitySelected?.IsTrackObject || false,
     IsTrackJob: state.entitySelected?.IsTrackJob || false,
@@ -82,8 +86,23 @@ const account = reactive({
         state.entitySelected?.Item === 0
             ? MISA_RESOURCE.TRACK_TYPE[0].optionId
             : MISA_RESOURCE.TRACK_TYPE[1].optionId,
-    Grade: state.entitySelected?.Grade || 1,
+    Grade: state.entitySelected?.Grade || state.gradeAccountSelected + 1,
 });
+
+/**
+ * Lấy ra số lượng bản ghi trên 1 trang sử dụng vue-router
+ * created by : NHGiang
+ */
+watch(
+    () => route.query.pageSize,
+    (newValue) => {
+        pageSize.value = newValue;
+        try {
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
 
 /**
  * Hàm xử lý submit form
@@ -92,7 +111,6 @@ const handleSubmit = async () => {
     try {
         const status = useValidate({ account });
         const { TypeName, ...accountRest } = account;
-        console.log(isOpenError.value);
 
         if (!status) {
             // xử lý thêm tài khoản
@@ -103,7 +121,7 @@ const handleSubmit = async () => {
                 accountRest.IsParent = false;
                 await addAccount(accountRest)
                     .then(async () => {
-                        await getAccountsByFilter();
+                        await getAccountsByFilter(state.keyword, pageSize.value, MISA_ENUM.PAGENUMBER_DEFAULT);
                     })
                     .catch((isOpenError.value = true));
             }
@@ -111,7 +129,7 @@ const handleSubmit = async () => {
             if (state.identityForm === MISA_ENUM.FORM_MODE.EDIT) {
                 await editAccount(accountRest, state.entitySelected.AccountId)
                     .then(async () => {
-                        await getAccountsByFilter();
+                        await getAccountsByFilter(state.keyword, pageSize.value, MISA_ENUM.PAGENUMBER_DEFAULT);
                     })
                     .catch((isOpenError.value = true));
             }
@@ -160,6 +178,7 @@ const handleSelected = (event) => {
 const handleCloseForm = () => {
     try {
         let accountToCompare = {};
+        const { TypeName, ...restAccount } = account;
         if (state.identityForm === MISA_ENUM.FORM_MODE.ADD) {
             accountToCompare = {
                 ParentId: "00000000-0000-0000-0000-000000000000",
@@ -204,7 +223,7 @@ const handleCloseForm = () => {
             accountToCompare = rest;
         }
 
-        if (JSON.stringify(accountToCompare) !== JSON.stringify(account)) {
+        if (JSON.stringify(accountToCompare) !== JSON.stringify(restAccount)) {
             isShowNote.value = true;
         } else {
             setIsForm();
@@ -220,7 +239,7 @@ const handleCloseForm = () => {
  */
 onMounted(() => {
     try {
-        refAccountNumber.value.handleFocus();
+        refAccountNumber.value.handleFocusInput();
     } catch (error) {
         console.log(error);
     }
@@ -235,7 +254,7 @@ const handleSetTabindex = (e) => {
     try {
         if (e.keyCode === MISA_ENUM.KEY_CODE.TAB) {
             e.preventDefault();
-            refAccountNumber.value.handleFocus();
+            refAccountNumber.value.handleFocusInput();
         }
         if (e.shiftKey && e.keyCode === MISA_ENUM.KEY_CODE.TAB) {
             refSaveAndAddBtn.value.focus();

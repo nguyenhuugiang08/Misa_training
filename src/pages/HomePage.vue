@@ -65,12 +65,12 @@ watch(
 getAllEmployees();
 setEntities(listAllEmployees);
 
-handleFilterPage("", route.query.pageSize, 1);
+handleFilterPage("", route.query.pageSize, MISA_ENUM.PAGENUMBER_DEFAULT);
 setEntities(listEmployees);
 setTotalEntities(totalRecord);
 setTotalPage(totalPage);
 const router = useRouter();
-router.push({ path: "/", query: { pageSize: pageSize.value, pageNumber: 1 } });
+router.push({ path: "/", query: { pageSize: pageSize.value, pageNumber: MISA_ENUM.PAGENUMBER_DEFAULT } });
 
 /**
  * Xử lý hiển thị toast message thông báo
@@ -90,10 +90,10 @@ const handleShowToast = (toast) => {
 const debounceSearch = async (val) => {
     try {
         setKeyword(val);
-        router.push({ path: "/", query: { pageSize: pageSize.value, pageNumber: 1 } });
+        router.push({ path: "/", query: { pageSize: pageSize.value, pageNumber: MISA_ENUM.PAGENUMBER_DEFAULT } });
         isLoading.value = true;
         setTimeout(async () => {
-            await handleFilterPage(val, pageSize.value, 1);
+            await handleFilterPage(val, pageSize.value, MISA_ENUM.PAGENUMBER_DEFAULT);
             setEntities(listEmployees);
             setTotalPage(totalPage);
             isLoading.value = false;
@@ -110,7 +110,7 @@ const debounceSearch = async (val) => {
 const handleEndEditEmployee = async (event) => {
     try {
         const { isCloseForm, ...toastInfo } = event;
-        await handleFilterPage("", pageSize.value, 1);
+        await handleFilterPage("", pageSize.value, MISA_ENUM.PAGENUMBER_DEFAULT);
         setEntities(listEmployees);
         if (isCloseForm) {
             setIsForm();
@@ -135,7 +135,7 @@ const handleEndEditEmployee = async (event) => {
 const handleEndAddEmployee = async (event) => {
     try {
         const { isCloseForm, ...toastInfo } = event;
-        await handleFilterPage("", pageSize.value, 1);
+        await handleFilterPage("", pageSize.value, MISA_ENUM.PAGENUMBER_DEFAULT);
         setEntities(listEmployees);
         if (isCloseForm) {
             setIsForm();
@@ -179,9 +179,9 @@ const handleEndDeleteEmployee = async ({ event, id }) => {
 const handleRefresh = async () => {
     try {
         isLoading.value = true;
-        router.push({ path: "/", query: { pageSize: pageSize.value, pageNumber: 1 } });
+        router.push({ path: "/", query: { pageSize: pageSize.value, pageNumber: MISA_ENUM.PAGENUMBER_DEFAULT } });
         setTimeout(async () => {
-            await handleFilterPage(state.keyword, pageSize.value, 1);
+            await handleFilterPage(state.keyword, pageSize.value, MISA_ENUM.PAGENUMBER_DEFAULT);
             setEntities(listEmployees);
             setTotalPage(totalPage);
             isLoading.value = false;
@@ -236,8 +236,8 @@ const handleBatchExecution = async () => {
         await handleBulkDelete(state.listItemChecked);
         setListItemChecked([]);
         setListPageChecked([]);
-        router.push({ path: "/", query: { pageSize: pageSize.value, pageNumber: 1 } });
-        handleFilterPage("", route.query.pageSize, 1);
+        router.push({ path: "/", query: { pageSize: pageSize.value, pageNumber: MISA_ENUM.PAGENUMBER_DEFAULT } });
+        handleFilterPage("", route.query.pageSize, MISA_ENUM.PAGENUMBER_DEFAULT);
         setEntities(listEmployees);
         setTotalEntities(totalRecord);
         setTotalPage(totalPage);

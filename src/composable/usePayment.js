@@ -14,6 +14,7 @@ const {
     setListToast,
     setEntitySelected,
     setlistAllEntities,
+    setNewRefNo,
 } = diy;
 
 export const usePayment = () => {
@@ -126,17 +127,14 @@ export const usePayment = () => {
          */
         const addPayment = async (payment) => {
             try {
-                // payment.RefDate = new Date(convertDatetime(formatDate(payment.RefDate), true));
-                // payment.PostedDate = new Date(
-                //     convertDatetime(formatDate(payment.PostedDate), true)
-                // );
-                await paymentApi.addPayment(payment);
+                const paymentId = await paymentApi.addPayment(payment);
                 const toastMessage = {
                     toastMessage: MISA_RESOURCE.TOAST.ADD_PAYMENT_SUCCESS.TOAST_MESSAGE,
                     statusMessage: MISA_RESOURCE.TOAST.ADD_PAYMENT_SUCCESS.STATUS_MESSAGE,
                     status: MISA_RESOURCE.TOAST.ADD_PAYMENT_SUCCESS.STATUS,
                 };
                 setListToast(toastMessage);
+                return paymentId;
             } catch (error) {
                 console.log(error);
             }
@@ -162,6 +160,34 @@ export const usePayment = () => {
             }
         };
 
+        /**
+         * Hàm lấy ra Số phiếu chi mới
+         * Created by: NHGiang - (20/03/23)
+         * @returns
+         */
+        const getNewRefNo = async () => {
+            try {
+                const newRefNo = await paymentApi.getNewRefNo();
+                setNewRefNo(newRefNo);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        /**
+         * Hàm sửa phiếu chi
+         * @param {*} payment -- thông tin phiếu chi
+         * @returns
+         * Created by: NHGiang - (20/03/23)
+         */
+        const editPayement = async (payment, paymentId) => {
+            try {
+                await paymentApi.editPayement(payment, paymentId);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
         return {
             getPayments,
             getPaymentsByFilter,
@@ -170,6 +196,8 @@ export const usePayment = () => {
             getPaymentById,
             addPayment,
             deletePaymentById,
+            getNewRefNo,
+            editPayement,
         };
     } catch (error) {
         console.log(error);

@@ -64,6 +64,15 @@ export const MISA_RESOURCE = {
     RefDateText: {
         blank: "Ngày phiếu chi không được để trống.",
     },
+    ObjectIdText: {
+        blank: "Đối tượng không được để trống.",
+    },
+    DebitAccountText: {
+        blank: "Tài khoản nợ không được để trống.",
+    },
+    CreditAccountText: {
+        blank: "Tài khoản có không được để trống.",
+    },
     FORM_TITLE: {
         ADD: "Thêm nhân viên", // tiêu đề form thêm
         EDIT: "Sửa thông tin nhân viên", // tiêu đề form sửa

@@ -22,7 +22,7 @@ const emit = defineEmits(["update:modelValue"]);
  */
 const formatInputMoney = (money) => {
     try {
-        if (money) {
+        if (money || money === 0) {
             money = new Intl.NumberFormat().format(money);
             return money;
         }
@@ -89,6 +89,7 @@ const handleCheckIsNumber = (e) => {
             class="textfield__input"
             :class="status ? 'textfield--error-input' : ''"
             :style="{ minWidth: width, width: width, marginRight: marginRight }"
+            style="text-align: right"
             v-model="valueForDisplay"
             @keydown="handleCheckIsNumber"
         />

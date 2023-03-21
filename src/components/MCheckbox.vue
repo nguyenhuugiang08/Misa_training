@@ -383,9 +383,10 @@ const handleClickDropButton = (e) => {
     left: 50%;
     transform: translateX(-50%);
     width: 200px;
-    top: 52px;
+    top: 36px;
     font-weight: 400;
     display: none;
+    white-space: normal;
 }
 
 .error-checkbox::before {

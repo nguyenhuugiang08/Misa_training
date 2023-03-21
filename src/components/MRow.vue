@@ -22,7 +22,7 @@ const toDropList = ref(0); // Khoảng cách của danh sách chức năng so v�
 
 const router = useRouter();
 
-const { state, setIsForm, setTitleForm, setEntitySelected, setIdentityForm } = inject("diy");
+const { state, setIdentityForm } = inject("diy");
 
 /**
  * Hàm xử lý check 1 dòng
@@ -42,6 +42,7 @@ const handleEditPayment = async (paymentId) => {
     try {
         await getPaymentById(paymentId);
         router.push("/pay/pay-detail");
+        handleSetStatusForm();
         setIdentityForm(MISA_ENUM.FORM_MODE.EDIT);
     } catch (error) {
         console.log(error);
@@ -133,7 +134,7 @@ const handleClickOutside = () => {
         <td class="tbl-col tbl-align-right">{{ formatMoney(entity.TotalAmount) || "" }}</td>
         <td class="tbl-col">{{ entity.ObjectCode || "" }}</td>
         <td class="tbl-col">{{ entity.ObjectName || "" }}</td>
-        <td class="tbl-col">{{ entity.Address || "" }}</td>
+        <td class="tbl-col" style="width: 280px">{{ entity.Address || "" }}</td>
         <td class="tbl-col tbl-col__last">
             <div class="tbl-col__action">
                 <label class="tbl-col__action-edit" @click="handleEditPayment(entity.PaymentId)"
