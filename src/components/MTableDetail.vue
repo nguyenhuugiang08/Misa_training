@@ -30,7 +30,7 @@ defineExpose({ focusTableDetail });
 </script>
 
 <template>
-    <table class="tbl">
+    <table class="tbl" tabindex="-1">
         <tbody class="tb-detail">
             <tr class="tbl-row">
                 <th
@@ -90,6 +90,7 @@ defineExpose({ focusTableDetail });
 
 .tb-detail {
     height: max-content !important;
+    overflow: unset !important;
 }
 
 .tbl-detail-tooltip {
@@ -99,8 +100,8 @@ defineExpose({ focusTableDetail });
     color: #fff;
     padding: 2px 6px;
     border-radius: 4px;
-    top: 20px;
-    left: 16px;
+    top: 8px;
+    left: 52px;
     z-index: 99;
     animation: identifier 0.3s ease-in;
     display: none;

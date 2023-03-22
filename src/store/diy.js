@@ -17,12 +17,12 @@ const state = reactive({
     listPageChecked: [], // Danh sách các page đã được check all
     keyword: "", // Từ khóa tìm kiếm
     isLoading: false, // Trạng thái Ẩn hiện loading
-    objects: [],
-    employees: [],
-    payments: [],
-    parentId: MISA_RESOURCE.GUID_EMPTY,
+    objects: [], // Danh sách đối tượng lấy từ BE
+    employees: [], // Danh sách nhân viên lấy từ BE
+    payments: [], // Danh sách phiếu chi
+    parentId: MISA_RESOURCE.GUID_EMPTY, // lấy ra id của tài khoản khi click 1 dòng trên bảng
     objectSelected: {},
-    newRefNo: "",
+    newRefNo: "", // Số phiếu chi mới lấy từ BE
     paymentDetails: [
         {
             PaymentId: "",
@@ -36,7 +36,7 @@ const state = reactive({
             CreditAccountName: "",
             Description: "",
         },
-    ],
+    ], // Mảng các chi tiết phiếu chi trên UI detail
     paymentDetail: {
         PaymentId: "",
         ObjectId: "",
@@ -48,10 +48,11 @@ const state = reactive({
         CreditAccount: "",
         CreditAccountName: "",
         Description: "",
-    },
-    gradeAccountSelected: MISA_ENUM.GRADE_DEFAULT,
-    totalPayment: 0,
-    indexRowEditable: 0,
+    }, // Object cập nhật thông tin của chi tiết phiếu chi khi đang được sửa
+    gradeAccountSelected: MISA_ENUM.GRADE_DEFAULT, // Bậc của tài khoản được chọn khi click chọn 2 dòng trên bảng tài khoản
+    totalPayment: 0, // tổng tiền của phiếu chi
+    indexRowEditable: 0, // index của dòng đang được chọn để edit trên UI detail
+    indexTabRouter: 0, // index của tab router
 });
 
 /**
@@ -322,6 +323,33 @@ const setNewRefNo = (newRefNo) => {
  * @param {*} index
  * Created by: NHGiang - (21/03/23)
  */
+const setPaymentDetailsDefault = () => {
+    try {
+        state.paymentDetails = [
+            {
+                PaymentId: "",
+                ObjectId: "",
+                ObjectCode: "",
+                ObjectName: "",
+                Amount: 0,
+                DebitAccount: "",
+                DebitAccountName: "",
+                CreditAccount: "",
+                CreditAccountName: "",
+                Description: "",
+            },
+        ];
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm gán lại item mảng paymentDetails
+ * @param {*} paymentDetail
+ * @param {*} index
+ * Created by: NHGiang - (21/03/23)
+ */
 const setPaymentDetails = (paymentDetail, index) => {
     try {
         state.paymentDetails[index] = paymentDetail;
@@ -338,6 +366,19 @@ const setPaymentDetails = (paymentDetail, index) => {
 const addPaymentDetails = (paymentDetail) => {
     try {
         state.paymentDetails.push(paymentDetail);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm xóa 1 item vào mảng paymentDetails khi click thêm dòng
+ * @param {*} paymentDetail
+ * Created by: NHGiang - (21/03/23)
+ */
+const deletePaymentDetails = (index) => {
+    try {
+        state.paymentDetails = state.paymentDetails.filter((paymentDetail, i) => i !== index);
     } catch (error) {
         console.log(error);
     }
@@ -395,6 +436,19 @@ const setIndexRowEditable = (index) => {
     }
 };
 
+/**
+ * Hàm set lại tabrouter đang được select
+ * Created by: NHGiang - (23/03/23)
+ * @param {*} indexTab
+ */
+const setIndexTabRouter = (indexTab) => {
+    try {
+        state.indexTabRouter = indexTab;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 export default {
     state: readonly(state),
     setIsSidebar,
@@ -424,4 +478,7 @@ export default {
     setGradeAccountSelected,
     setTotalPayment,
     setIndexRowEditable,
+    setPaymentDetailsDefault,
+    deletePaymentDetails,
+    setIndexTabRouter,
 };

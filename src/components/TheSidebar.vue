@@ -1,6 +1,6 @@
 <script setup>
 import { inject, ref } from "vue";
-const { state, setIsSidebar } = inject("diy");
+const { state, setIsSidebar, setIndexTabRouter } = inject("diy");
 const index = ref(1);
 </script>
 
@@ -59,17 +59,21 @@ const index = ref(1);
             </router-link>
             <router-link
                 to="/cash/procedure"
-                @click="index = 2"
+                @click="
+                    setIndexTabRouter(0);
+                    index = 2;
+                "
                 :class="{ 'sidebar-item--active': index === 2 }"
                 class="sidebar-item"
             >
                 <div class="sidebar-item__icon">
                     <div
-                        style="
-                            background: url('../../src/assets/img/Sprites.ee5d4fa7.svg') no-repeat -78px -1631px;
-                            width: 14px;
-                            height: 18px;
-                        "
+                        :style="{
+                            background:
+                                'url(../../src/assets/img/Sprites.ee5d4fa7.svg) no-repeat -78px -1631px',
+                            width: '14px',
+                            height: '18px',
+                        }"
                     ></div>
                 </div>
                 <p v-if="!state.isSidebar">Tiền mặt</p>

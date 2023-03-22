@@ -6,7 +6,7 @@ import { ref, reactive, inject, watch } from "vue";
 import { MISA_RESOURCE } from "../base/resource";
 import { useAccount } from "../composable/useAccount";
 import { formatMoney } from "../utilities/formatMoney";
-import { paymentDetailErrors, error } from "../utilities/validateForm";
+import { paymentDetailErrors, error, useValidate } from "../utilities/validateForm";
 
 const props = defineProps({
     numericalOrder: Number,
@@ -18,7 +18,8 @@ const props = defineProps({
     index: Number,
 });
 
-const { state, setPaymentDetail, setPaymentDetails, setIndexRowEditable } = inject("diy");
+const { state, setPaymentDetail, setPaymentDetails, setIndexRowEditable, deletePaymentDetails } =
+    inject("diy");
 const { getAccounts } = useAccount();
 getAccounts();
 
@@ -74,6 +75,7 @@ watch(
     () => {
         setPaymentDetail(paymentDetail);
         setPaymentDetails(state.paymentDetail, props.index);
+        useValidate({ paymentDetails: state.paymentDetails });
     }
 );
 
@@ -88,7 +90,13 @@ defineExpose({ handleFocus });
             background: state.indexRowEditable === index ? 'var(--table-bg-color)' : '#fff',
         }"
     >
-        <td class="tbl-col tbl-col__first">
+        <td
+            class="tbl-col tbl-col__first"
+            :style="{
+                background:
+                    state.indexRowEditable === index ? 'var(--table-bg-color) !important' : '#fff',
+            }"
+        >
             <span class="tbl-detail-text">{{ numericalOrder + 1 || "" }}</span>
         </td>
         <td class="tbl-col">
@@ -211,8 +219,12 @@ defineExpose({ handleFocus });
             v-if="hasColumnDelete"
             class="tbl-col tbl-col-delete tbl-col__last"
             style="width: 34px; min-width: 34px"
+            :style="{
+                background:
+                    state.indexRowEditable === index ? 'var(--table-bg-color) !important' : '#fff',
+            }"
         >
-            <div class="delete-icon"></div>
+            <div class="delete-icon" @click.stop="deletePaymentDetails(index)"></div>
         </td>
     </tr>
 </template>

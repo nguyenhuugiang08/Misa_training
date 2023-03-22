@@ -4,7 +4,7 @@ import MAccountForm from "../components/MAccountForm.vue";
 import MFeatureDetail from "../components/MFeatureDetail.vue";
 import MLoading from "../components/MLoading.vue";
 import { DxTreeList, DxColumn, DxPaging, DxPager, DxScrolling } from "devextreme-vue/tree-list";
-import { ref, inject, watch } from "vue";
+import { ref, inject, watch, onMounted, onUnmounted } from "vue";
 import { useAccount } from "../composable/useAccount";
 import { useRouter, useRoute } from "vue-router";
 import { MISA_RESOURCE } from "../base/resource";
@@ -51,7 +51,10 @@ watch(
         }
     }
 );
-router.push({ path: "/account-system", query: { pageSize: pageSize.value, pageNumber: MISA_ENUM.PAGENUMBER_DEFAULT } });
+router.push({
+    path: "/account-system",
+    query: { pageSize: pageSize.value, pageNumber: MISA_ENUM.PAGENUMBER_DEFAULT },
+});
 
 /**
  * Lấy ra trang thứ bao nhiêu sử dụng vue-router
@@ -81,7 +84,6 @@ const toogleExpanded = () => {
             }
         });
         newExpandedRowKeys.value = [...newList];
-        console.log(newExpandedRowKeys.value);
     } catch (error) {
         console.log(error);
     }
@@ -144,6 +146,52 @@ const handleClickRow = async (event) => {
         console.log(error);
     }
 };
+
+/**
+ * Hàm mở form thêm tài khoản
+ * Created by: NHGiang - (23/03/23)
+ */
+const handleOpenFormAddAccount = () => {
+    try {
+        setIsForm();
+        setTitleForm(MISA_RESOURCE.FORM_TITLE.ADD_ACCOUNT);
+        setIdentityForm(MISA_ENUM.FORM_MODE.ADD);
+        handleSetStatusForm();
+        setEntitySelected({});
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm xử lỹ phím tắt
+ * @param {*} e
+ * Created by: NHGiang - (24/02/23)
+ */
+const docKeyDown = (e) => {
+    // Cất form với phím tắt ctrl + S
+    if (e.ctrlKey && e.key === "1") {
+        e.preventDefault();
+        e.stopPropagation();
+        handleOpenFormAddAccount();
+    }
+};
+
+/**
+ * Hàm thêm event keydown
+ * Created by: NHGiang - (24/02/23)
+ */
+onMounted(() => {
+    document.addEventListener("keydown", docKeyDown, false);
+});
+
+/**
+ * Hàm xử lý remove event
+ * Created by: NHGiang - (24/02/23)
+ */
+onUnmounted(() => {
+    document.removeEventListener("keydown", docKeyDown);
+});
 </script>
 
 <template>
@@ -187,16 +235,7 @@ const handleClickRow = async (event) => {
                     class="sidebar-item__icon content-wrapper__action-refresh refresh-icon"
                     @click="handleRefreshData"
                 ></div>
-                <button
-                    class="btn btn-primary btn-add-account"
-                    @click="
-                        setIsForm();
-                        setTitleForm(MISA_RESOURCE.FORM_TITLE.ADD_ACCOUNT);
-                        setIdentityForm(MISA_ENUM.FORM_MODE.ADD);
-                        handleSetStatusForm();
-                        setEntitySelected({});
-                    "
-                >
+                <button class="btn btn-primary btn-add-account" @click="handleOpenFormAddAccount">
                     Thêm
                 </button>
             </div>

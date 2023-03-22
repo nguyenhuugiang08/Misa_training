@@ -414,8 +414,6 @@ const useValidate = ({
         if (paymentDetails?.length > 0) {
             paymentDetailErrors = [];
             paymentDetails.forEach((element, index) => {
-                debugger;
-
                 // Validate đối tượng detail
                 if (!element.ObjectId) {
                     setError("ObjectId", "blank");
@@ -437,9 +435,9 @@ const useValidate = ({
                     setDataValid("CreditAccount");
                 }
 
-                const ObjectId = {...error.ObjectId};
-                const DebitAccount = {...error.DebitAccount};
-                const CreditAccount = {...error.CreditAccount};
+                const ObjectId = { ...error.ObjectId };
+                const DebitAccount = { ...error.DebitAccount };
+                const CreditAccount = { ...error.CreditAccount };
                 const errorPaymentDetail = {
                     ObjectId,
                     DebitAccount,
@@ -451,6 +449,8 @@ const useValidate = ({
                 paymentDetailErrors?.forEach((error) => {
                     if (error.status) {
                         statusPayemtnDetail = true;
+                    } else {
+                        statusPayemtnDetail = false;
                     }
                 });
             });

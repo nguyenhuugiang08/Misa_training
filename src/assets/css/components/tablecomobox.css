@@ -1,7 +1,7 @@
 .wrapper-cbo-tbl {
     border: 1px solid #babec5;
     border-radius: 2px;
-    position: fixed !important;
+    position: absolute;
 }
 
 .tbl-cbo {

@@ -16,6 +16,14 @@ const paymentDetailApi = {
             console.log(error);
         }
     },
+
+    getPaymentDetailsByPaymentId: (paymentId) => {
+        try {
+        return axiosClient.get(`${baseUrl}/paymentId`)
+        } catch (error) {
+          console.log(error);
+        }
+    }
 };
 
 export default paymentDetailApi;

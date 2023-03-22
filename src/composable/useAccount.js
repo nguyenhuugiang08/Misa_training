@@ -19,6 +19,8 @@ const {
 export const useAccount = () => {
     try {
         const accounts = ref([]);
+        const totalPage = ref(0);
+        const totalRecord = ref(0);
 
         /**
          * Hàm lấy danh sách tài khoản theo bộ lọc và phân trang
@@ -41,7 +43,34 @@ export const useAccount = () => {
                     const allAccounts = await accountApi.getAccounts();
                     const res = await accountApi.getChildrens();
                     const { Data, TotalRecord, TotalPage } = response;
-                    accounts.value = [...Data];
+                    totalPage.value = TotalPage;
+                    totalRecord.value = TotalRecord;
+
+                    if (keyword) {
+                        const accountsGreaterThanOne =
+                            await accountApi.getAccountsGradeGreaterThanOne(
+                                keyword,
+                                pageSize,
+                                pageNumber
+                            );
+
+                        if (accountsGreaterThanOne.Data.length === 1 && Data.length === 0) {
+                            accountsGreaterThanOne.Data[0].ParentId = 0;
+                        }
+                        accountsGreaterThanOne.Data?.forEach((account) => {
+                            try {
+                                if (account.IsParent === true && Data.length === 0)
+                                    account.ParentId = 0;
+                            } catch (error) {
+                                console.log(error);
+                            }
+                        });
+                        accounts.value = [...Data, ...accountsGreaterThanOne.Data];
+                        totalPage.value = accountsGreaterThanOne.TotalPage;
+                        totalRecord.value = accounts.value.length;
+                    } else {
+                        accounts.value = [...Data];
+                    }
 
                     // lấy ra danh sách các AccountId của tài khoản cha
                     let accountIds = accounts.value.map((account) => account.AccountId);
@@ -51,7 +80,10 @@ export const useAccount = () => {
                     // Xử lý lấy ra những tài khoản con tương ứng với các tài khoản cha đang có tại trang hiện tại -> thêm vào danh sách tài khoản
                     res.forEach((child) => {
                         try {
-                            if (accountIds.includes(child.ParentId)) {
+                            if (
+                                accountIds.includes(child.ParentId) &&
+                                !accountIds.includes(child.AccountId)
+                            ) {
                                 accounts.value.push(child);
                                 accountIds = accounts.value.map((account) => account.AccountId);
                                 countRecords++;
@@ -73,7 +105,7 @@ export const useAccount = () => {
                     });
 
                     if (state.keyword) {
-                        setTotalEntities(TotalRecord + countRecords);
+                        setTotalEntities(totalRecord.value + countRecords);
                     } else {
                         const Options = allAccounts.map((account) => {
                             return {
@@ -86,7 +118,7 @@ export const useAccount = () => {
                         setTotalEntities(Options.length);
                     }
                     setEntities(accounts);
-                    setTotalPage(TotalPage);
+                    setTotalPage(totalPage.value);
                     setIsLoading();
                 }, 500);
             } catch (error) {

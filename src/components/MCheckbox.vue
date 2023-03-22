@@ -224,13 +224,16 @@ const handleClickDropButton = (e) => {
     try {
         isOpen.value = !props.disabled ? !isOpen.value : false;
         optionSearch.value = [...props.options];
-        topTableCombobox.value = e.target.getBoundingClientRect().y + 28;
+        // topTableCombobox.value = e.target.getBoundingClientRect().y + 28;
 
-        if (e.target.getBoundingClientRect().x < 860) {
-            leftTableCombobox.value = e.target.getBoundingClientRect().x - props.width;
-        } else {
-            leftTableCombobox.value = e.target.getBoundingClientRect().x - 646;
-        }
+        // if (
+        //     e.target.getBoundingClientRect().x < 860 ||
+        //     e.target.getBoundingClientRect().x === 922
+        // ) {
+        //     leftTableCombobox.value = e.target.getBoundingClientRect().x - props.width;
+        // } else {
+        //     leftTableCombobox.value = e.target.getBoundingClientRect().x - 646;
+        // }
     } catch (error) {
         console.log(error);
     }
@@ -382,8 +385,8 @@ const handleClickDropButton = (e) => {
     text-align: center;
     left: 50%;
     transform: translateX(-50%);
-    width: 200px;
-    top: 36px;
+    width: max-content;
+    top: 32px;
     font-weight: 400;
     display: none;
     white-space: normal;
@@ -396,14 +399,14 @@ const handleClickDropButton = (e) => {
     width: 0;
     border: 8px solid;
     border-color: transparent transparent #f65d5d transparent;
-    top: -13px;
+    top: -11px;
     left: 50%;
     transform: translateX(-50%);
 }
 
 .cbo-table-list {
     position: absolute;
-    top: 48px;
+    top: 48px !important;
     z-index: 99;
 }
 </style>

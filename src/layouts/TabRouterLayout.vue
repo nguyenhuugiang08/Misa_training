@@ -2,9 +2,9 @@
 import TheSidebar from "../components/TheSidebar.vue";
 import TheHeader from "../components/TheHeader.vue";
 import { MISA_RESOURCE } from "../base/resource";
-import { ref } from "vue";
+import { ref, inject } from "vue";
 
-const indexTab = ref(0);
+const { state, setIndexTabRouter } = inject("diy");
 </script>
 
 <template>
@@ -17,10 +17,12 @@ const indexTab = ref(0);
                     <ul class="tab-list">
                         <router-link
                             :to="tab.tabLink"
-                            :class="`tab-item ${indexTab === index ? 'tab-item--active' : ''}`"
+                            :class="`tab-item ${
+                                state.indexTabRouter === index ? 'tab-item--active' : ''
+                            }`"
                             v-for="(tab, index) in MISA_RESOURCE.TAB"
                             :key="index"
-                            @click="indexTab = index"
+                            @click="setIndexTabRouter(index)"
                         >
                             {{ tab.tabName }}
                         </router-link>

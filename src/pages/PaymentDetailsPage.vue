@@ -12,7 +12,7 @@ import { usePayment } from "../composable/usePayment";
 import { inject, reactive, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { MISA_ENUM } from "../base/enum";
-import { error, useValidate } from "../utilities/validateForm";
+import { error, useValidate, paymentDetailErrors } from "../utilities/validateForm";
 import MToast from "../components/MToast.vue";
 import MPopUpError from "../components/MPopUpError.vue";
 import { usePaymentDeatil } from "../composable/usePaymentDetail";
@@ -23,6 +23,8 @@ const refTableDetail = ref(null); // Tham chiếu tới bảng detail
 const disable = ref(false); // trạng thái disable các ô nhập liệu khi cất
 const today = ref(null); // lấy ra ngày hiện tại
 const isOpenError = ref(false); // trạng thái đóng mở của popup hiển thị khi có lỗi xả ra
+const paymentDetailTextErrors = ref([]); // mảng lưu text lỗi của UI detail
+const isOpenPopupConstruction = ref(false); // trạng thái đóng/ mở của popup thông báo chức năng đang thi công
 
 onMounted(() => {
     try {
@@ -51,10 +53,7 @@ const payment = reactive({
     Receiver: state.entitySelected?.Receiver || "",
     RefDate: state.entitySelected?.RefDate ? state.entitySelected?.RefDate : new Date(),
     RefNo: state.entitySelected?.RefNo || "",
-    TotalAmount:
-        state.entitySelected?.TotalAmount || state.entitySelected?.TotalAmount === 0
-            ? state.entitySelected?.TotalAmount
-            : state.totalPayment || 0,
+    TotalAmount: 0,
 });
 
 const paymentDetails = ref([
@@ -96,6 +95,15 @@ const handleSubmit = async (identityButton) => {
     try {
         const paymentDetails = state.paymentDetails;
         const status = useValidate({ payment, paymentDetails });
+        paymentDetailTextErrors.value = [];
+        paymentDetailErrors?.forEach((error) => {
+            if (error.DebitAccount.textError)
+                paymentDetailTextErrors.value.push(error.DebitAccount.textError);
+            if (error.CreditAccount.textError)
+                paymentDetailTextErrors.value.push(error.CreditAccount.textError);
+            if (error.ObjectId.textError)
+                paymentDetailTextErrors.value.push(error.ObjectId.textError);
+        });
 
         if (!status) {
             // xử lý thêm tài khoản
@@ -226,17 +234,6 @@ const handleSetReverseTabindex = (e) => {
     }
 };
 
-const handle = (e) => {
-    try {
-        if (e.keyCode === MISA_ENUM.KEY_CODE.TAB) {
-            e.preventDefault();
-            refTableDetail.value.focusTableDetail();
-        }
-    } catch (error) {
-        console.log(error);
-    }
-};
-
 watch(
     () => payment.PostedDate,
     (newValue) => {
@@ -303,10 +300,10 @@ watch(
                     <div class="instruct-icon"></div>
                 </div>
                 <router-link to="/" class="instruct-link">Hướng dẫn</router-link>
-                <div class="m-icon m-icon__second">
+                <div class="m-icon m-icon__second" @click="isOpenPopupConstruction = true">
                     <div class="setting-icon"></div>
                 </div>
-                <div class="m-icon m-icon__second">
+                <div class="m-icon m-icon__second" @click="isOpenPopupConstruction = true">
                     <div class="help-icon"></div>
                 </div>
                 <div class="m-icon m-icon__second" @click="handleCloseForm">
@@ -450,13 +447,13 @@ watch(
                     :status="error.RefNo.status"
                     :statusPublic="error.status"
                     :text-error="error.RefNo.textError"
-                    @keydown="handle"
                     @inputValue="payment.RefNo = $event"
+                    @changeValue="error.RefNo.status = $event"
                 />
             </div>
             <div class="container-right">
                 Tổng tiền
-                <div class="payment-total">{{ formatMoney(payment.TotalAmount) }}</div>
+                <div class="payment-total">{{ formatMoney(state.totalPayment) }}</div>
             </div>
         </div>
         <div class="payment-detail">
@@ -513,9 +510,20 @@ watch(
             <m-pop-up-error
                 :title="'Lỗi'"
                 :text-error="
-                    error.RefDate.textError || error.RefNo.textError || error.PostedDate.textError
+                    error.RefDate.textError ||
+                    error.RefNo.textError ||
+                    error.PostedDate.textError ||
+                    paymentDetailTextErrors?.[0]
                 "
                 @closeError="isOpenError = !isOpenError"
+            />
+        </div>
+        <div class="modal-error" v-if="isOpenPopupConstruction">
+            <m-pop-up-error
+                v-if="isOpenPopupConstruction"
+                :title="'Thông báo'"
+                :text-error="`Chức năng chưa thi công.`"
+                @closeError="isOpenPopupConstruction = !isOpenPopupConstruction"
             />
         </div>
     </div>
@@ -557,5 +565,45 @@ watch(
     justify-content: center;
     color: #fff !important;
     align-items: center;
+}
+
+.close-icon::after {
+    position: absolute;
+    content: "Đóng (ESC)";
+    display: block;
+    background-color: #434242;
+    color: #fff;
+    top: 46px;
+    right: 0;
+    width: max-content;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: none;
+    opacity: 0;
+    animation: identifier 0.3s ease-in;
+}
+
+.close-icon::before {
+    content: "";
+    position: absolute;
+    display: block;
+    height: 0;
+    width: 0;
+    border: 6px solid;
+    border-color: transparent transparent #434242 transparent;
+    top: 36px;
+    display: none;
+    opacity: 0;
+    animation: identifier 0.3s ease-in;
+}
+
+.close-icon:hover::before {
+    display: block;
+    opacity: 1;
+}
+
+.close-icon:hover::after {
+    display: block;
+    opacity: 1;
 }
 </style>

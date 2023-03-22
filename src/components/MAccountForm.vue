@@ -37,7 +37,7 @@ const account = reactive({
     TypeName: MISA_RESOURCE.ACCOUNT_NATURE[1].optionName,
     Description: state.entitySelected?.Description || "",
     HasForeignCurrencyAccounting: state.entitySelected?.HasForeignCurrencyAccounting || false,
-    IsActive: state.entitySelected?.IsActive ? true : false,
+    IsActive: state.entitySelected?.IsActive === false ? false : true,
     IsParent: state.entitySelected?.IsParent || false,
     IsTrackObject: state.entitySelected?.IsTrackObject || false,
     IsTrackJob: state.entitySelected?.IsTrackJob || false,
@@ -358,6 +358,7 @@ const handleSetReverseTabindex = (e) => {
                         :statusPublic="error.status"
                         :text-error="error.AccountNumber.textError"
                         @inputValue="account.AccountNumber = $event"
+                        @changeValue="error.AccountNumber.status = $event"
                         @keydown="handleSetReverseTabindex"
                     />
                 </div>
@@ -372,6 +373,7 @@ const handleSetReverseTabindex = (e) => {
                         :status="error.AccountName.status"
                         :statusPublic="error.status"
                         :text-error="error.AccountName.textError"
+                        @changeValue="error.AccountName.status = $event"
                         @inputValue="account.AccountName = $event"
                     />
                     <m-input

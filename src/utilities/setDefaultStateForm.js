@@ -1,4 +1,4 @@
-import { error } from "./validateForm";
+import { error, paymentDetailErrors } from "./validateForm";
 
 /**
  * set lại trang thái lỗi ban đầu cho form khi mở lên
@@ -65,6 +65,20 @@ export const handleSetStatusForm = () => {
             textError: "",
             status: false,
         };
+        error.ObjectId = {
+            textError: "",
+            status: false,
+        };
+        error.DebitAccount = {
+            textError: "",
+            status: false,
+        };
+        error.CreditAccount = {
+            textError: "",
+            status: false,
+        };
+
+        paymentDetailErrors.splice(0, paymentDetailErrors.length);
         error.status = false;
     } catch (error) {
         console.log(error);

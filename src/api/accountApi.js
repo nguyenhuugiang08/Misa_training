@@ -133,6 +133,27 @@ const accountApi = {
             console.log(error);
         }
     },
+
+    /**
+     * Hàm lấy danh sách tài khoản có bậc lớn hơn 1 theo bộ lọc và phân trang
+     * @param {*} keyword 
+     * @param {*} pageSize 
+     * @param {*} pageNumber 
+     * @returns 
+     */
+    getAccountsGradeGreaterThanOne: (keyword, pageSize, pageNumber) => {
+        try {
+            return axiosClient.get(`${baseUrl}/greaterThanOne`, {
+                params: {
+                    entityFilter: keyword,
+                    pageSize: pageSize,
+                    pageNumber: pageNumber,
+                },
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    },
 };
 
 export default accountApi;

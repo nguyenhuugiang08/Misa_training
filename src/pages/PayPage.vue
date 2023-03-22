@@ -24,22 +24,27 @@ const totalPayment = ref(0);
 
 const router = useRouter();
 const route = useRoute();
-router.push({ path: "/cash/pay", query: { pageSize: pageSize.value, pageNumber: MISA_ENUM.PAGENUMBER_DEFAULT } });
+router.push({
+    path: "/cash/pay",
+    query: { pageSize: pageSize.value, pageNumber: MISA_ENUM.PAGENUMBER_DEFAULT },
+});
 
 const { getPaymentsByFilter, handlExportExcel, handleBulkDelete, getPayments, getNewRefNo } =
     usePayment();
 getPaymentsByFilter();
 getPayments();
 
-const { state, setEntitySelected, setIdentityForm } = inject("diy");
+const { state, setEntitySelected, setIdentityForm, setPaymentDetailsDefault, setPaymentDetail } =
+    inject("diy");
 
 watch(
-    () => state.listAllEntities,
+    () => state.listAllEntities.length,
     (newValue) => {
         try {
-            totalPayment.value = newValue?.reduce((result, cur) => {
+            totalPayment.value = state.listAllEntities?.reduce((result, cur) => {
                 try {
-                    return (result += cur.TotalAmount);
+                    result += cur.TotalAmount;
+                    return result;
                 } catch (error) {
                     console.log(error);
                 }
@@ -96,6 +101,19 @@ const handleShowPaymentDetail = async () => {
         setIdentityForm(MISA_ENUM.FORM_MODE.ADD);
         handleSetStatusForm();
         router.push("/pay/pay-detail");
+        setPaymentDetailsDefault();
+        setPaymentDetail({
+            PaymentId: "",
+            ObjectId: "",
+            ObjectCode: "",
+            ObjectName: "",
+            Amount: 0,
+            DebitAccount: "",
+            DebitAccountName: "",
+            CreditAccount: "",
+            CreditAccountName: "",
+            Description: "",
+        });
     } catch (error) {
         console.log(error);
     }
