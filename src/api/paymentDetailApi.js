@@ -17,13 +17,25 @@ const paymentDetailApi = {
         }
     },
 
-    getPaymentDetailsByPaymentId: (paymentId) => {
+    /**
+     * Hàm lấy ra danh sách chi tiết phiếu chi theo ID của phiếu chi
+     * @param {*} paymentId
+     * @returns
+     * Created by : NHGiang - (23/03/23)
+     */
+    getPaymentDetailsByPaymentId: (paymentId, pageSize, pageNumber) => {
         try {
-        return axiosClient.get(`${baseUrl}/paymentId`)
+            return axiosClient.get(`${baseUrl}/paymentId`, {
+                params: {
+                    paymentId: paymentId,
+                    pageSize: pageSize,
+                    pageNumber: pageNumber,
+                },
+            });
         } catch (error) {
-          console.log(error);
+            console.log(error);
         }
-    }
+    },
 };
 
 export default paymentDetailApi;

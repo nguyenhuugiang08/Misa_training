@@ -9,6 +9,9 @@ import { MISA_ENUM } from "../base/enum";
 const props = defineProps({
     path: String,
     funcFilter: Function,
+    totalPage: Number,
+    totalRecord: Number,
+    keyword: String,
 });
 
 const { state } = inject("diy");
@@ -16,7 +19,6 @@ const pageSize = ref(20);
 const page = ref(1);
 const router = useRouter();
 const route = useRoute();
-const { query } = route;
 
 /**
  * Theo dõi sự thay đổi pageSize từ URL
@@ -66,9 +68,14 @@ const isLoading = ref(false);
  */
 const handleChangePageSize = async (pageSize, pageNumber = 1) => {
     try {
-        router.push({ path: props.path, query: { pageSize: pageSize, pageNumber: pageNumber } });
+        if (props.path) {
+            router.push({
+                path: props.path,
+                query: { pageSize: pageSize, pageNumber: pageNumber },
+            });
+        }
         isLoading.value = true;
-        await props.funcFilter(state.keyword, pageSize, pageNumber);
+        await props.funcFilter(props.keyword || state.keyword, pageSize, pageNumber);
         isLoading.value = false;
     } catch (error) {
         console.log(error);
@@ -82,12 +89,14 @@ const handleChangePageSize = async (pageSize, pageNumber = 1) => {
  */
 const handleChangePageNumber = async (pageNumber) => {
     try {
-        router.push({
-            path: props.path,
-            query: { pageSize: pageSize.value, pageNumber: pageNumber },
-        });
+        if (props.path) {
+            router.push({
+                path: props.path,
+                query: { pageSize: pageSize.value, pageNumber: pageNumber },
+            });
+        }
         isLoading.value = true;
-        await props.funcFilter(state.keyword, pageSize.value, pageNumber);
+        await props.funcFilter(props.keyword || state.keyword, pageSize.value, pageNumber);
         isLoading.value = false;
     } catch (error) {
         console.log(error);
@@ -99,7 +108,7 @@ const handleChangePageNumber = async (pageNumber) => {
 <template>
     <div class="content-footer">
         <div class="empolyee-quantity">
-            Tổng: <strong>{{ state.totalEntities }}</strong> bản ghi
+            Tổng: <strong>{{ totalRecord }}</strong> bản ghi
         </div>
         <div style="display: flex; align-items: center">
             <m-checkbox
@@ -112,7 +121,7 @@ const handleChangePageNumber = async (pageNumber) => {
             />
             <paginate
                 v-model="page"
-                :page-count="state.totalPageValue"
+                :page-count="totalPage"
                 :page-range="3"
                 :margin-pages="1"
                 :prev-text="'Trước'"
@@ -127,7 +136,7 @@ const handleChangePageNumber = async (pageNumber) => {
             </paginate>
         </div>
         <div v-if="isLoading" class="overlay">
-            <m-Loading />
+            <m-loading />
         </div>
     </div>
 </template>

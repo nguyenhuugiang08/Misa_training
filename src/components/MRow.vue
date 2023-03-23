@@ -5,6 +5,7 @@ import { inject, ref } from "vue";
 import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
 import { MISA_ENUM } from "../base/enum";
 import { usePayment } from "../composable/usePayment";
+import { usePaymentDeatil } from "../composable/usePaymentDetail";
 import { useRouter } from "vue-router";
 
 // Định nghĩa các props nhận vào
@@ -15,6 +16,7 @@ const props = defineProps({
 });
 
 const { getPaymentById } = usePayment();
+const { getPaymentDetailsByPaymentId } = usePaymentDeatil();
 
 const emit = defineEmits(["check", "displayWarning"]);
 const isShowList = ref(false); // Trạng thái ẩn hiện danh sách chức năng (Nhân bản, Xóa)
@@ -22,7 +24,7 @@ const toDropList = ref(0); // Khoảng cách của danh sách chức năng so v�
 
 const router = useRouter();
 
-const { state, setIdentityForm } = inject("diy");
+const { state, setIdentityForm, setRowPaymentSelected } = inject("diy");
 
 /**
  * Hàm xử lý check 1 dòng
@@ -41,6 +43,7 @@ const handleCheckItem = (itemId) => {
 const handleEditPayment = async (paymentId) => {
     try {
         await getPaymentById(paymentId);
+        await getPaymentDetailsByPaymentId(paymentId);
         router.push("/pay/pay-detail");
         handleSetStatusForm();
         setIdentityForm(MISA_ENUM.FORM_MODE.EDIT);
@@ -109,8 +112,20 @@ const handleClickOutside = () => {
 </script>
 
 <template>
-    <tr class="tbl-row" @dblclick="handleEditPayment(entity.PaymentId)">
-        <td class="tbl-col tbl-col__first" v-if="hasCheckbox">
+    <tr
+        class="tbl-row"
+        @dblclick="handleEditPayment(entity.PaymentId)"
+        @click="setRowPaymentSelected(entity.PaymentId)"
+        :style="{ background: state.rowPaymentSelected === entity.PaymentId ? '#e5f3ff' : '' }"
+    >
+        <td
+            class="tbl-col tbl-col__first"
+            v-if="hasCheckbox"
+            :style="{
+                background:
+                    state.rowPaymentSelected === entity.PaymentId ? '#e5f3ff !important' : '',
+            }"
+        >
             <input
                 type="checkbox"
                 class="tbl-checkbox"
@@ -135,7 +150,13 @@ const handleClickOutside = () => {
         <td class="tbl-col">{{ entity.ObjectCode || "" }}</td>
         <td class="tbl-col">{{ entity.ObjectName || "" }}</td>
         <td class="tbl-col" style="width: 280px">{{ entity.Address || "" }}</td>
-        <td class="tbl-col tbl-col__last">
+        <td
+            class="tbl-col tbl-col__last"
+            :style="{
+                background:
+                    state.rowPaymentSelected === entity.PaymentId ? '#e5f3ff !important' : '',
+            }"
+        >
             <div class="tbl-col__action">
                 <label class="tbl-col__action-edit" @click="handleEditPayment(entity.PaymentId)"
                     >Xem</label

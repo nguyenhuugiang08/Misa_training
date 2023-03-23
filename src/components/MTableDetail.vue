@@ -1,6 +1,6 @@
 <script setup>
 import MRowDetail from "./MRowDetail.vue";
-import { ref, defineExpose, inject } from "vue";
+import { ref, defineExpose, inject, watchEffect } from "vue";
 import { formatMoney } from "../utilities/formatMoney";
 
 const props = defineProps({
@@ -11,7 +11,7 @@ const props = defineProps({
     reason: String,
 });
 
-const { state } = inject("diy");
+const { state, setTotalPayment } = inject("diy");
 
 const refRowDetail = ref(null);
 const editable = ref(false);
@@ -27,6 +27,21 @@ const focusTableDetail = () => {
 };
 
 defineExpose({ focusTableDetail });
+
+watchEffect(() => {
+    try {
+        const totalPayment = state.paymentDetails?.reduce((result, cur) => {
+            try {
+                return result + cur.Amount;
+            } catch (error) {
+                console.log(error);
+            }
+        }, 0);
+        setTotalPayment(totalPayment);
+    } catch (error) {
+        console.log(error);
+    }
+});
 </script>
 
 <template>

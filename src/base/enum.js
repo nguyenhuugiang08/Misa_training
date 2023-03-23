@@ -59,5 +59,6 @@ export const MISA_ENUM = {
         SAVE_CLOSE: 2, // Cất và đóng
     },
     GRADE_DEFAULT: 0, // bậc tài khoản ban đầu
-    PAGENUMBER_DEFAULT: 1 // Trang đầu tiêng
+    PAGENUMBER_DEFAULT: 1, // Trang đầu tiêng
+    INDEX_SIDEBAR_CATEGORY: 16, // index của page danh mục trên sidebar
 };

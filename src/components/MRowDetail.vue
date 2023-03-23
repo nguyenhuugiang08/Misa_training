@@ -18,22 +18,32 @@ const props = defineProps({
     index: Number,
 });
 
-const { state, setPaymentDetail, setPaymentDetails, setIndexRowEditable, deletePaymentDetails } =
-    inject("diy");
+const {
+    state,
+    setPaymentDetail,
+    setPaymentDetailsByIndex,
+    setIndexRowEditable,
+    deletePaymentDetails,
+} = inject("diy");
+
 const { getAccounts } = useAccount();
-getAccounts();
+if (props.isEdit) {
+    getAccounts();
+}
 
 const refRowDetail = ref(null);
 const paymentDetail = reactive({
     PaymentId: "",
-    ObjectId: state.paymentDetail?.ObjectId || state.objectSelected?.optionId || "",
-    ObjectCode: state.paymentDetail?.ObjectCode || state.objectSelected?.optionCode || "",
-    ObjectName: state.paymentDetail?.ObjectName || state.objectSelected?.optionName || "",
-    Amount: state.paymentDetail?.Amount || 0,
-    DebitAccount: state.paymentDetail?.DebitAccount || "",
-    DebitAccountName: state.paymentDetail?.DebitAccountName || "",
-    CreditAccount: state.paymentDetail?.CreditAccount || "",
-    CreditAccountName: state.paymentDetail?.CreditAccountName || "",
+    ObjectId: state.paymentDetails[props.index]?.ObjectId || state.objectSelected?.optionId || "",
+    ObjectCode:
+        state.paymentDetails[props.index]?.ObjectCode || state.objectSelected?.optionCode || "",
+    ObjectName:
+        state.paymentDetails[props.index]?.ObjectName || state.objectSelected?.optionName || "",
+    Amount: state.paymentDetails[props.index]?.Amount || 0,
+    DebitAccount: state.paymentDetails[props.index]?.DebitAccount || "",
+    DebitAccountName: state.paymentDetails[props.index]?.DebitAccountName || "",
+    CreditAccount: state.paymentDetails[props.index]?.CreditAccount || "",
+    CreditAccountName: state.paymentDetails[props.index]?.CreditAccountName || "",
     Description: props.reason || MISA_RESOURCE.REASON_PAYMENT_DEFAULT,
 });
 
@@ -74,8 +84,7 @@ watch(
     () => JSON.stringify(paymentDetail),
     () => {
         setPaymentDetail(paymentDetail);
-        setPaymentDetails(state.paymentDetail, props.index);
-        useValidate({ paymentDetails: state.paymentDetails });
+        setPaymentDetailsByIndex(state.paymentDetail, props.index);
     }
 );
 
@@ -85,16 +94,19 @@ defineExpose({ handleFocus });
 <template>
     <tr
         class="tbl-row"
-        @click="setIndexRowEditable(index)"
+        @click="isEdit && setIndexRowEditable(index)"
         :style="{
-            background: state.indexRowEditable === index ? 'var(--table-bg-color)' : '#fff',
+            background:
+                isEdit && state.indexRowEditable === index ? 'var(--table-bg-color)' : '#fff',
         }"
     >
         <td
             class="tbl-col tbl-col__first"
             :style="{
                 background:
-                    state.indexRowEditable === index ? 'var(--table-bg-color) !important' : '#fff',
+                    isEdit && state.indexRowEditable === index
+                        ? 'var(--table-bg-color) !important'
+                        : '#fff',
             }"
         >
             <span class="tbl-detail-text">{{ numericalOrder + 1 || "" }}</span>
@@ -113,10 +125,11 @@ defineExpose({ handleFocus });
                     @inputValue="paymentDetail.Description = $event"
                 />
             </span>
+            <span v-if="!isEdit">{{ state.paymentDetails[index]?.Description }}</span>
             <span v-if="isEdit && !(index === state.indexRowEditable)">{{
-                paymentDetail.Description
-                    ? paymentDetail.Description
-                    : `Chi tiền cho ${paymentDetail.ObjectName}`
+                state.paymentDetails[index]?.Description
+                    ? state.paymentDetails[index]?.Description
+                    : `Chi tiền cho ${state.paymentDetails[index]?.ObjectName}`
             }}</span>
         </td>
         <td class="tbl-col">
@@ -141,6 +154,7 @@ defineExpose({ handleFocus });
                         "
                     />
                 </div>
+                <span v-if="!isEdit">{{ state.paymentDetails[index]?.DebitAccountName }}</span>
                 <span v-if="isEdit && !(index === state.indexRowEditable)">{{
                     paymentDetail.DebitAccountName
                 }}</span>
@@ -168,6 +182,7 @@ defineExpose({ handleFocus });
                         "
                     />
                 </div>
+                <span v-if="!isEdit">{{ state.paymentDetails[index]?.CreditAccountName }}</span>
                 <span v-if="isEdit && !(index === state.indexRowEditable)">{{
                     paymentDetail.CreditAccountName
                 }}</span>
@@ -182,6 +197,7 @@ defineExpose({ handleFocus });
                     v-model="paymentDetail.Amount"
                     @update:model-value="paymentDetail.Amount = $event"
                 />
+                <span v-if="!isEdit">{{ formatMoney(state.paymentDetails[index]?.Amount) }}</span>
                 <span v-if="isEdit && !(index === state.indexRowEditable)">{{
                     formatMoney(paymentDetail.Amount)
                 }}</span>
@@ -191,6 +207,7 @@ defineExpose({ handleFocus });
             <span class="tbl-detail-text">
                 <div class="checkbox-wrapper" v-if="isEdit && index === state.indexRowEditable">
                     <m-checkbox
+                        v-if="state.objects.length"
                         width="130px"
                         bottom="2px"
                         :columns="MISA_RESOURCE.COLUMNS_NAME_COMBOBOX_OBJECT"
@@ -200,6 +217,7 @@ defineExpose({ handleFocus });
                         :status="paymentDetailErrors?.[index]?.ObjectId.status"
                         :textError="paymentDetailErrors?.[index]?.ObjectId.textError"
                         :statusPublic="error.status"
+                        left="-300px"
                         @select="
                             paymentDetail.ObjectId = $event.optionId;
                             paymentDetail.ObjectCode = $event.optionCode;
@@ -207,6 +225,7 @@ defineExpose({ handleFocus });
                         "
                     />
                 </div>
+                <span v-if="!isEdit">{{ state.paymentDetails[index]?.ObjectCode }}</span>
                 <span v-if="isEdit && !(index === state.indexRowEditable)">{{
                     paymentDetail.ObjectCode
                 }}</span>

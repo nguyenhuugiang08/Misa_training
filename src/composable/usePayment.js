@@ -1,8 +1,6 @@
 import paymentApi from "../api/paymentApi";
 import diy from "../store/diy";
 import { MISA_RESOURCE } from "../base/resource";
-import { convertDatetime } from "../utilities/convertDatetime";
-import { formatDate } from "../utilities/formatDate";
 
 const {
     setPayments,
@@ -71,6 +69,7 @@ export const usePayment = () => {
             try {
                 const outputFilename = MISA_RESOURCE.FILE_EXCEL_PAYMENT_NAME;
 
+                setIsLoading();
                 const response = await paymentApi.exportExcel(keyword, dataCount, pageNumber);
 
                 // Thực hiện tạo 1 thẻ a để thực hiện tải file khi xuất xong
@@ -80,6 +79,7 @@ export const usePayment = () => {
                 link.setAttribute("download", outputFilename);
                 document.body.appendChild(link);
                 link.click();
+                setIsLoading();
             } catch (error) {
                 console.log(error);
             }

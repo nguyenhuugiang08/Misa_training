@@ -1,5 +1,5 @@
 <script setup>
-import { ref, inject, watch } from "vue";
+import { ref, inject, watch, watchEffect } from "vue";
 import { MISA_RESOURCE } from "../base/resource";
 import MTable from "../components/MTable.vue";
 import MPagination from "../components/MPagination.vue";
@@ -11,9 +11,11 @@ import { usePayment } from "../composable/usePayment";
 import MPopUpWarning from "../components/MPopUpWarning.vue";
 import MToast from "../components/MToast.vue";
 import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
+import { usePaymentDeatil } from "../composable/usePaymentDetail";
+import MLoading from "../components/MLoading.vue";
 
 const isFocus = ref(false); // Trạng thái focus vào ô tìm kiếm
-const heightMaster = ref(MISA_ENUM.HEIGHT_PAYMENT_CONTENT); // Chiều cao phần master
+const heightMaster = ref(MISA_ENUM.HEIGHT_PAYMENT_MASTER); // Chiều cao phần master
 const heightDetail = ref(MISA_ENUM.HEIGHT_PAYMENT_DETAIL); // Chiều cao mặc định của phần detail
 const vueResizeRef = ref(null); // ref của component vue-resize
 const pageSize = ref(20); // số bản ghi trên 1 trang
@@ -34,47 +36,31 @@ const { getPaymentsByFilter, handlExportExcel, handleBulkDelete, getPayments, ge
 getPaymentsByFilter();
 getPayments();
 
-const { state, setEntitySelected, setIdentityForm, setPaymentDetailsDefault, setPaymentDetail } =
-    inject("diy");
+const { getPaymentDetailsByPaymentId } = usePaymentDeatil();
 
-watch(
-    () => state.listAllEntities.length,
-    (newValue) => {
-        try {
-            totalPayment.value = state.listAllEntities?.reduce((result, cur) => {
-                try {
-                    result += cur.TotalAmount;
-                    return result;
-                } catch (error) {
-                    console.log(error);
-                }
-            }, 0);
-        } catch (error) {
-            console.log(error);
-        }
+const {
+    state,
+    setEntitySelected,
+    setIdentityForm,
+    setPaymentDetailsDefault,
+    setPaymentDetail,
+    setObjectSelected,
+} = inject("diy");
+
+watchEffect(() => {
+    try {
+        totalPayment.value = state.listAllEntities?.reduce((result, cur) => {
+            try {
+                result += cur.TotalAmount;
+                return result;
+            } catch (error) {
+                console.log(error);
+            }
+        }, 0);
+    } catch (error) {
+        console.log(error);
     }
-);
-
-const fakeDataDetail = [
-    {
-        PaymentId: 1,
-        Explain: "Chi tiền cho Nguyễn Hữu Giang",
-        AccountDebt: "111",
-        AccountHas: "111",
-        Money: 1000000,
-        SubjectId: "KH001",
-        SubjectName: "Công ty cổ phần văn phòng phẩm Hồng Hà tại Hà Nội",
-    },
-    {
-        PaymentId: 2,
-        Explain: "Chi tiền cho Nguyễn Hữu Giang",
-        AccountDebt: "111",
-        AccountHas: "111",
-        Money: 1000000,
-        SubjectId: "KH001",
-        SubjectName: "Công ty cổ phần văn phòng phẩm Hồng Hà tại Hà Nội",
-    },
-];
+});
 
 /**
  * Hàm thực hiện thay đổi chiều cao phần detail khi resize
@@ -97,6 +83,7 @@ const handleChangeHeight = (event) => {
 const handleShowPaymentDetail = async () => {
     try {
         setEntitySelected({});
+        setObjectSelected({});
         await getNewRefNo();
         setIdentityForm(MISA_ENUM.FORM_MODE.ADD);
         handleSetStatusForm();
@@ -297,15 +284,27 @@ const handleClickOutsideButtonBulkDelete = () => {
                 :max-height="heightMaster"
                 :total-payment="totalPayment"
             />
-            <m-pagination path="/cash/pay" :func-filter="getPaymentsByFilter" />
+            <m-pagination
+                path="/cash/pay"
+                :func-filter="getPaymentsByFilter"
+                :total-page="state.totalPageValue"
+                :total-record="state.totalEntities"
+            />
         </vue-resizable>
         <div class="detail-payment" :style="{ height: heightDetail + 'px' }">
             <div class="detail-payment__title">Chi tiết</div>
             <m-table-detail
                 :columns="MISA_RESOURCE.COLUMNS_NAME_PAYMENT_DETAIL"
-                :entities="fakeDataDetail"
+                :entities="state.paymentDetails"
             />
-            <div class="detail-payment__paging"><m-pagination /></div>
+            <div class="detail-payment__paging">
+                <m-pagination
+                    :total-page="state.totalPagePaymentDetail"
+                    :total-record="state.totalRecordPaymentDetail"
+                    :func-filter="getPaymentDetailsByPaymentId"
+                    :keyword="state.paymentIdFilter"
+                />
+            </div>
         </div>
         <div class="overlay" v-if="state.isLoading"><m-loading /></div>
         <div class="modal-error" v-if="isShowPopupWarningDelete">

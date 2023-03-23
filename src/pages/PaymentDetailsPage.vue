@@ -9,7 +9,7 @@ import MComboButton from "../components/MComboButton.vue";
 import { useObject } from "../composable/useObject";
 import { useEmployee } from "../composable/useEmployee";
 import { usePayment } from "../composable/usePayment";
-import { inject, reactive, onMounted, onUnmounted, ref, watch } from "vue";
+import { inject, reactive, onMounted, onUnmounted, ref, watch, watchEffect } from "vue";
 import { useRouter } from "vue-router";
 import { MISA_ENUM } from "../base/enum";
 import { error, useValidate, paymentDetailErrors } from "../utilities/validateForm";
@@ -25,6 +25,7 @@ const today = ref(null); // lấy ra ngày hiện tại
 const isOpenError = ref(false); // trạng thái đóng mở của popup hiển thị khi có lỗi xả ra
 const paymentDetailTextErrors = ref([]); // mảng lưu text lỗi của UI detail
 const isOpenPopupConstruction = ref(false); // trạng thái đóng/ mở của popup thông báo chức năng đang thi công
+const refObjectCode = ref(null); // tham chiếu tới ô combobox mã đối tượng
 
 onMounted(() => {
     try {
@@ -32,6 +33,7 @@ onMounted(() => {
         if (state.newRefNo && state.identityForm === MISA_ENUM.FORM_MODE.ADD) {
             payment.RefNo = state.newRefNo;
         }
+        refObjectCode.value.handleFocusCombobox();
     } catch (error) {
         console.log(error);
     }
@@ -53,7 +55,7 @@ const payment = reactive({
     Receiver: state.entitySelected?.Receiver || "",
     RefDate: state.entitySelected?.RefDate ? state.entitySelected?.RefDate : new Date(),
     RefNo: state.entitySelected?.RefNo || "",
-    TotalAmount: 0,
+    TotalAmount: state.totalPayment || 0,
 });
 
 const paymentDetails = ref([
@@ -86,6 +88,17 @@ const handleCloseForm = () => {
         console.log(error);
     }
 };
+
+watch(
+    () => state.totalPayment,
+    (newValue) => {
+        try {
+            payment.TotalAmount = newValue;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
 
 /**
  * Hàm xử lý submit
@@ -257,23 +270,20 @@ const handleAddRowDetail = () => {
     }
 };
 
-watch(
-    () => JSON.stringify(state.paymentDetails),
-    () => {
-        try {
-            const totalPayment = state.paymentDetails?.reduce((result, cur) => {
-                try {
-                    return result + cur.Amount;
-                } catch (error) {
-                    console.log(error);
-                }
-            }, 0);
-            setTotalPayment(totalPayment);
-        } catch (error) {
-            console.log(error);
-        }
+watchEffect(() => {
+    try {
+        const totalPayment = state.paymentDetails?.reduce((result, cur) => {
+            try {
+                return result + cur.Amount;
+            } catch (error) {
+                console.log(error);
+            }
+        }, 0);
+        setTotalPayment(totalPayment);
+    } catch (error) {
+        console.log(error);
     }
-);
+});
 </script>
 
 <template>
@@ -317,6 +327,7 @@ watch(
                     <div class="checkbox-wrapper">
                         <m-checkbox
                             v-if="state.objects.length"
+                            ref="refObjectCode"
                             text-label="Mã đối tượng"
                             width="424px"
                             :default="payment.ObjectId"

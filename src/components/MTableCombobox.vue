@@ -63,6 +63,6 @@ watch(
 
 .row--active:hover {
     background-color: var(--primary-color) !important;
-    color: #fff!important;
+    color: #fff !important;
 }
 </style>

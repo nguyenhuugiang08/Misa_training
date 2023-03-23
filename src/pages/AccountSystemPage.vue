@@ -4,7 +4,7 @@ import MAccountForm from "../components/MAccountForm.vue";
 import MFeatureDetail from "../components/MFeatureDetail.vue";
 import MLoading from "../components/MLoading.vue";
 import { DxTreeList, DxColumn, DxPaging, DxPager, DxScrolling } from "devextreme-vue/tree-list";
-import { ref, inject, watch, onMounted, onUnmounted } from "vue";
+import { ref, inject, watch, onMounted, onUnmounted, watchEffect } from "vue";
 import { useAccount } from "../composable/useAccount";
 import { useRouter, useRoute } from "vue-router";
 import { MISA_RESOURCE } from "../base/resource";
@@ -70,6 +70,19 @@ watch(
         }
     }
 );
+
+watchEffect(() => {
+    try {
+        const newList = state.Entities.map((item) => {
+            if (item.IsParent === true) {
+                return item.AccountId;
+            }
+        });
+        newExpandedRowKeys.value = [...newList];
+    } catch (error) {
+        console.log(error);
+    }
+});
 
 /**
  * Hàm thực hiện Thu gọn/Mở rộng các hàng
@@ -271,7 +284,12 @@ onUnmounted(() => {
                     <m-feature-detail :data="options.data" />
                 </template>
             </DxTreeList>
-            <m-pagination path="/account-system" :func-filter="getAccountsByFilter" />
+            <m-pagination
+                path="/account-system"
+                :func-filter="getAccountsByFilter"
+                :total-page="state.totalPageValue"
+                :total-record="state.totalEntities"
+            />
             <MAccountForm v-if="state.isForm" @closeForm="isOpenForm = false" />
             <div class="overlay" v-if="state.isLoading"><m-loading /></div>
         </div>

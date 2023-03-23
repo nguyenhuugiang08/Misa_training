@@ -234,18 +234,6 @@ const handleCloseForm = () => {
 };
 
 /**
- * Xử lý focus input employee code
- * Created by: NHGiang - (20/02/23)
- */
-onMounted(() => {
-    try {
-        refAccountNumber.value.handleFocusInput();
-    } catch (error) {
-        console.log(error);
-    }
-});
-
-/**
  * Xử lý set lại tabindex khi hết
  * @param {*} e event object
  * Created by: NHGiang - (20/02/23)
@@ -291,11 +279,16 @@ const docKeyDown = (e) => {
 };
 
 /**
- * Hàm thêm event keydown
+ * Hàm thêm event keydown và focus vào ô input số tài khoản
  * Created by: NHGiang - (24/02/23)
  */
 onMounted(() => {
-    document.addEventListener("keydown", docKeyDown, false);
+    try {
+        refAccountNumber.value.handleFocusInput();
+        document.addEventListener("keydown", docKeyDown, false);
+    } catch (error) {
+        console.log(error);
+    }
 });
 
 /**

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, defineExpose } from "vue";
+import { ref, watchEffect, defineExpose, watch } from "vue";
 import { MISA_ENUM } from "../base/enum";
 import MTableCombobox from "./MTableCombobox.vue";
 
@@ -9,7 +9,6 @@ const isFocus = ref(false); // trạng thái Focus vào ô input.
 const optionSearch = ref([]); // Mảng lưu các lựa chọn phù hợp khi thực hiện tìm kiếm.
 const indexOptionSelected = ref(0); // Chỉ số của lựa chọn đã được chọn trong mảng danh sách các lựa chọn.
 const topTableCombobox = ref(0); // khoảng cách combobox dạng table đến top của trình duyệt
-const leftTableCombobox = ref(0); // khoảng cách combox dạng table đến left trình duyệt
 
 // Định nghĩa các props nhận vào.
 const props = defineProps({
@@ -30,14 +29,13 @@ const props = defineProps({
     isTable: Boolean,
     columns: { type: Array, default: [] },
     tooltip: String,
+    left: { type: String, default: "0px" },
 });
 
 const refCheckBox = ref(null);
 const refList = ref(null);
 const isShowError = ref(false);
 const refItem = ref(null);
-
-defineExpose({ refList, refItem });
 
 // Gán giá trị ban của mảng optionSearch là danh sách tất cả các lựa chọn.
 optionSearch.value = [...props.options];
@@ -101,16 +99,22 @@ const handleDefaultValue = (optionId) => {
  * - Nếu không có -> gán indexOptionSelected = -1
  */
 
-if (props.default || props.default === 0) {
-    selected.value = handleDefaultValue(props.default);
-    indexOptionSelected.value = optionSearch.value.findIndex(
-        (option) => option?.optionId === props.default
-    );
-} else {
-    indexOptionSelected.value = optionSearch.value.findIndex(
-        (option) => option?.optionName === selected.value
-    );
-}
+watchEffect(() => {
+    try {
+        if (props.default || props.default === 0) {
+            selected.value = handleDefaultValue(props.default);
+            indexOptionSelected.value = optionSearch.value.findIndex(
+                (option) => option?.optionId === props.default
+            );
+        } else {
+            indexOptionSelected.value = optionSearch.value.findIndex(
+                (option) => option?.optionName === selected.value
+            );
+        }
+    } catch (error) {
+        console.log(error);
+    }
+});
 
 /**
  * Xử lý click outside element
@@ -164,9 +168,9 @@ const handleSearchOption = (keyword) => {
 watch(
     () => indexOptionSelected.value,
     (newValue) => {
-        if (!props.isTable && newValue) {
+        if (props.isTable && newValue) {
             if (refItem.value) {
-                const liH = refItem.value?.[`${newValue}`].clientHeight;
+                const liH = refItem.value?.[`${newValue}`]?.clientHeight;
                 refList.value.scrollTop = liH * indexOptionSelected.value;
             }
         }
@@ -224,20 +228,26 @@ const handleClickDropButton = (e) => {
     try {
         isOpen.value = !props.disabled ? !isOpen.value : false;
         optionSearch.value = [...props.options];
-        // topTableCombobox.value = e.target.getBoundingClientRect().y + 28;
-
-        // if (
-        //     e.target.getBoundingClientRect().x < 860 ||
-        //     e.target.getBoundingClientRect().x === 922
-        // ) {
-        //     leftTableCombobox.value = e.target.getBoundingClientRect().x - props.width;
-        // } else {
-        //     leftTableCombobox.value = e.target.getBoundingClientRect().x - 646;
-        // }
     } catch (error) {
         console.log(error);
     }
 };
+
+/**
+ * Xử lý focus ô input
+ * created by: NHGiang - (24/03/23)
+ */
+const handleFocusCombobox = () => {
+    try {
+        if (refCheckBox.value) {
+            refCheckBox.value.focus();
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+defineExpose({ refList, refItem, handleFocusCombobox });
 </script>
 
 <template>
@@ -301,7 +311,7 @@ const handleClickDropButton = (e) => {
         </ul>
         <MTableCombobox
             v-if="isTable && isOpen"
-            :style="{ top: `${topTableCombobox}px`, left: `${leftTableCombobox}px` }"
+            :style="{ top: `${topTableCombobox}px`, left: left }"
             class="cbo-table-list"
             :options="optionSearch"
             :columns="columns"

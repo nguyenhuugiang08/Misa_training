@@ -53,6 +53,11 @@ const state = reactive({
     totalPayment: 0, // tổng tiền của phiếu chi
     indexRowEditable: 0, // index của dòng đang được chọn để edit trên UI detail
     indexTabRouter: 0, // index của tab router
+    sidebarSelected: 0, // Page được chọn khi click chọn 1 tab trên sidebar
+    rowPaymentSelected: 0, // index của dòng đang được chọn trên UI Master payment
+    totalPagePaymentDetail: 0, // tổng số trang phiếu chi chi tiết UI Detail
+    totalRecordPaymentDetail: 0, // tổng số trang phiếu chi chi tiết UI Detail
+    paymentIdFilter: "", // ID của phiếu chi dùng để lấy danh sách các chi tiết phiếu chi
 });
 
 /**
@@ -345,14 +350,27 @@ const setPaymentDetailsDefault = () => {
 };
 
 /**
- * Hàm gán lại item mảng paymentDetails
+ * Hàm gán lại item mảng paymentDetails theo index
  * @param {*} paymentDetail
  * @param {*} index
  * Created by: NHGiang - (21/03/23)
  */
-const setPaymentDetails = (paymentDetail, index) => {
+const setPaymentDetailsByIndex = (paymentDetail, index) => {
     try {
         state.paymentDetails[index] = paymentDetail;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm lấy ra danh sách các paymentDetails
+ * Created by: NHGiang - (23/03/23)
+ * @param {} paymentDetails
+ */
+const setPaymentDetails = (paymentDetails) => {
+    try {
+        state.paymentDetails = [...paymentDetails];
     } catch (error) {
         console.log(error);
     }
@@ -449,6 +467,71 @@ const setIndexTabRouter = (indexTab) => {
     }
 };
 
+/**
+ * Hàm lấy ra index của page đang được chọn trên sidebar
+ * Created by: NHGiang - (23/03/23)
+ * @param {*} index
+ */
+const setSidebarSelected = (index) => {
+    try {
+        state.sidebarSelected = index;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm lấy ra index của dòng đang được chọn trên UI master payment
+ * Created by: NHGiang - (23/03/23)
+ * @param {*} index
+ */
+const setRowPaymentSelected = (index) => {
+    try {
+        state.rowPaymentSelected = index;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm lấy ra tổng số trang payment Detail trên UI detail
+ * Created by: NHGiang - (23/03/23)
+ * @param {*} totalPage
+ */
+const setTotalPagePaymentDetail = (totalPage) => {
+    try {
+        state.totalPagePaymentDetail = totalPage;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm lấy ra tổng số bản ghi payment Detail trên UI detail
+ * Created by: NHGiang - (23/03/23)
+ * @param {*} totalPage
+ */
+const setTotalRecordPaymentDetail = (totalRecord) => {
+    try {
+        state.totalRecordPaymentDetail = totalRecord;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm lấy ra paymentId dùng để lấy danh sách phiếu chi chi tiết
+ * Created by : NHGiang - (23/03/23)
+ * @param {*} id
+ */
+const setPaymentIdFilter = (id) => {
+    try {
+        state.paymentIdFilter = id;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 export default {
     state: readonly(state),
     setIsSidebar,
@@ -481,4 +564,10 @@ export default {
     setPaymentDetailsDefault,
     deletePaymentDetails,
     setIndexTabRouter,
+    setPaymentDetailsByIndex,
+    setSidebarSelected,
+    setRowPaymentSelected,
+    setTotalPagePaymentDetail,
+    setTotalRecordPaymentDetail,
+    setPaymentIdFilter,
 };

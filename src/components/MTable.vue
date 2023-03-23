@@ -1,11 +1,11 @@
 <script setup>
-import { ref, inject, reactive, watch, onMounted } from "vue";
+import { ref, inject, reactive, watch, watchEffect } from "vue";
 import Mrow from "./MRow.vue";
-import MLoading from "../components/MLoading.vue";
 import MPopUpWarning from "./MPopUpWarning.vue";
 import { useRoute } from "vue-router";
 import { usePayment } from "../composable/usePayment";
 import { formatMoney } from "../utilities/formatMoney";
+import { usePaymentDeatil } from "../composable/usePaymentDetail";
 
 const props = defineProps({
     columns: Array,
@@ -16,8 +16,8 @@ const props = defineProps({
 });
 
 const { deletePaymentById, getPaymentsByFilter } = usePayment();
-const { state, setListItemChecked, setListPageChecked, setTotalEmployee, setTotalPage } =
-    inject("diy");
+const { getPaymentDetailsByPaymentId } = usePaymentDeatil();
+const { state, setListItemChecked, setListPageChecked, setRowPaymentSelected } = inject("diy");
 
 const isPopUp = reactive({
     isOpenWarning: false, // Trạng thái Đóng/Mở pop up warning
@@ -31,6 +31,21 @@ const id = ref(null); // Id của nhân viên muốn xóa
 const code = ref(null); // Mã của nhân viên muôn xóa
 const listCheck = ref([]); // mảng chứa các ID của các nhân viên đã được check
 const listTemporary = ref([]); // mảng tạm lưu thông tin của các ID của các nhân viên đã được check trong trang
+
+watchEffect(() => {
+    setRowPaymentSelected(props.entities[0]?.PaymentId);
+});
+
+watch(
+    () => state.rowPaymentSelected,
+    async (newValue) => {
+        try {
+            await getPaymentDetailsByPaymentId(newValue);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
 
 /**
  * Lấy ra trang thứ n sử dụng vue-router
