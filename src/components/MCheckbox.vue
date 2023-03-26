@@ -1,14 +1,8 @@
 <script setup>
+import { MISA_RESOURCE } from "../base/resource";
 import { ref, watchEffect, defineExpose, watch } from "vue";
 import { MISA_ENUM } from "../base/enum";
 import MTableCombobox from "./MTableCombobox.vue";
-
-const selected = ref(props.default ? props.default : null); // Giá trị của item được lựa chọn.
-const isOpen = ref(false); // trạng thái đóng/mở của danh sách chứa các lựa chọn.
-const isFocus = ref(false); // trạng thái Focus vào ô input.
-const optionSearch = ref([]); // Mảng lưu các lựa chọn phù hợp khi thực hiện tìm kiếm.
-const indexOptionSelected = ref(0); // Chỉ số của lựa chọn đã được chọn trong mảng danh sách các lựa chọn.
-const topTableCombobox = ref(0); // khoảng cách combobox dạng table đến top của trình duyệt
 
 // Định nghĩa các props nhận vào.
 const props = defineProps({
@@ -30,7 +24,16 @@ const props = defineProps({
     columns: { type: Array, default: [] },
     tooltip: String,
     left: { type: String, default: "0px" },
+    isShiftTab: { type: Boolean, default: false },
 });
+
+const selected = ref(null); // Giá trị của item được lựa chọn.
+const isOpen = ref(false); // trạng thái đóng/mở của danh sách chứa các lựa chọn.
+const isFocus = ref(false); // trạng thái Focus vào ô input.
+const optionSearch = ref(props.options ? props.options : []); // Mảng lưu các lựa chọn phù hợp khi thực hiện tìm kiếm.
+const indexOptionSelected = ref(0); // Chỉ số của lựa chọn đã được chọn trong mảng danh sách các lựa chọn.
+const topTableCombobox = ref(0); // khoảng cách combobox dạng table đến top của trình duyệt
+const count = ref(0);
 
 const refCheckBox = ref(null);
 const refList = ref(null);
@@ -38,11 +41,20 @@ const isShowError = ref(false);
 const refItem = ref(null);
 
 // Gán giá trị ban của mảng optionSearch là danh sách tất cả các lựa chọn.
-optionSearch.value = [...props.options];
+watch(
+    () => props.options.length,
+    () => {
+        try {
+            optionSearch.value = [...props.options];
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
 const dataShow = props.columns.find((option) => option.dataShow === true)?.identityOption;
 
 // Emit các sự kiện ra ngoài component cha
-const emit = defineEmits(["select", "changeValue"]);
+const emit = defineEmits(["select", "changeValue", "focusBtn"]);
 
 /**
  * Hiển thị tên option được chọn lên giao diện.
@@ -84,7 +96,7 @@ const handleShowSelectedValue = (option, index) => {
  */
 const handleDefaultValue = (optionId) => {
     try {
-        const optionSelected = props.options.filter((option) => option?.optionId === optionId);
+        const optionSelected = optionSearch.value.filter((option) => option?.optionId === optionId);
         if (props.isTable) {
             return optionSelected[0]?.[`${dataShow}`];
         }
@@ -98,11 +110,17 @@ const handleDefaultValue = (optionId) => {
  * - Nếu có ID của giá trị mặc định -> Hiển thị tên của option lên giao diện
  * - Nếu không có -> gán indexOptionSelected = -1
  */
-
 watchEffect(() => {
     try {
         if (props.default || props.default === 0) {
-            selected.value = handleDefaultValue(props.default);
+            const defaultValue = handleDefaultValue(props.default);
+            if (props.default === MISA_RESOURCE.GUID_EMPTY) {
+                selected.value = null;
+            }
+            if (defaultValue && count.value < 1) {
+                selected.value = defaultValue;
+                count.value++;
+            }
             indexOptionSelected.value = optionSearch.value.findIndex(
                 (option) => option?.optionId === props.default
             );
@@ -144,7 +162,6 @@ const handleSearchOption = (keyword) => {
         optionSearch.value = props.options.filter((option) =>
             option.optionName.toLowerCase().includes(keyword.toLowerCase())
         );
-
         /**
          * - Nếu giá trị nhập trùng với 1 option -> gửi giá trị nhập -> hợp lệ
          * - Nếu không trùng -> gửi giá trị nhập -> không có trong danh mục
@@ -214,6 +231,11 @@ const handleInputKeydown = (event) => {
                 break;
             default:
                 break;
+        }
+
+        if (props.isShiftTab && event.shiftKey && event.keyCode === MISA_ENUM.KEY_CODE.TAB) {
+            event.preventDefault();
+            emit("focusBtn");
         }
     } catch (error) {
         console.log(error);

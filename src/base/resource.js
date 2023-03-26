@@ -73,6 +73,9 @@ export const MISA_RESOURCE = {
     CreditAccountText: {
         blank: "Tài khoản có không được để trống.",
     },
+    ObjectCodeText: {
+        blank: "Dữ liệu <Mã đối tượng> không có trong danh mục.",
+    },
     FORM_TITLE: {
         ADD: "Thêm nhân viên", // tiêu đề form thêm
         EDIT: "Sửa thông tin nhân viên", // tiêu đề form sửa
@@ -269,9 +272,10 @@ export const MISA_RESOURCE = {
         {
             columnName: "#",
             width: "34px",
-            align: "left",
+            align: "center",
             isMoney: false,
             isSticky: true,
+            padding: "0",
         },
         {
             columnName: "Diễn giải",
@@ -279,6 +283,7 @@ export const MISA_RESOURCE = {
             align: "left",
             isMoney: false,
             isSticky: false,
+            padding: "10px",
         },
         {
             columnName: "TK Nợ",
@@ -286,6 +291,7 @@ export const MISA_RESOURCE = {
             align: "left",
             isMoney: false,
             isSticky: false,
+            padding: "10px",
             tooltip: "Tài khoản nợ",
         },
         {
@@ -294,6 +300,7 @@ export const MISA_RESOURCE = {
             align: "left",
             isMoney: false,
             isSticky: false,
+            padding: "10px",
             tooltip: "Tài khoản có",
         },
         {
@@ -302,6 +309,7 @@ export const MISA_RESOURCE = {
             align: "right",
             isMoney: true,
             isSticky: false,
+            padding: "10px",
         },
         {
             columnName: "Đối tượng",
@@ -309,6 +317,7 @@ export const MISA_RESOURCE = {
             align: "left",
             isMoney: false,
             isSticky: false,
+            padding: "10px",
         },
         {
             columnName: "Tên đối tượng",
@@ -316,6 +325,7 @@ export const MISA_RESOURCE = {
             align: "left",
             isMoney: false,
             isSticky: false,
+            padding: "10px",
         },
         {
             columnName: "",
@@ -323,6 +333,7 @@ export const MISA_RESOURCE = {
             align: "center",
             isMoney: false,
             isSticky: true,
+            padding: "10px",
             isLast: true,
         },
     ],
@@ -330,10 +341,12 @@ export const MISA_RESOURCE = {
         {
             optionName: "Cất và đóng",
             tooltip: "Cất và đóng (Ctrl + Q)",
+            identityAction: MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE_CLOSE,
         },
         {
             optionName: "Cất và thêm",
             tooltip: "Cất và thêm (Ctrl + Shift + S)",
+            identityAction: MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE_ADD,
         },
     ],
     ACCOUNT_NATURE: [
@@ -400,9 +413,10 @@ export const MISA_RESOURCE = {
         {
             columnName: "#",
             width: "34px",
-            align: "left",
+            align: "Center",
             isMoney: false,
             isSticky: true,
+            padding: "0",
         },
         {
             columnName: "Diễn giải",
@@ -410,6 +424,7 @@ export const MISA_RESOURCE = {
             align: "left",
             isMoney: false,
             isSticky: false,
+            padding: "10px",
         },
         {
             columnName: "TK Nợ",

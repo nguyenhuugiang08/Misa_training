@@ -43,12 +43,14 @@ export const MISA_ENUM = {
         UP_ARROW: 38, // phím mũi tên lên
         ESCAPE: 27, // phím esc
         TAB: 9, // phím tab
+        INSERT: 45, // phím insert
+        DELETE: 46, // phím delete
     },
     STATUS_CODE: {
         BAD_REQUEST: 400, // status code 400
         INTERNAL_SERVER_ERROR: 500, // status code 500
     },
-    HEIGHT_PAYMENT_CONTENT: 647, // Chiều cao phần content trang phiếu chi
+    HEIGHT_PAYMENT_CONTENT: 660, // Chiều cao phần content trang phiếu chi
     HEIGHT_PAYMENT_MASTER: 383, // Chiều cao phần master trang phiếu chi
     HEIGHT_PAYMENT_DETAIL: 264, // Chiều cao phần detail trang phiếu chi
     MAX_LENGTH_ACCOUNTNUMBER: 20,
@@ -61,4 +63,9 @@ export const MISA_ENUM = {
     GRADE_DEFAULT: 0, // bậc tài khoản ban đầu
     PAGENUMBER_DEFAULT: 1, // Trang đầu tiêng
     INDEX_SIDEBAR_CATEGORY: 16, // index của page danh mục trên sidebar
+    TIMEZONE_DIFFERENCE: 7, // giờ chênh lệch
+    STATUS_SAVE_ACCOUNT: {
+        SAVE: 0, // Cất
+        SAVE_ADD: 1, // Cất và thêm
+    },
 };

@@ -150,3 +150,14 @@ body {
     top: 0;
     z-index: 999;
 }
+
+.not-found {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.not-found img {
+    margin: 50px 0 12px 0;
+}

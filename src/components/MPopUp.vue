@@ -229,7 +229,7 @@ const handleEditEmployee = async (isCloseForm) => {
  */
 onMounted(() => {
     try {
-        refEmployeeCode.value.handleFocus();
+        refEmployeeCode.value.handleFocusInput();
     } catch (error) {
         console.log(error);
     }
@@ -446,6 +446,7 @@ const handleSetReverseTabindex = (e) => {
                         }"
                     >
                         <m-date-field
+                            id="birth"
                             :width="'166px'"
                             :fieldText="'Ngày sinh'"
                             :value="employee.DateOfBirth"
@@ -511,6 +512,7 @@ const handleSetReverseTabindex = (e) => {
                             :text-error="error.IdentityNumber.textError"
                         />
                         <m-date-field
+                            id="identityDate"
                             :width="'166px'"
                             :fieldText="'Ngày cấp'"
                             :value="employee.IdentityDate"

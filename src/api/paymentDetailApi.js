@@ -36,6 +36,20 @@ const paymentDetailApi = {
             console.log(error);
         }
     },
+
+    /**
+     * Hàm sửa chi tiết phiếu chi theo ID của phiếu chi
+     * @param {*} paymentId
+     * @param {*} paymentDetails
+     * @returns
+     */
+    editPaymentDetailsByPaymentId: (paymentDetails) => {
+        try {
+            return axiosClient.put(`${baseUrl}/updatePaymentDetails`, paymentDetails);
+        } catch (error) {
+            console.log(error);
+        }
+    },
 };
 
 export default paymentDetailApi;

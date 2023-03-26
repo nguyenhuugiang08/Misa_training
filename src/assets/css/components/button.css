@@ -127,9 +127,7 @@
     box-shadow: 0 4px 16px #171b2a3d;
     height: max-content;
     transition: height 0.2s ease-in;
-    overflow: hidden;
     bottom: 42px;
-    overflow: auto;
     z-index: 20;
     font-weight: 400;
     right: 16px;
@@ -144,9 +142,9 @@
     cursor: pointer;
     padding: 0 14px 0 10px;
     white-space: nowrap;
-    overflow: hidden;
     text-overflow: ellipsis;
     position: relative;
+    border-radius: 2px;
 }
 
 .cbo-item:hover {
@@ -234,4 +232,19 @@
 .btn-curved--right {
     border-top-right-radius: 99px;
     border-bottom-right-radius: 99px;
+}
+
+.cbo-item__tooltip {
+    position: absolute;
+    background-color: #434242;
+    color: #fff;
+    top: -32px;
+    width: 110px;
+    white-space: normal;
+    padding: 4px 8px;
+    border-radius: 4px;
+    animation: identifier 0.3s ease-in;
+    font-weight: 400;
+    left: -80px;
+    z-index: 99;
 }

@@ -27,7 +27,7 @@ const {
     setEntities,
     setTitleForm,
     setIsForm,
-    setEmployeeSelected,
+    setEntitySelected,
     setTotalPage,
     setTotalEntities,
     setIdentityForm,
@@ -199,7 +199,7 @@ const handleHideFormAdd = () => {
     try {
         setIsForm();
         setTitleForm(MISA_RESOURCE.FORM_TITLE.ADD);
-        setEmployeeSelected({});
+        setEntitySelected({});
         setIdentityForm(MISA_ENUM.FORM_MODE.ADD);
         handleSetStatusForm();
     } catch (error) {

@@ -17,15 +17,46 @@ import MToast from "../components/MToast.vue";
 import MPopUpError from "../components/MPopUpError.vue";
 import { usePaymentDeatil } from "../composable/usePaymentDetail";
 
-const { state, setObjectSelected, addPaymentDetails, setTotalPayment } = inject("diy");
+const {
+    state,
+    setObjectSelected,
+    addPaymentDetails,
+    setTotalPayment,
+    deletePaymentDetails,
+    setPaymentDetailDefault,
+    setPaymentDetailsDefault,
+    setIndexRowEditable,
+    setIdentityForm,
+} = inject("diy");
 const router = useRouter();
 const refTableDetail = ref(null); // Tham chiếu tới bảng detail
-const disable = ref(false); // trạng thái disable các ô nhập liệu khi cất
 const today = ref(null); // lấy ra ngày hiện tại
 const isOpenError = ref(false); // trạng thái đóng mở của popup hiển thị khi có lỗi xả ra
 const paymentDetailTextErrors = ref([]); // mảng lưu text lỗi của UI detail
 const isOpenPopupConstruction = ref(false); // trạng thái đóng/ mở của popup thông báo chức năng đang thi công
 const refObjectCode = ref(null); // tham chiếu tới ô combobox mã đối tượng
+const actionSelected = ref(0); // lưu lại hành động nguwfoi dùng vừa thực hiện (Cất và thêm hoặc Cất và đóng)
+const isClickRow = ref(false); // trạng thái click dòng trên UI detail khi ấn nút cất -> true : không thể chọn dòng, false: có thể chọn
+const isEditButton = ref(false); // false: content nút là cất, true: content nút là Sửa
+// trạng thái disable của các trường nhập dưc liệu
+const disableFiled = reactive({
+    objectCode: false,
+    objectName: false,
+    address: false,
+    attachment: false,
+    employeeId: false,
+    postedDate: false,
+    reason: false,
+    reasonType: false,
+    receiver: false,
+    refDate: false,
+    refNo: false,
+});
+const editable = ref(false); // trạng thái disable các trường trên UI detail
+const paymentIdAdded = ref(null); // ID của phiếu chi vừa được thêm vào DB
+const paymentDetailIds = ref([]); // danh sách ID của các chi tiết phiếu chi vừa được thêm vào DB
+const refCancelBtn = ref(null); // tham chiếu tới button Hủy
+const refSaveAndAddBtn = ref(null); // Tham chiếu tới button cất
 
 onMounted(() => {
     try {
@@ -33,14 +64,16 @@ onMounted(() => {
         if (state.newRefNo && state.identityForm === MISA_ENUM.FORM_MODE.ADD) {
             payment.RefNo = state.newRefNo;
         }
-        refObjectCode.value.handleFocusCombobox();
+        if (refObjectCode.value) {
+            refObjectCode.value.handleFocusCombobox();
+        }
     } catch (error) {
         console.log(error);
     }
 });
 
-const { addPayment, getPaymentsByFilter, editPayement } = usePayment();
-const { insertPaymentDetails } = usePaymentDeatil();
+const { addPayment, getPaymentsByFilter, editPayement, getNewRefNo } = usePayment();
+const { insertPaymentDetails, editPaymentDetailsByPaymentId } = usePaymentDeatil();
 
 const payment = reactive({
     Address: state.entitySelected?.Address || "",
@@ -58,24 +91,21 @@ const payment = reactive({
     TotalAmount: state.totalPayment || 0,
 });
 
-const paymentDetails = ref([
-    {
-        PaymentId: "",
-        ObjectId: "",
-        ObjectCode: state.objectSelected?.optionCode || "",
-        ObjectName: state.objectSelected?.optionName || "",
-        Amount: "",
-        DebitAccount: "",
-        CreditAccount: "",
-        Description: "",
-    },
-]);
-
 const { getObjects } = useObject();
 getObjects();
 
 const { getAllEmployees } = useEmployee();
 getAllEmployees();
+
+watchEffect(() => {
+    try {
+        if (localStorage.getItem("actionSelected")) {
+            actionSelected.value = localStorage.getItem("actionSelected");
+        }
+    } catch (error) {
+        console.log(error);
+    }
+});
 
 /**
  * Hàm đóng form chi tiết phiếu chi
@@ -89,6 +119,10 @@ const handleCloseForm = () => {
     }
 };
 
+/**
+ * Thay đổi tổng tiền phiếu chi
+ * Created by: NHGiang - (24/03/23)
+ */
 watch(
     () => state.totalPayment,
     (newValue) => {
@@ -108,6 +142,8 @@ const handleSubmit = async (identityButton) => {
     try {
         const paymentDetails = state.paymentDetails;
         const status = useValidate({ payment, paymentDetails });
+
+        // xử lý lấy ra mảng error phần detail UI
         paymentDetailTextErrors.value = [];
         paymentDetailErrors?.forEach((error) => {
             if (error.DebitAccount.textError)
@@ -124,36 +160,142 @@ const handleSubmit = async (identityButton) => {
                 state.identityForm === MISA_ENUM.FORM_MODE.ADD ||
                 state.identityForm === MISA_ENUM.FORM_MODE.DUPLICATE
             ) {
-                payment.RefDate.setHours(payment.RefDate.getHours() + 7);
-                payment.PostedDate.setHours(payment.PostedDate.getHours() + 7);
-                await addPayment(payment)
-                    .then(async (data) => {
-                        if (data) {
-                            const payementDetails = state.paymentDetails?.map((element) => {
-                                return { ...element, PaymentId: data };
-                            });
-                            await insertPaymentDetails(payementDetails);
-                            await getPaymentsByFilter();
-                            if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE) {
-                                // disable.value = true;
-                                isOpenError.value = false;
-                            }
-                        }
-                    })
-                    .catch((isOpenError.value = true));
+                handleAddPayment(identityButton);
             }
 
             if (state.identityForm === MISA_ENUM.FORM_MODE.EDIT) {
-                await editPayement(payment, state.entitySelected.PaymentId)
-                    .then(async () => {
-                        await getPaymentsByFilter();
-                        isOpenError.value = false;
-                    })
-                    .catch((isOpenError.value = true));
+                handleEditPayment(identityButton);
             }
         } else {
             isOpenError.value = true;
         }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm xử lý thêm phiếu chi
+ * Created by: NHGiang - (25/03/23)
+ */
+const handleAddPayment = async (identityButton) => {
+    try {
+        payment.RefDate.setHours(payment.RefDate.getHours() + MISA_ENUM.TIMEZONE_DIFFERENCE);
+        payment.PostedDate.setHours(payment.PostedDate.getHours() + MISA_ENUM.TIMEZONE_DIFFERENCE);
+        await addPayment(payment)
+            .then(async (data) => {
+                if (data) {
+                    paymentIdAdded.value = data;
+                    // xử lý thêm danh sách phiếu chi chi tiết theo ID của phiếu chi vừa được thêm
+                    const paymentDetails = state.paymentDetails?.map((element) => {
+                        return { ...element, PaymentId: data };
+                    });
+                    const ids = await insertPaymentDetails(paymentDetails);
+                    paymentDetailIds.value = [...ids];
+                    await getPaymentsByFilter();
+                    if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE) {
+                        disableFiled.objectCode = true;
+                        disableFiled.objectName = true;
+                        disableFiled.address = true;
+                        disableFiled.attachment = true;
+                        disableFiled.employeeId = true;
+                        disableFiled.postedDate = true;
+                        disableFiled.reason = true;
+                        disableFiled.reasonType = true;
+                        disableFiled.receiver = true;
+                        disableFiled.refDate = true;
+                        disableFiled.refNo = true;
+
+                        isOpenError.value = false;
+                        setIndexRowEditable(-1);
+                        isClickRow.value = true;
+                        isEditButton.value = true;
+                        editable.value = true;
+                    }
+
+                    if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE_CLOSE) {
+                        handleCloseForm();
+                    }
+
+                    if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE_ADD) {
+                        await getNewRefNo();
+                        payment.Address = "";
+                        payment.Attachment = "";
+                        payment.EmployeeId = MISA_RESOURCE.GUID_EMPTY;
+                        payment.ObjectCode = "";
+                        payment.ObjectId = MISA_RESOURCE.GUID_EMPTY;
+                        payment.ObjectName = "";
+                        payment.PostedDate = new Date();
+                        payment.Reason = MISA_RESOURCE.REASON_PAYMENT_DEFAULT;
+                        payment.ReasonType = 6;
+                        payment.Receiver = "";
+                        payment.RefDate = new Date();
+                        payment.RefNo = state.newRefNo;
+                        payment.TotalAmount = 0;
+
+                        await setPaymentDetailsDefault();
+                        setObjectSelected({});
+                        setPaymentDetailDefault();
+                        isOpenError.value = false;
+                    }
+                }
+            })
+            .catch((isOpenError.value = true));
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * hàm xử lý sửa phiếu chi theo ID
+ * Created by: NHGiang - (25/03/23)
+ */
+const handleEditPayment = async (identityButton) => {
+    try {
+        await editPayement(payment, state.entitySelected.PaymentId || paymentIdAdded.value)
+            .then(async () => {
+                if (paymentDetailIds.value.length > 0) {
+                    const paymentDetails = state.paymentDetails.map((paymentDetail, index) => {
+                        return {
+                            ...paymentDetail,
+                            PaymentDetailId: paymentDetailIds.value[index],
+                        };
+                    });
+                    await editPaymentDetailsByPaymentId(paymentDetails);
+                } else {
+                    await editPaymentDetailsByPaymentId(state.paymentDetails);
+                }
+                await getPaymentsByFilter();
+                isOpenError.value = false;
+
+                if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE) {
+                    disableFiled.objectCode = true;
+                    disableFiled.objectName = true;
+                    disableFiled.address = true;
+                    disableFiled.attachment = true;
+                    disableFiled.employeeId = true;
+                    disableFiled.postedDate = true;
+                    disableFiled.reason = true;
+                    disableFiled.reasonType = true;
+                    disableFiled.receiver = true;
+                    disableFiled.refDate = true;
+                    disableFiled.refNo = true;
+
+                    isOpenError.value = false;
+                    setIndexRowEditable(-1);
+                    isClickRow.value = true;
+                    isEditButton.value = true;
+                    editable.value = true;
+                }
+
+                if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE_CLOSE) {
+                    handleCloseForm();
+                }
+
+                if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE_ADD) {
+                }
+            })
+            .catch((isOpenError.value = true));
     } catch (error) {
         console.log(error);
     }
@@ -180,10 +322,10 @@ const handleSetTabindex = (e) => {
     try {
         if (e.keyCode === MISA_ENUM.KEY_CODE.TAB) {
             e.preventDefault();
-            // refAccountNumber.value.handleFocus();
+            refObjectCode.value.handleFocusCombobox();
         }
         if (e.shiftKey && e.keyCode === MISA_ENUM.KEY_CODE.TAB) {
-            // refSaveAndAddBtn.value.focus();
+            refSaveAndAddBtn.value.focus();
         }
     } catch (error) {
         console.log(error);
@@ -200,19 +342,39 @@ const docKeyDown = (e) => {
     if (e.ctrlKey && e.key === "s") {
         e.preventDefault();
         e.stopPropagation();
-        handleSubmit();
+        handleSubmit(MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE);
     }
 
     // Cất form và mở form thêm với phím tắt ctrl + shift + S
     if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "s") {
         e.preventDefault();
         e.stopPropagation();
-        handleSubmit();
+        handleSubmit(MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE_ADD);
     }
 
     // Đóng form với phím tắt ESC
     if (e.keyCode === MISA_ENUM.KEY_CODE.ESCAPE) {
         handleCloseForm();
+    }
+
+    // Thêm dòng với phím ctrl + insert
+    if (e.ctrlKey && e.keyCode === MISA_ENUM.KEY_CODE.INSERT) {
+        handleAddRowDetail();
+    }
+
+    // xóa dòng với phím ctrl + delete
+    if (e.ctrlKey && e.keyCode === MISA_ENUM.KEY_CODE.DELETE) {
+        deletePaymentDetails(state.paymentDetails.length - 1);
+        if (state.paymentDetails.length - 1 === -1) {
+            setPaymentDetailDefault();
+        }
+    }
+
+    // Cất và đóng với phím ctrl + Q
+    if (e.ctrlKey && e.key.toLowerCase() === "q") {
+        e.preventDefault();
+        e.stopPropagation();
+        handleSubmit(MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE_CLOSE);
     }
 };
 
@@ -236,22 +398,29 @@ onUnmounted(() => {
  * Hàm set lại Tabindex khi nhấn Shift + Tab
  * Created by: NHGiang - (26/02/23)
  */
-const handleSetReverseTabindex = (e) => {
+const handleSetReverseTabindex = () => {
     try {
-        if (e.shiftKey && e.keyCode === MISA_ENUM.KEY_CODE.TAB) {
-            e.preventDefault();
-            // refCancelBtn.value.focus();
-        }
+        refCancelBtn.value.focus();
     } catch (error) {
         console.log(error);
     }
 };
 
+/**
+ * Thay đổi ngày phiếu chi khi ngày hạch toán thay đổi
+ * Created by: NHGiang - (24/03/23)
+ */
 watch(
     () => payment.PostedDate,
-    (newValue) => {
+    (newValue, oldValue) => {
         try {
-            if (newValue) payment.RefDate = newValue;
+            if (oldValue?.valueOf() === payment.RefDate?.valueOf() && newValue) {
+                payment.RefDate = newValue;
+            }
+
+            if (oldValue === null) {
+                payment.RefDate = newValue;
+            }
         } catch (error) {
             console.log(error);
         }
@@ -270,6 +439,10 @@ const handleAddRowDetail = () => {
     }
 };
 
+/**
+ * Hàm tính tổng phiếu chi
+ * Created by: NHGiang - (25/03/23)
+ */
 watchEffect(() => {
     try {
         const totalPayment = state.paymentDetails?.reduce((result, cur) => {
@@ -284,6 +457,26 @@ watchEffect(() => {
         console.log(error);
     }
 });
+
+/**
+ * Hàm đối trạng thái form thêm -> sửa
+ * Created by: NHGiang - (26/03/23)
+ */
+const handleChangeStatsForm = () => {
+    try {
+        setIdentityForm(MISA_ENUM.FORM_MODE.EDIT);
+        disableFiled.objectName = false;
+        disableFiled.address = false;
+        disableFiled.attachment = false;
+        disableFiled.employeeId = false;
+        disableFiled.reason = false;
+        disableFiled.receiver = false;
+        setIndexRowEditable(0);
+        isEditButton.value = false;
+    } catch (error) {
+        console.log(error);
+    }
+};
 </script>
 
 <template>
@@ -299,7 +492,7 @@ watchEffect(() => {
                         :default="payment.ReasonType"
                         :options="MISA_RESOURCE.PAY_ACTIVE"
                         :width="'290px'"
-                        :disabled="disable"
+                        :disabled="disableFiled.reasonType"
                         has-display-data-disable
                         @select="payment.ReasonType = $event.optionId"
                     />
@@ -326,23 +519,25 @@ watchEffect(() => {
                 <div class="row">
                     <div class="checkbox-wrapper">
                         <m-checkbox
-                            v-if="state.objects.length"
                             ref="refObjectCode"
                             text-label="Mã đối tượng"
                             width="424px"
                             :default="payment.ObjectId"
-                            :options="state.objects"
+                            :options="state.objects.length && state.objects"
                             :isTable="true"
                             :columns="MISA_RESOURCE.COLUMNS_NAME_COMBOBOX_OBJECT"
                             bottom="8px"
                             has-display-data-disable
-                            :disabled="disable"
+                            :disabled="disableFiled.objectCode"
+                            :isShiftTab="true"
                             marginRight="12px"
+                            @focusBtn="handleSetReverseTabindex"
                             @select="
                                 payment.ObjectId = $event.optionId;
                                 payment.ObjectName = $event.optionName;
                                 payment.Address = $event.optionAddress;
                                 payment.Receiver = $event.optionName;
+                                payment.ObjectCode = $event.optionCode;
                                 setObjectSelected({
                                     optionId: $event.optionId,
                                     optionName: $event.optionName,
@@ -356,7 +551,7 @@ watchEffect(() => {
                         width="424px"
                         bottom="8px"
                         :value="payment.ObjectName"
-                        :disable="disable"
+                        :disable="disableFiled.objectName"
                         @inputValue="payment.ObjectName = $event"
                     />
                 </div>
@@ -367,7 +562,7 @@ watchEffect(() => {
                         bottom="8px"
                         margin-right="12px"
                         :value="payment.Receiver"
-                        :disable="disable"
+                        :disable="disableFiled.receiver"
                         @inputValue="payment.Receiver = $event"
                     />
                     <m-input
@@ -375,7 +570,7 @@ watchEffect(() => {
                         width="424px"
                         bottom="8px"
                         :value="payment.Address"
-                        :disable="disable"
+                        :disable="disableFiled.address"
                         @inputValue="payment.Address = $event"
                     />
                 </div>
@@ -389,22 +584,21 @@ watchEffect(() => {
                             : `Chi tiền cho ${payment.ObjectName}`
                     "
                     @inputValue="payment.Reason = $event"
-                    :disable="disable"
+                    :disable="disableFiled.reason"
                 />
                 <div class="row">
                     <div class="checkbox-wrapper">
                         <m-checkbox
-                            v-if="state.employees.length"
                             text-label="Nhân viên"
                             width="424px"
                             :default="payment.EmployeeId"
-                            :options="state.employees"
+                            :options="state.employees.length && state.employees"
                             :isTable="true"
                             :columns="MISA_RESOURCE.COLUMNS_NAME_COMBOBOX_EMPLOYEE"
                             bottom="8px"
                             marginRight="12px"
                             has-display-data-disable
-                            :disabled="disable"
+                            :disabled="disableFiled.employeeId"
                             @select="payment.EmployeeId = $event.optionId"
                         />
                     </div>
@@ -417,7 +611,7 @@ watchEffect(() => {
                         place-holder="số lượng"
                         place-holder-align="right"
                         :only-number="true"
-                        :disable="disable"
+                        :disable="disableFiled.attachment"
                     />
                     <div class="row-text">chứng từ gốc</div>
                 </div>
@@ -430,7 +624,7 @@ watchEffect(() => {
                     bottom="8px"
                     width="166px"
                     :value="payment.PostedDate"
-                    :disable="disable"
+                    :disable="disableFiled.postedDate"
                     :status="error.PostedDate.status"
                     :textError="error.PostedDate.textError"
                     :statusPublic="error.status"
@@ -442,7 +636,7 @@ watchEffect(() => {
                     field-text="Ngày phiếu chi"
                     bottom="8px"
                     width="166px"
-                    :disable="disable"
+                    :disable="disableFiled.refDate"
                     :value="payment.RefDate"
                     :status="error.RefDate.status"
                     :textError="error.RefDate.textError"
@@ -454,7 +648,7 @@ watchEffect(() => {
                     field-text="Số phiếu chi"
                     width="166px"
                     :value="payment.RefNo"
-                    :disable="disable"
+                    :disable="disableFiled.refNo"
                     :status="error.RefNo.status"
                     :statusPublic="error.status"
                     :text-error="error.RefNo.textError"
@@ -476,24 +670,36 @@ watchEffect(() => {
                 :reason="payment.Reason"
                 isEdit
                 ref="refTableDetail"
+                :is-click-row="isClickRow"
+                :editable="editable"
             />
 
             <div class="payment-action">
-                <button class="btn btn-secondary payment-action__btn" @click="handleAddRowDetail">
+                <button
+                    class="btn btn-secondary payment-action__btn btn-add-row"
+                    @click="handleAddRowDetail"
+                    :class="{ 'btn-disable': disable }"
+                >
                     Thêm dòng
                 </button>
-                <button class="btn btn-secondary payment-action__btn">Xóa hết dòng</button>
+                <button
+                    class="btn btn-secondary payment-action__btn"
+                    :class="{ 'btn-disable': disable }"
+                >
+                    Xóa hết dòng
+                </button>
             </div>
         </div>
         <div class="import-footer">
-            <button
-                class="btn btn-secondary btn-import-prev pay-cancel-btn"
-                @click="handleCloseForm"
-            >
-                Hủy
-            </button>
             <div class="footer-right">
+                <MComboButton
+                    :default="MISA_RESOURCE.BUTTON_ACTION_SAVE[actionSelected]?.optionName"
+                    :options="MISA_RESOURCE.BUTTON_ACTION_SAVE"
+                    @click-btn="handleSubmit($event)"
+                />
                 <button
+                    ref="refSaveAndAddBtn"
+                    v-if="!isEditButton"
                     type="submit"
                     class="btn btn-secondary payment-btn-save"
                     tabindex="0"
@@ -501,11 +707,25 @@ watchEffect(() => {
                 >
                     Cất
                 </button>
-                <MComboButton
-                    :default="MISA_RESOURCE.BUTTON_ACTION_SAVE[0].optionName"
-                    :options="MISA_RESOURCE.BUTTON_ACTION_SAVE"
-                />
+                <button
+                    ref="refSaveAndAddBtn"
+                    v-if="isEditButton"
+                    type="submit"
+                    class="btn btn-secondary payment-btn-save"
+                    tabindex="0"
+                    @click="handleChangeStatsForm"
+                >
+                    Sửa
+                </button>
             </div>
+            <button
+                ref="refCancelBtn"
+                class="btn btn-secondary btn-import-prev pay-cancel-btn"
+                @click="handleCloseForm"
+                @keydown.tab="handleSetTabindex"
+            >
+                Hủy
+            </button>
         </div>
         <div class="toast-container">
             <m-toast
@@ -616,5 +836,40 @@ watchEffect(() => {
 .close-icon:hover::after {
     display: block;
     opacity: 1;
+}
+
+.btn-add-row {
+    position: relative;
+}
+
+.btn-add-row::before {
+    position: absolute;
+    content: "Ctrl + Insert";
+    background-color: #434242 !important;
+    color: #fff;
+    top: 32px;
+    width: max-content;
+    padding: 0px 8px;
+    border-radius: 4px;
+    display: none;
+    opacity: 0;
+    animation: identifier 0.3s ease-in;
+    font-weight: 400;
+}
+
+.btn-add-row:hover::before {
+    display: block;
+    opacity: 1;
+}
+
+.btn-disable {
+    border: 1px solid #8d9096;
+    color: #afafaf;
+    background: 0 0;
+    cursor: default;
+}
+
+.btn-disable:hover {
+    background: 0 0 !important;
 }
 </style>

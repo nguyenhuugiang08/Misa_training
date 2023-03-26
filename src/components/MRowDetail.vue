@@ -2,11 +2,11 @@
 import MInput from "./MInput.vue";
 import MCheckbox from "./MCheckbox.vue";
 import MInputMoney from "./MInputMoney.vue";
-import { ref, reactive, inject, watch } from "vue";
+import { ref, reactive, inject, watch, watchEffect } from "vue";
 import { MISA_RESOURCE } from "../base/resource";
 import { useAccount } from "../composable/useAccount";
 import { formatMoney } from "../utilities/formatMoney";
-import { paymentDetailErrors, error, useValidate } from "../utilities/validateForm";
+import { paymentDetailErrors, error } from "../utilities/validateForm";
 
 const props = defineProps({
     numericalOrder: Number,
@@ -16,6 +16,7 @@ const props = defineProps({
     editable: Boolean,
     reason: String,
     index: Number,
+    isClickRow: Boolean,
 });
 
 const {
@@ -33,18 +34,44 @@ if (props.isEdit) {
 
 const refRowDetail = ref(null);
 const paymentDetail = reactive({
-    PaymentId: "",
-    ObjectId: state.paymentDetails[props.index]?.ObjectId || state.objectSelected?.optionId || "",
+    PaymentDetailId: state.paymentDetails[props.index]?.PaymentDetailId || MISA_RESOURCE.GUID_EMPTY,
+    PaymentId: state.paymentDetails[props.index]?.PaymentId || MISA_RESOURCE.GUID_EMPTY,
+    ObjectId:
+        state.paymentDetails[props.index]?.ObjectId ||
+        state.objectSelected?.optionId ||
+        MISA_RESOURCE.GUID_EMPTY,
     ObjectCode:
         state.paymentDetails[props.index]?.ObjectCode || state.objectSelected?.optionCode || "",
     ObjectName:
         state.paymentDetails[props.index]?.ObjectName || state.objectSelected?.optionName || "",
     Amount: state.paymentDetails[props.index]?.Amount || 0,
-    DebitAccount: state.paymentDetails[props.index]?.DebitAccount || "",
+    DebitAccount: state.paymentDetails[props.index]?.DebitAccount || MISA_RESOURCE.GUID_EMPTY,
     DebitAccountName: state.paymentDetails[props.index]?.DebitAccountName || "",
-    CreditAccount: state.paymentDetails[props.index]?.CreditAccount || "",
+    CreditAccount: state.paymentDetails[props.index]?.CreditAccount || MISA_RESOURCE.GUID_EMPTY,
     CreditAccountName: state.paymentDetails[props.index]?.CreditAccountName || "",
     Description: props.reason || MISA_RESOURCE.REASON_PAYMENT_DEFAULT,
+});
+
+// trạng thái disable của các trường nhập dưc liệu
+const disableFiled = reactive({
+    objectCode: false,
+    description: false,
+    amount: false,
+    debitAccount: false,
+    creditAccount: false,
+});
+
+watchEffect(() => {
+    try {
+        if (props.editable) {
+            disableFiled.objectCode = true;
+            disableFiled.amount = true;
+            disableFiled.debitAccount = true;
+            disableFiled.creditAccount = true;
+        }
+    } catch (error) {
+        console.log(error);
+    }
 });
 
 /**
@@ -87,14 +114,13 @@ watch(
         setPaymentDetailsByIndex(state.paymentDetail, props.index);
     }
 );
-
 defineExpose({ handleFocus });
 </script>
 
 <template>
     <tr
         class="tbl-row"
-        @click="isEdit && setIndexRowEditable(index)"
+        @click="isEdit && !isClickRow && setIndexRowEditable(index)"
         :style="{
             background:
                 isEdit && state.indexRowEditable === index ? 'var(--table-bg-color)' : '#fff',
@@ -107,12 +133,17 @@ defineExpose({ handleFocus });
                     isEdit && state.indexRowEditable === index
                         ? 'var(--table-bg-color) !important'
                         : '#fff',
+                textAlign: 'center',
+                padding: '0',
             }"
         >
             <span class="tbl-detail-text">{{ numericalOrder + 1 || "" }}</span>
         </td>
         <td class="tbl-col">
-            <span class="tbl-detail-text" v-if="isEdit && index === state.indexRowEditable">
+            <span
+                class="tbl-detail-text"
+                v-if="isEdit && !disableFiled.description && index === state.indexRowEditable"
+            >
                 <m-input
                     ref="refRowDetail"
                     width="500px"
@@ -126,22 +157,28 @@ defineExpose({ handleFocus });
                 />
             </span>
             <span v-if="!isEdit">{{ state.paymentDetails[index]?.Description }}</span>
-            <span v-if="isEdit && !(index === state.indexRowEditable)">{{
-                state.paymentDetails[index]?.Description
-                    ? state.paymentDetails[index]?.Description
-                    : `Chi tiền cho ${state.paymentDetails[index]?.ObjectName}`
-            }}</span>
+            <span
+                v-if="isEdit && !(index === state.indexRowEditable) && !disableFiled.description"
+                >{{
+                    state.paymentDetails[index]?.Description
+                        ? state.paymentDetails[index]?.Description
+                        : `Chi tiền cho ${state.paymentDetails[index]?.ObjectName}`
+                }}</span
+            >
         </td>
         <td class="tbl-col">
             <span class="tbl-detail-text">
-                <div class="checkbox-wrapper" v-if="isEdit && index === state.indexRowEditable">
+                <div
+                    class="checkbox-wrapper"
+                    v-if="isEdit && !disableFiled.debitAccount && index === state.indexRowEditable"
+                >
                     <m-checkbox
-                        v-if="state.listAllEntities.length"
                         width="130px"
                         bottom="2px"
                         :default="paymentDetail.DebitAccount"
                         :options="
-                            state.listAllEntities.filter((account) => account.optionGrade !== 1)
+                            state.listAllAccounts.length &&
+                            state.listAllAccounts.filter((account) => account.optionGrade !== 1)
                         "
                         :isTable="true"
                         :status="paymentDetailErrors?.[index]?.DebitAccount.status"
@@ -154,22 +191,31 @@ defineExpose({ handleFocus });
                         "
                     />
                 </div>
-                <span v-if="!isEdit">{{ state.paymentDetails[index]?.DebitAccountName }}</span>
-                <span v-if="isEdit && !(index === state.indexRowEditable)">{{
-                    paymentDetail.DebitAccountName
+                <span v-if="disableFiled.debitAccount">{{
+                    state.paymentDetails[index]?.DebitAccountName
                 }}</span>
+                <span v-if="!isEdit">{{ state.paymentDetails[index]?.DebitAccountName }}</span>
+                <span
+                    v-if="
+                        isEdit && !(index === state.indexRowEditable) && !disableFiled.debitAccount
+                    "
+                    >{{ paymentDetail.DebitAccountName }}</span
+                >
             </span>
         </td>
         <td class="tbl-col">
             <span class="tbl-detail-text">
-                <div class="checkbox-wrapper" v-if="isEdit && index === state.indexRowEditable">
+                <div
+                    class="checkbox-wrapper"
+                    v-if="isEdit && !disableFiled.creditAccount && index === state.indexRowEditable"
+                >
                     <m-checkbox
-                        v-if="state.listAllEntities.length"
                         width="130px"
                         bottom="2px"
                         :default="paymentDetail.CreditAccount"
                         :options="
-                            state.listAllEntities.filter((account) => account.optionGrade !== 1)
+                            state.listAllAccounts.length &&
+                            state.listAllAccounts.filter((account) => account.optionGrade !== 1)
                         "
                         :isTable="true"
                         :status="paymentDetailErrors?.[index]?.CreditAccount.status"
@@ -182,37 +228,49 @@ defineExpose({ handleFocus });
                         "
                     />
                 </div>
-                <span v-if="!isEdit">{{ state.paymentDetails[index]?.CreditAccountName }}</span>
-                <span v-if="isEdit && !(index === state.indexRowEditable)">{{
-                    paymentDetail.CreditAccountName
+                <span v-if="disableFiled.creditAccount">{{
+                    state.paymentDetails[index]?.CreditAccountName
                 }}</span>
+                <span v-if="!isEdit">{{ state.paymentDetails[index]?.CreditAccountName }}</span>
+                <span
+                    v-if="
+                        isEdit && !(index === state.indexRowEditable) && !disableFiled.creditAccount
+                    "
+                    >{{ paymentDetail.CreditAccountName }}</span
+                >
             </span>
         </td>
         <td class="tbl-col tbl-align-right">
             <span class="tbl-detail-text">
                 <m-input-money
-                    v-if="isEdit && index === state.indexRowEditable"
+                    v-if="isEdit && !disableFiled.amount && index === state.indexRowEditable"
                     width="130px"
                     bottom="2px"
                     v-model="paymentDetail.Amount"
                     @update:model-value="paymentDetail.Amount = $event"
                 />
-                <span v-if="!isEdit">{{ formatMoney(state.paymentDetails[index]?.Amount) }}</span>
-                <span v-if="isEdit && !(index === state.indexRowEditable)">{{
-                    formatMoney(paymentDetail.Amount)
+                <span v-if="disableFiled.amount">{{
+                    formatMoney(state.paymentDetails[index]?.Amount)
                 }}</span>
+                <span v-if="!isEdit">{{ formatMoney(state.paymentDetails[index]?.Amount) }}</span>
+                <span
+                    v-if="isEdit && !(index === state.indexRowEditable) && !disableFiled.amount"
+                    >{{ formatMoney(paymentDetail.Amount) }}</span
+                >
             </span>
         </td>
         <td class="tbl-col">
             <span class="tbl-detail-text">
-                <div class="checkbox-wrapper" v-if="isEdit && index === state.indexRowEditable">
+                <div
+                    class="checkbox-wrapper"
+                    v-if="isEdit && !disableFiled.objectCode && index === state.indexRowEditable"
+                >
                     <m-checkbox
-                        v-if="state.objects.length"
                         width="130px"
                         bottom="2px"
                         :columns="MISA_RESOURCE.COLUMNS_NAME_COMBOBOX_OBJECT"
                         :default="paymentDetail.ObjectId"
-                        :options="state.objects"
+                        :options="state.objects.length && state.objects"
                         :isTable="true"
                         :status="paymentDetailErrors?.[index]?.ObjectId.status"
                         :textError="paymentDetailErrors?.[index]?.ObjectId.textError"
@@ -225,10 +283,14 @@ defineExpose({ handleFocus });
                         "
                     />
                 </div>
-                <span v-if="!isEdit">{{ state.paymentDetails[index]?.ObjectCode }}</span>
-                <span v-if="isEdit && !(index === state.indexRowEditable)">{{
-                    paymentDetail.ObjectCode
+                <span v-if="disableFiled.objectCode">{{
+                    state.paymentDetails[index]?.ObjectCode
                 }}</span>
+                <span v-if="!isEdit">{{ state.paymentDetails[index]?.ObjectCode }}</span>
+                <span
+                    v-if="isEdit && !(index === state.indexRowEditable) && !disableFiled.objectCode"
+                    >{{ paymentDetail.ObjectCode }}</span
+                >
             </span>
         </td>
         <td class="tbl-col">
@@ -236,7 +298,7 @@ defineExpose({ handleFocus });
         </td>
         <td
             v-if="hasColumnDelete"
-            class="tbl-col tbl-col-delete tbl-col__last"
+            class="tbl-col tbl-col-delete tbl-col__last btn-delete-row"
             style="width: 34px; min-width: 34px"
             :style="{
                 background:
@@ -269,5 +331,30 @@ defineExpose({ handleFocus });
 .tbl-row-detail:hover {
     background-color: #ebedf0;
     color: #2ca01c;
+}
+
+.btn-delete-row {
+    position: relative;
+}
+
+.btn-delete-row::before {
+    position: absolute;
+    content: "Ctrl + Delete";
+    background-color: #434242;
+    color: #fff;
+    right: 36px;
+    top: -2px;
+    width: max-content;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: none;
+    opacity: 0;
+    animation: identifier 0.3s ease-in;
+    font-weight: 400;
+}
+
+.btn-delete-row:hover::before {
+    display: block;
+    opacity: 1;
 }
 </style>

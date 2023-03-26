@@ -182,7 +182,7 @@ const handleOpenFormAddAccount = () => {
  * Created by: NHGiang - (24/02/23)
  */
 const docKeyDown = (e) => {
-    // Cất form với phím tắt ctrl + S
+    // Mở form với phím tắt ctrl + 1
     if (e.ctrlKey && e.key === "1") {
         e.preventDefault();
         e.stopPropagation();

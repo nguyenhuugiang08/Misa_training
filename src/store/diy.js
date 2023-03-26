@@ -58,6 +58,7 @@ const state = reactive({
     totalPagePaymentDetail: 0, // tổng số trang phiếu chi chi tiết UI Detail
     totalRecordPaymentDetail: 0, // tổng số trang phiếu chi chi tiết UI Detail
     paymentIdFilter: "", // ID của phiếu chi dùng để lấy danh sách các chi tiết phiếu chi
+    listAllAccounts: [], // danh sách tất cả các tài khoản
 });
 
 /**
@@ -416,6 +417,29 @@ const setPaymentDetail = (paymentDetail) => {
 };
 
 /**
+ * Hàm gán lại object paymentDetail với giá trị mặc định
+ * Created by: NHGiang - (21/03/23)
+ */
+const setPaymentDetailDefault = () => {
+    try {
+        state.paymentDetail = {
+            PaymentId: "",
+            ObjectId: "",
+            ObjectCode: "",
+            ObjectName: "",
+            Amount: 0,
+            DebitAccount: "",
+            DebitAccountName: "",
+            CreditAccount: "",
+            CreditAccountName: "",
+            Description: "",
+        };
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
  * Hàm lấy ra bậc của tài khoản khi click chọn 1 dòng trong bảng tài khoản
  * @param {*} grade
  *  Created by: NHGiang - (21/03/23)
@@ -532,6 +556,14 @@ const setPaymentIdFilter = (id) => {
     }
 };
 
+const setListAllAccounts = (accounts) => {
+    try {
+        state.listAllAccounts = accounts;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 export default {
     state: readonly(state),
     setIsSidebar,
@@ -570,4 +602,6 @@ export default {
     setTotalPagePaymentDetail,
     setTotalRecordPaymentDetail,
     setPaymentIdFilter,
+    setPaymentDetailDefault,
+    setListAllAccounts,
 };

@@ -9,24 +9,13 @@ const props = defineProps({
     hasColumnDelete: Boolean,
     isEdit: Boolean,
     reason: String,
+    isClickRow: Boolean,
+    editable: Boolean,
 });
 
 const { state, setTotalPayment } = inject("diy");
 
-const refRowDetail = ref(null);
-const editable = ref(false);
 const emit = defineEmits(["focusRowDetail"]);
-
-const focusTableDetail = () => {
-    try {
-        editable.value = true;
-        refRowDetail.value?.[0].handleFocus();
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-defineExpose({ focusTableDetail });
 
 watchEffect(() => {
     try {
@@ -46,8 +35,8 @@ watchEffect(() => {
 
 <template>
     <table class="tbl" tabindex="-1">
-        <tbody class="tb-detail">
-            <tr class="tbl-row">
+        <tbody class="tb-detail" tabindex="-1">
+            <tr class="tbl-row" tabindex="-1">
                 <th
                     :class="`tbl-col ${column.isMoney && 'tbl-col--money'} ${
                         column.isSticky
@@ -60,9 +49,11 @@ watchEffect(() => {
                         width: column.width,
                         minWidth: column.width,
                         textAlign: column.align,
+                        paddingLeft: column.padding,
                     }"
                     v-for="(column, index) in columns"
                     :key="index"
+                    tabindex="-1"
                 >
                     {{ column.columnName }}
                     <div class="tbl-detail-tooltip" v-if="column.tooltip">
@@ -82,8 +73,16 @@ watchEffect(() => {
                 :index="index"
                 tabindex="0"
                 ref="refRowDetail"
+                :is-click-row="isClickRow"
             />
-            <tr class="tbl-row">
+            <div v-if="!entities.length" class="not-found">
+                <img
+                    src="https://actappg2.misacdn.net/img/bg_report_nodata.76e50bd8.svg"
+                    alt="logo NotFound"
+                />
+                <span style="margin-bottom: 80px">Không có dũ liệu</span>
+            </div>
+            <tr class="tbl-row" v-if="entities.length">
                 <th></th>
                 <th style="padding-left: 16px; border-left: unset">Tổng</th>
                 <th></th>
@@ -100,7 +99,7 @@ watchEffect(() => {
 <style>
 .tbl-col--money {
     text-align: right;
-    padding: 0 16px;
+    padding: 0 10px;
 }
 
 .tb-detail {

@@ -251,7 +251,14 @@ watch(
                 @check="setListCheck($event)"
                 @displayWarning="handleShowWarning($event)"
             />
-            <tr class="tbl-row">
+            <div v-if="!entities.length" class="not-found">
+                <img
+                    src="https://actappg2.misacdn.net/img/bg_report_nodata.76e50bd8.svg"
+                    alt="logo NotFound"
+                />
+                <span style="margin-bottom: 80px">Không có dũ liệu</span>
+            </div>
+            <tr class="tbl-row" v-if="entities.length">
                 <th class="row-last" style="z-index: 99"></th>
                 <th class="row-last" style="text-align: center">Tổng</th>
                 <th class="row-last" colspan="3"></th>
@@ -282,16 +289,5 @@ watch(
     position: relative;
     top: 50%;
     transform: translateY(-50%);
-}
-
-.not-found {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.not-found img {
-    margin: 50px 0 12px 0;
 }
 </style>

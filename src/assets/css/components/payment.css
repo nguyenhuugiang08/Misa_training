@@ -2,11 +2,18 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: row-reverse;
 }
 
 .row {
     display: flex;
     justify-content: flex-start;
+    align-items: center;
+}
+
+.cbo-btn-wrapper {
+    display: flex;
+    justify-content: center;
     align-items: center;
 }
 
@@ -198,7 +205,6 @@
     padding: 12px 0 0 0;
     position: relative;
     z-index: 99;
-    overflow: hidden;
 }
 
 .detail-payment__title {

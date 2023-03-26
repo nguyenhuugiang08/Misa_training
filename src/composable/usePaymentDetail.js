@@ -19,7 +19,8 @@ export const usePaymentDeatil = () => {
          */
         const insertPaymentDetails = async (paymentDetails) => {
             try {
-                await paymentDetailApi.insertPaymentDetails(paymentDetails);
+                const ids = await paymentDetailApi.insertPaymentDetails(paymentDetails);
+                return ids;
             } catch (error) {
                 console.log(error);
             }
@@ -50,9 +51,24 @@ export const usePaymentDeatil = () => {
             }
         };
 
+        /**
+         * Hàm sửa chi tiết phiếu chi theo ID của phiếu chi
+         * @param {*} paymentId
+         * @param {*} paymentDetails
+         * @returns
+         */
+        const editPaymentDetailsByPaymentId = async (paymentDetails) => {
+            try {
+                await paymentDetailApi.editPaymentDetailsByPaymentId(paymentDetails);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
         return {
             insertPaymentDetails,
             getPaymentDetailsByPaymentId,
+            editPaymentDetailsByPaymentId,
         };
     } catch (error) {
         console.log(error);

@@ -385,6 +385,7 @@ const useValidate = ({
         }
 
         if (payment) {
+
             // Validate số phiếu chi
             if (!payment.RefNo) {
                 setError("RefNo", "blank");

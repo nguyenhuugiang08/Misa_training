@@ -2,6 +2,8 @@ import { MISA_RESOURCE } from "../base/resource";
 import { ref } from "vue";
 import accountApi from "../api/accountApi";
 import diy from "../store/diy";
+import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
+import { MISA_ENUM } from "../base/enum";
 
 const {
     state,
@@ -10,10 +12,12 @@ const {
     setTotalEntities,
     setIsLoading,
     setKeyword,
-    setlistAllEntities,
+    setListAllAccounts,
     setEntitySelected,
     setIsForm,
     setListToast,
+    setTitleForm,
+    setIdentityForm,
 } = diy;
 
 export const useAccount = () => {
@@ -142,7 +146,7 @@ export const useAccount = () => {
                         optionGrade: account.Grade,
                     };
                 });
-                setlistAllEntities(Options);
+                setListAllAccounts(Options);
             } catch (error) {
                 console.log(error);
             }
@@ -153,7 +157,7 @@ export const useAccount = () => {
          * @param {*} account -- thông tin tài khoản
          * Created by: NHGiang - (12/03/23)
          */
-        const addAccount = async (account) => {
+        const addAccount = async (account, identityAction) => {
             try {
                 await accountApi.addAccount(account);
                 const toastMessage = {
@@ -163,6 +167,14 @@ export const useAccount = () => {
                 };
                 setListToast(toastMessage);
                 setIsForm();
+
+                if (identityAction === MISA_ENUM.STATUS_SAVE_ACCOUNT.SAVE_ADD) {
+                    setIsForm();
+                    setTitleForm(MISA_RESOURCE.FORM_TITLE.ADD);
+                    setEntitySelected({});
+                    setIdentityForm(MISA_ENUM.FORM_MODE.ADD);
+                    handleSetStatusForm();
+                }
             } catch (error) {
                 console.log(error);
             }
@@ -188,16 +200,24 @@ export const useAccount = () => {
          * @param {*} accountId -- ID của tài khoản
          * @returns
          */
-        const editAccount = async (account, accountId) => {
+        const editAccount = async (account, accountId, identityAction) => {
             try {
                 await accountApi.editAccount(account, accountId);
-                setIsForm();
                 const toastMessage = {
                     toastMessage: MISA_RESOURCE.TOAST.EDIT_ACCOUNT_SUCCESS.TOAST_MESSAGE,
                     statusMessage: MISA_RESOURCE.TOAST.EDIT_ACCOUNT_SUCCESS.STATUS_MESSAGE,
                     status: MISA_RESOURCE.TOAST.EDIT_ACCOUNT_SUCCESS.STATUS,
                 };
                 setListToast(toastMessage);
+                await setIsForm();
+
+                if (identityAction === MISA_ENUM.STATUS_SAVE_ACCOUNT.SAVE_ADD) {
+                    setIsForm();
+                    setTitleForm(MISA_RESOURCE.FORM_TITLE.ADD_ACCOUNT);
+                    setIdentityForm(MISA_ENUM.FORM_MODE.ADD);
+                    handleSetStatusForm();
+                    setEntitySelected({});
+                }
             } catch (error) {
                 console.log(error);
             }

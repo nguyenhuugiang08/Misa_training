@@ -11,8 +11,9 @@ import MPopUpInfo from "./MPopUpInfo.vue";
 import MPopUpError from "./MPopUpError.vue";
 import { useValidate } from "../utilities/validateForm";
 import { useRoute } from "vue-router";
+import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
 
-const { state, setIsForm } = inject("diy");
+const { state, setIsForm, setEntitySelected } = inject("diy");
 
 const { getAccounts, addAccount, getAccountsByFilter, editAccount } = useAccount();
 getAccounts();
@@ -107,7 +108,7 @@ watch(
 /**
  * Hàm xử lý submit form
  */
-const handleSubmit = async () => {
+const handleSubmit = async (identityAction) => {
     try {
         const status = useValidate({ account });
         const { TypeName, ...accountRest } = account;
@@ -119,17 +120,25 @@ const handleSubmit = async () => {
                 state.identityForm === MISA_ENUM.FORM_MODE.DUPLICATE
             ) {
                 accountRest.IsParent = false;
-                await addAccount(accountRest)
+                await addAccount(accountRest, identityAction)
                     .then(async () => {
-                        await getAccountsByFilter(state.keyword, pageSize.value, MISA_ENUM.PAGENUMBER_DEFAULT);
+                        await getAccountsByFilter(
+                            state.keyword,
+                            pageSize.value,
+                            MISA_ENUM.PAGENUMBER_DEFAULT
+                        );
                     })
                     .catch((isOpenError.value = true));
             }
 
             if (state.identityForm === MISA_ENUM.FORM_MODE.EDIT) {
-                await editAccount(accountRest, state.entitySelected.AccountId)
+                await editAccount(accountRest, state.entitySelected.AccountId, identityAction)
                     .then(async () => {
-                        await getAccountsByFilter(state.keyword, pageSize.value, MISA_ENUM.PAGENUMBER_DEFAULT);
+                        await getAccountsByFilter(
+                            state.keyword,
+                            pageSize.value,
+                            MISA_ENUM.PAGENUMBER_DEFAULT
+                        );
                     })
                     .catch((isOpenError.value = true));
             }
@@ -262,14 +271,14 @@ const docKeyDown = (e) => {
     if (e.ctrlKey && e.key === "s") {
         e.preventDefault();
         e.stopPropagation();
-        handleSubmit();
+        handleSubmit(MISA_ENUM.STATUS_SAVE_ACCOUNT.SAVE);
     }
 
     // Cất form và mở form thêm với phím tắt ctrl + shift + S
     if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "s") {
         e.preventDefault();
         e.stopPropagation();
-        handleSubmit();
+        handleSubmit(MISA_ENUM.STATUS_SAVE_ACCOUNT.SAVE_ADD);
     }
 
     // Đóng form với phím tắt ESC
@@ -309,6 +318,18 @@ const handleSetReverseTabindex = (e) => {
             e.preventDefault();
             refCancelBtn.value.focus();
         }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm thay đổi giá trị ô checkbox hạch toán ngoại tệ
+ * Created by: NHGiang - (25/03/23)
+ */
+const changeCheckboxForeignCurrencyAccounting = () => {
+    try {
+        account.HasForeignCurrencyAccounting = !account.HasForeignCurrencyAccounting;
     } catch (error) {
         console.log(error);
     }
@@ -382,12 +403,12 @@ const handleSetReverseTabindex = (e) => {
                 <div class="row">
                     <div class="checkbox-wrapper" style="width: 25%; margin-right: 8px">
                         <m-checkbox
-                            v-if="state.listAllEntities.length"
+                            v-if="state.listAllAccounts.length"
                             text-label="Tài khoản tổng hợp"
                             width="100%"
                             bottom="12px"
                             :default="account.ParentId"
-                            :options="state.listAllEntities"
+                            :options="state.listAllAccounts"
                             :isTable="true"
                             :columns="MISA_RESOURCE.COLUMNS_NAME_COMBOBOX_ACCOUNT"
                             @select="
@@ -430,19 +451,19 @@ const handleSetReverseTabindex = (e) => {
                         for="accounting"
                         class="modal__header-left-wrapper account-checkbox"
                         tabindex="0"
+                        @keydown.enter="changeCheckboxForeignCurrencyAccounting"
                     >
                         <input
                             type="checkbox"
                             id="accounting"
                             :checked="account.HasForeignCurrencyAccounting"
-                            @change="
-                                account.HasForeignCurrencyAccounting =
-                                    !account.HasForeignCurrencyAccounting
-                            "
+                            @change="changeCheckboxForeignCurrencyAccounting"
                         />
                         <div class="check-icon"></div>
                     </label>
-                    <span>Có hạch toán ngoại tệ</span>
+                    <span @click="changeCheckboxForeignCurrencyAccounting"
+                        >Có hạch toán ngoại tệ</span
+                    >
                 </div>
             </div>
             <div class="account-track-detail">
@@ -479,7 +500,7 @@ const handleSetReverseTabindex = (e) => {
                         type="submit"
                         class="btn btn-secondary modal-btn__secondary btn-save"
                         tabindex="0"
-                        @click="handleSubmit"
+                        @click="handleSubmit(MISA_ENUM.STATUS_SAVE_ACCOUNT.SAVE)"
                     >
                         Cất
                     </button>
@@ -487,6 +508,7 @@ const handleSetReverseTabindex = (e) => {
                         class="btn btn-primary btn-save-add"
                         tabindex="0"
                         ref="refSaveAndAddBtn"
+                        @click="handleSubmit(MISA_ENUM.STATUS_SAVE_ACCOUNT.SAVE_ADD)"
                     >
                         Cất và thêm
                     </button>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, inject, watch, watchEffect } from "vue";
+import { ref, inject, watch, watchEffect, onMounted, onUnmounted } from "vue";
 import { MISA_RESOURCE } from "../base/resource";
 import MTable from "../components/MTable.vue";
 import MPagination from "../components/MPagination.vue";
@@ -47,9 +47,22 @@ const {
     setObjectSelected,
 } = inject("diy");
 
-watchEffect(() => {
+watchEffect(async () => {
     try {
-        totalPayment.value = state.listAllEntities?.reduce((result, cur) => {
+        await getPaymentDetailsByPaymentId(state.payments?.[0]?.PaymentId);
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+/**
+ * Hàm tính tổng tiền tất cả các phiếu chi
+ * @param {*} payments - danh sách các phiếu chi
+ * Created by: NHGiang - (24/03/23)
+ */
+const CaculateTotalPayment = (payments) => {
+    try {
+        totalPayment.value = payments?.reduce((result, cur) => {
             try {
                 result += cur.TotalAmount;
                 return result;
@@ -57,6 +70,14 @@ watchEffect(() => {
                 console.log(error);
             }
         }, 0);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+watchEffect(() => {
+    try {
+        CaculateTotalPayment(state.listAllEntities);
     } catch (error) {
         console.log(error);
     }
@@ -143,7 +164,11 @@ watch(
  */
 const debounceSearch = async (value) => {
     try {
-        await getPaymentsByFilter(value, pageSize.value, pageNumber.value);
+        router.push({
+            path: "/cash/pay",
+            query: { pageSize: pageSize.value, pageNumber: MISA_ENUM.PAGENUMBER_DEFAULT },
+        });
+        await getPaymentsByFilter(value, pageSize.value, MISA_ENUM.PAGENUMBER_DEFAULT);
     } catch (error) {
         console.log(error);
     }
@@ -180,6 +205,10 @@ const onClickButtonExport = async () => {
     }
 };
 
+/**
+ * hàm xử lý nếu chọn nhiều hơn 1 phiếu chi mới enable chức năng xóa nhiều phiếu chi
+ * Created by: NHGiang - (25/03/23)
+ */
 watch(
     () => state.listItemChecked.length,
     (newValue) => {
@@ -217,6 +246,52 @@ const handleClickOutsideButtonBulkDelete = () => {
         console.log(error);
     }
 };
+
+/**
+ * Hàm xử lý ẩn hiện phần UI detail
+ * Created by: NHGiang - (25/03/23)
+ */
+const handleHideDetail = () => {
+    try {
+        if (heightMaster.value === MISA_ENUM.HEIGHT_PAYMENT_CONTENT) {
+            heightMaster.value = MISA_ENUM.HEIGHT_PAYMENT_MASTER;
+        } else {
+            heightMaster.value = MISA_ENUM.HEIGHT_PAYMENT_CONTENT;
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+/**
+ * Hàm xử lỹ phím tắt
+ * @param {*} e
+ * Created by: NHGiang - (24/02/23)
+ */
+const docKeyDown = (e) => {
+    // Mở form với phím tắt ctrl + 1
+    if (e.ctrlKey && e.key === "1") {
+        e.preventDefault();
+        e.stopPropagation();
+        handleShowPaymentDetail();
+    }
+};
+
+/**
+ * Hàm thêm event keydown
+ * Created by: NHGiang - (24/02/23)
+ */
+onMounted(() => {
+    document.addEventListener("keydown", docKeyDown, false);
+});
+
+/**
+ * Hàm xử lý remove event
+ * Created by: NHGiang - (24/02/23)
+ */
+onUnmounted(() => {
+    document.removeEventListener("keydown", docKeyDown);
+});
 </script>
 
 <template>
@@ -305,6 +380,18 @@ const handleClickOutsideButtonBulkDelete = () => {
                     :keyword="state.paymentIdFilter"
                 />
             </div>
+            <div class="collapse-btn" @click="handleHideDetail">
+                <div
+                    class="collapse-btn__icon"
+                    :style="{
+                        transform: `${
+                            heightMaster === MISA_ENUM.HEIGHT_PAYMENT_CONTENT
+                                ? 'rotate(180deg)'
+                                : 'rotate(0deg)'
+                        }`,
+                    }"
+                ></div>
+            </div>
         </div>
         <div class="overlay" v-if="state.isLoading"><m-loading /></div>
         <div class="modal-error" v-if="isShowPopupWarningDelete">
@@ -363,10 +450,9 @@ const handleClickOutsideButtonBulkDelete = () => {
     border-radius: 4px;
     display: flex;
     justify-content: center;
-    display: flex;
-    justify-content: center;
     align-items: center;
     cursor: pointer;
+    display: none;
 }
 
 .pay-bulk-delete--active {
@@ -378,5 +464,27 @@ const handleClickOutsideButtonBulkDelete = () => {
     position: relative;
     top: 4px;
     margin-left: 8px;
+}
+
+.collapse-btn {
+    position: absolute;
+    left: calc(50% - 30px);
+    top: -13px;
+    width: 48px;
+    height: 13px;
+    background: #d4d7dc;
+    border: 1px solid #d4d7dc;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.collapse-btn__icon {
+    background: url("../../src/assets/img/Sprites.svg") no-repeat -564px -365px;
+    width: 8px;
+    height: 5px;
 }
 </style>

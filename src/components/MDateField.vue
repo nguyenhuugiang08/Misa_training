@@ -82,39 +82,41 @@ onMounted(() => {
      * @param {*} value -- Giá trị ô input
      * Created by: NHGiang - (20/02/23)
      */
-    dateInput.addEventListener("input", function (e) {
-        if (e.inputType !== "deleteContentBackward") {
-            var input = this.value;
-            if (/\D\/$/.test(input)) input = input.substr(0, input.length - 3);
-            var values = input.split("/").map(function (v) {
-                return v.replace(/\D/g, "");
-            });
-            if (values[0]) values[0] = checkValue(values[0], 31);
-            if (values[1]) values[1] = checkValue(values[1], 12);
-            var output = values.map(function (v, i) {
-                return v.length == 2 && i < 2 ? v + "/" : v;
-            });
+    if (dateInput) {
+        dateInput.addEventListener("input", function (e) {
+            if (e.inputType !== "deleteContentBackward") {
+                var input = this.value;
+                if (/\D\/$/.test(input)) input = input.substr(0, input.length - 3);
+                var values = input.split("/").map(function (v) {
+                    return v.replace(/\D/g, "");
+                });
+                if (values[0]) values[0] = checkValue(values[0], 31);
+                if (values[1]) values[1] = checkValue(values[1], 12);
+                var output = values.map(function (v, i) {
+                    return v.length == 2 && i < 2 ? v + "/" : v;
+                });
 
-            this.value = output.join("").substr(0, 10);
+                this.value = output.join("").substr(0, 10);
 
-            if (this.value.length === 10) {
-                if (handleCheckFormat(MISA_RESOURCE.REGEX.DATE, this.value)) {
-                    date.value = new Date(convertDatetime(this.value));
-                } else {
-                    date.value = new Date();
+                if (this.value.length === 10) {
+                    if (handleCheckFormat(MISA_RESOURCE.REGEX.DATE, this.value)) {
+                        date.value = new Date(convertDatetime(this.value));
+                    } else {
+                        date.value = new Date();
+                    }
+                    emit("dateField", date.value);
                 }
-                emit("dateField", date.value);
-            }
 
-            if (this.value.length === 0) {
-                datepicker.value.clearValue();
+                if (this.value.length === 0) {
+                    datepicker.value.clearValue();
+                }
+            } else {
+                if (this.value.length === 0) {
+                    datepicker.value.clearValue();
+                }
             }
-        } else {
-            if (this.value.length === 0) {
-                datepicker.value.clearValue();
-            }
-        }
-    });
+        });
+    }
 });
 
 /**

@@ -13,9 +13,23 @@ const isChecked = ref(props.checked);
 const emit = defineEmits(["select", "onCheckInput"]);
 const isShowTooltip = ref(false);
 
+// Lấy ra giá trị mặc định của ô checkbox khi được enable
 if (props.selected || props.selected === 0) {
     props.standard.default = props.selected;
 }
+
+/**
+ * Hàm xử lý thay đổi trạng thái check ô checkbox và combobox
+ * Created by: NHGiang - (25/03/23)
+ */
+const handleEnableOption = () => {
+    try {
+        isChecked.value = !isChecked.value;
+        emit("onCheckInput", { identity: props.standard?.identity, isChecked: isChecked.value });
+    } catch (error) {
+        console.log(error);
+    }
+};
 </script>
 
 <template>
@@ -25,10 +39,8 @@ if (props.selected || props.selected === 0) {
                 :for="`subject_${index}`"
                 class="modal__header-left-wrapper account-checkbox"
                 tabindex="0"
-                @change="
-                    isChecked = !isChecked;
-                    emit('onCheckInput', { identity: standard.identity, isChecked });
-                "
+                @change="handleEnableOption"
+                @keydown.enter="handleEnableOption"
             >
                 <input type="checkbox" :id="`subject_${index}`" :checked="isChecked" />
                 <div class="check-icon"></div>
@@ -37,6 +49,7 @@ if (props.selected || props.selected === 0) {
                 class="track-text"
                 @mouseover="isShowTooltip = true"
                 @mouseleave="isShowTooltip = false"
+                @click="handleEnableOption"
             >
                 {{ standard.trackText }}
                 <div class="track-text__tooltip" v-if="standard.tooltip && isShowTooltip">
@@ -63,6 +76,7 @@ if (props.selected || props.selected === 0) {
 <style>
 .track-text {
     position: relative;
+    cursor: pointer;
 }
 
 .track-text__tooltip {

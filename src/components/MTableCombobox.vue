@@ -14,7 +14,7 @@ watch(
     () => props.indexSelected,
     (newValue) => {
         if (!props.isTable) {
-            const liH = refItem.value[newValue].clientHeight;
+            const liH = refItem.value[newValue]?.clientHeight;
             refList.value.scrollTop = liH * newValue;
         }
     }
@@ -50,6 +50,7 @@ watch(
                         {{ option[col.identityOption] }}
                     </td>
                 </tr>
+                <div class="tbl-cbo-nodata" v-if="options.length === 0">Không có dữ liệu hiển thị</div>
             </tbody>
         </table>
     </div>
@@ -64,5 +65,10 @@ watch(
 .row--active:hover {
     background-color: var(--primary-color) !important;
     color: #fff !important;
+}
+
+.tbl-cbo-nodata {
+    margin: 8px auto;
+    text-align: center;
 }
 </style>

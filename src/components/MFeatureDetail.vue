@@ -152,7 +152,6 @@ const handleDeleteAccount = async (accountId, parentId) => {
 const handleActiveAccount = async (accountId, isActive, isParent, hasActiveChild) => {
     try {
         if (isParent) {
-            console.log("first");
             if (!hasActiveChild) {
                 const accountIds = [accountId];
                 const response = await accountApi.getChildrens();
