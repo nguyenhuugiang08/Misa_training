@@ -24,7 +24,15 @@ const toDropList = ref(0); // Khoảng cách của danh sách chức năng so v�
 
 const router = useRouter();
 
-const { state, setIdentityForm, setRowPaymentSelected } = inject("diy");
+const {
+    state,
+    setIdentityForm,
+    setRowPaymentSelected,
+    setDisableFiled,
+    setIsClickRow,
+    setIsEditButton,
+    setIndexRowEditable,
+} = inject("diy");
 
 /**
  * Hàm xử lý check 1 dòng
@@ -47,6 +55,23 @@ const handleEditPayment = async (paymentId) => {
         router.push("/pay/pay-detail");
         handleSetStatusForm();
         setIdentityForm(MISA_ENUM.FORM_MODE.EDIT);
+        const listFielDisable = [
+            "objectCode",
+            "objectName",
+            "address",
+            "attachment",
+            "employeeId",
+            "postedDate",
+            "reason",
+            "reasonType",
+            "receiver",
+            "refDate",
+            "refNo",
+        ];
+        setDisableFiled(listFielDisable, true);
+        setIndexRowEditable(-1);
+        setIsClickRow(true);
+        setIsEditButton(true);
     } catch (error) {
         console.log(error);
     }

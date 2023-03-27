@@ -1,6 +1,6 @@
 <script setup>
 import MRowDetail from "./MRowDetail.vue";
-import { ref, defineExpose, inject, watchEffect } from "vue";
+import { inject, watchEffect } from "vue";
 import { formatMoney } from "../utilities/formatMoney";
 
 const props = defineProps({
@@ -9,8 +9,6 @@ const props = defineProps({
     hasColumnDelete: Boolean,
     isEdit: Boolean,
     reason: String,
-    isClickRow: Boolean,
-    editable: Boolean,
 });
 
 const { state, setTotalPayment } = inject("diy");
@@ -68,12 +66,10 @@ watchEffect(() => {
                 :numerical-order="index"
                 :has-column-delete="hasColumnDelete"
                 :is-edit="isEdit"
-                :editable="editable"
                 :reason="reason"
                 :index="index"
                 tabindex="0"
                 ref="refRowDetail"
-                :is-click-row="isClickRow"
             />
             <div v-if="!entities.length" class="not-found">
                 <img

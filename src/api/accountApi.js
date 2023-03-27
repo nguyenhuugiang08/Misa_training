@@ -136,18 +136,16 @@ const accountApi = {
 
     /**
      * Hàm lấy danh sách tài khoản có bậc lớn hơn 1 theo bộ lọc và phân trang
-     * @param {*} keyword 
-     * @param {*} pageSize 
-     * @param {*} pageNumber 
-     * @returns 
+     * @param {*} keyword
+     * @param {*} pageSize
+     * @param {*} pageNumber
+     * @returns
      */
-    getAccountsGradeGreaterThanOne: (keyword, pageSize, pageNumber) => {
+    getAccountsGradeGreaterThanOne: (keyword) => {
         try {
             return axiosClient.get(`${baseUrl}/greaterThanOne`, {
                 params: {
                     entityFilter: keyword,
-                    pageSize: pageSize,
-                    pageNumber: pageNumber,
                 },
             });
         } catch (error) {

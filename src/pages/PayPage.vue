@@ -45,6 +45,7 @@ const {
     setPaymentDetailsDefault,
     setPaymentDetail,
     setObjectSelected,
+    setEditable,
 } = inject("diy");
 
 watchEffect(async () => {
@@ -122,6 +123,7 @@ const handleShowPaymentDetail = async () => {
             CreditAccountName: "",
             Description: "",
         });
+        setEditable(false);
     } catch (error) {
         console.log(error);
     }

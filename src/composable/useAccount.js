@@ -45,44 +45,27 @@ export const useAccount = () => {
                     );
 
                     const allAccounts = await accountApi.getAccounts();
-                    const res = await accountApi.getChildrens();
+                    const accountsGreaterThanOne = await accountApi.getAccountsGradeGreaterThanOne(
+                        keyword
+                    );
                     const { Data, TotalRecord, TotalPage } = response;
                     totalPage.value = TotalPage;
                     totalRecord.value = TotalRecord;
+                    // Lấy ra số tài khoản con được tìm thấy tương ứng với các tài khoản cha
+                    let countRecords = 0;
 
-                    if (keyword) {
-                        const accountsGreaterThanOne =
-                            await accountApi.getAccountsGradeGreaterThanOne(
-                                keyword,
-                                pageSize,
-                                pageNumber
-                            );
-
-                        if (accountsGreaterThanOne.Data.length === 1 && Data.length === 0) {
-                            accountsGreaterThanOne.Data[0].ParentId = 0;
-                        }
-                        accountsGreaterThanOne.Data?.forEach((account) => {
-                            try {
-                                if (account.IsParent === true && Data.length === 0)
-                                    account.ParentId = 0;
-                            } catch (error) {
-                                console.log(error);
-                            }
-                        });
-                        accounts.value = [...Data, ...accountsGreaterThanOne.Data];
-                        totalPage.value = accountsGreaterThanOne.TotalPage;
-                        totalRecord.value = accounts.value.length;
-                    } else {
+                    if (Data.length !== 0) {
                         accounts.value = [...Data];
+                    } else {
+                        accounts.value = [...accountsGreaterThanOne];
+                        countRecords = accountsGreaterThanOne.length;
                     }
 
                     // lấy ra danh sách các AccountId của tài khoản cha
                     let accountIds = accounts.value.map((account) => account.AccountId);
-                    // Lấy ra số tài khoản con được tìm thấy tương ứng với các tài khoản cha
-                    let countRecords = 0;
 
                     // Xử lý lấy ra những tài khoản con tương ứng với các tài khoản cha đang có tại trang hiện tại -> thêm vào danh sách tài khoản
-                    res.forEach((child) => {
+                    accountsGreaterThanOne.forEach((child) => {
                         try {
                             if (
                                 accountIds.includes(child.ParentId) &&
@@ -99,7 +82,7 @@ export const useAccount = () => {
 
                     // Xử lý dữ liệu tài khoản
                     accounts.value.forEach((element) => {
-                        if (element.Grade === 1) element.ParentId = 0;
+                        if (!accountIds.includes(element.ParentId)) element.ParentId = 0;
 
                         // xử lý trường tính chất
                         const indexType = MISA_RESOURCE.ACCOUNT_NATURE.findIndex(

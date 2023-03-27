@@ -20,6 +20,7 @@ const props = defineProps({
     placeHolderAlign: String,
     onlyNumber: Boolean,
     disable: Boolean,
+    maxLength: { type: Number, default: 255 },
 });
 
 // biến giúp tham chiếu đến element Input trong DOM
@@ -122,6 +123,7 @@ defineExpose({ handleFocusInput });
             :placeHolder="placeHolder"
             ref="refInput"
             :disabled="disable"
+            :maxlength="maxLength"
         />
         <div class="textfield-tooltip" v-if="tooltip">
             <span>{{ tooltip }}</span>

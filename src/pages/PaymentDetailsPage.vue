@@ -27,6 +27,11 @@ const {
     setPaymentDetailsDefault,
     setIndexRowEditable,
     setIdentityForm,
+    setDisableFiled,
+    setIsEditButton,
+    setIsClickRow,
+    setDisableFiledDefault,
+    setEditable,
 } = inject("diy");
 const router = useRouter();
 const refTableDetail = ref(null); // Tham chiếu tới bảng detail
@@ -36,23 +41,6 @@ const paymentDetailTextErrors = ref([]); // mảng lưu text lỗi của UI deta
 const isOpenPopupConstruction = ref(false); // trạng thái đóng/ mở của popup thông báo chức năng đang thi công
 const refObjectCode = ref(null); // tham chiếu tới ô combobox mã đối tượng
 const actionSelected = ref(0); // lưu lại hành động nguwfoi dùng vừa thực hiện (Cất và thêm hoặc Cất và đóng)
-const isClickRow = ref(false); // trạng thái click dòng trên UI detail khi ấn nút cất -> true : không thể chọn dòng, false: có thể chọn
-const isEditButton = ref(false); // false: content nút là cất, true: content nút là Sửa
-// trạng thái disable của các trường nhập dưc liệu
-const disableFiled = reactive({
-    objectCode: false,
-    objectName: false,
-    address: false,
-    attachment: false,
-    employeeId: false,
-    postedDate: false,
-    reason: false,
-    reasonType: false,
-    receiver: false,
-    refDate: false,
-    refNo: false,
-});
-const editable = ref(false); // trạng thái disable các trường trên UI detail
 const paymentIdAdded = ref(null); // ID của phiếu chi vừa được thêm vào DB
 const paymentDetailIds = ref([]); // danh sách ID của các chi tiết phiếu chi vừa được thêm vào DB
 const refCancelBtn = ref(null); // tham chiếu tới button Hủy
@@ -114,6 +102,10 @@ watchEffect(() => {
 const handleCloseForm = () => {
     try {
         router.go(-1);
+        setDisableFiledDefault();
+        setIsClickRow(false);
+        setIsEditButton(false);
+        setIndexRowEditable(0);
     } catch (error) {
         console.log(error);
     }
@@ -194,23 +186,26 @@ const handleAddPayment = async (identityButton) => {
                     paymentDetailIds.value = [...ids];
                     await getPaymentsByFilter();
                     if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE) {
-                        disableFiled.objectCode = true;
-                        disableFiled.objectName = true;
-                        disableFiled.address = true;
-                        disableFiled.attachment = true;
-                        disableFiled.employeeId = true;
-                        disableFiled.postedDate = true;
-                        disableFiled.reason = true;
-                        disableFiled.reasonType = true;
-                        disableFiled.receiver = true;
-                        disableFiled.refDate = true;
-                        disableFiled.refNo = true;
+                        const listFielDisable = [
+                            "objectCode",
+                            "objectName",
+                            "address",
+                            "attachment",
+                            "employeeId",
+                            "postedDate",
+                            "reason",
+                            "reasonType",
+                            "receiver",
+                            "refDate",
+                            "refNo",
+                        ];
+                        setDisableFiled(listFielDisable, true);
 
                         isOpenError.value = false;
                         setIndexRowEditable(-1);
-                        isClickRow.value = true;
-                        isEditButton.value = true;
-                        editable.value = true;
+                        setIsClickRow(true);
+                        setIsEditButton(true);
+                        setEditable(true);
                     }
 
                     if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE_CLOSE) {
@@ -269,23 +264,25 @@ const handleEditPayment = async (identityButton) => {
                 isOpenError.value = false;
 
                 if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE) {
-                    disableFiled.objectCode = true;
-                    disableFiled.objectName = true;
-                    disableFiled.address = true;
-                    disableFiled.attachment = true;
-                    disableFiled.employeeId = true;
-                    disableFiled.postedDate = true;
-                    disableFiled.reason = true;
-                    disableFiled.reasonType = true;
-                    disableFiled.receiver = true;
-                    disableFiled.refDate = true;
-                    disableFiled.refNo = true;
-
+                    const listFielDisable = [
+                        "objectCode",
+                        "objectName",
+                        "address",
+                        "attachment",
+                        "employeeId",
+                        "postedDate",
+                        "reason",
+                        "reasonType",
+                        "receiver",
+                        "refDate",
+                        "refNo",
+                    ];
+                    setDisableFiled(listFielDisable, true);
                     isOpenError.value = false;
                     setIndexRowEditable(-1);
-                    isClickRow.value = true;
-                    isEditButton.value = true;
-                    editable.value = true;
+                    setIsClickRow(true);
+                    setIsEditButton(true);
+                    setEditable(true);
                 }
 
                 if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE_CLOSE) {
@@ -465,14 +462,19 @@ watchEffect(() => {
 const handleChangeStatsForm = () => {
     try {
         setIdentityForm(MISA_ENUM.FORM_MODE.EDIT);
-        disableFiled.objectName = false;
-        disableFiled.address = false;
-        disableFiled.attachment = false;
-        disableFiled.employeeId = false;
-        disableFiled.reason = false;
-        disableFiled.receiver = false;
+        const listFieldEnable = [
+            "objectName",
+            "address",
+            "attachment",
+            "employeeId",
+            "reason",
+            "receiver",
+        ];
+        setDisableFiled(listFieldEnable, false);
         setIndexRowEditable(0);
-        isEditButton.value = false;
+        setIsEditButton(false);
+        setIsClickRow(false);
+        setEditable(true);
     } catch (error) {
         console.log(error);
     }
@@ -492,7 +494,7 @@ const handleChangeStatsForm = () => {
                         :default="payment.ReasonType"
                         :options="MISA_RESOURCE.PAY_ACTIVE"
                         :width="'290px'"
-                        :disabled="disableFiled.reasonType"
+                        :disabled="state.disableFiled.reasonType"
                         has-display-data-disable
                         @select="payment.ReasonType = $event.optionId"
                     />
@@ -528,7 +530,7 @@ const handleChangeStatsForm = () => {
                             :columns="MISA_RESOURCE.COLUMNS_NAME_COMBOBOX_OBJECT"
                             bottom="8px"
                             has-display-data-disable
-                            :disabled="disableFiled.objectCode"
+                            :disabled="state.disableFiled.objectCode"
                             :isShiftTab="true"
                             marginRight="12px"
                             @focusBtn="handleSetReverseTabindex"
@@ -551,7 +553,7 @@ const handleChangeStatsForm = () => {
                         width="424px"
                         bottom="8px"
                         :value="payment.ObjectName"
-                        :disable="disableFiled.objectName"
+                        :disable="state.disableFiled.objectName"
                         @inputValue="payment.ObjectName = $event"
                     />
                 </div>
@@ -562,7 +564,7 @@ const handleChangeStatsForm = () => {
                         bottom="8px"
                         margin-right="12px"
                         :value="payment.Receiver"
-                        :disable="disableFiled.receiver"
+                        :disable="state.disableFiled.receiver"
                         @inputValue="payment.Receiver = $event"
                     />
                     <m-input
@@ -570,7 +572,7 @@ const handleChangeStatsForm = () => {
                         width="424px"
                         bottom="8px"
                         :value="payment.Address"
-                        :disable="disableFiled.address"
+                        :disable="state.disableFiled.address"
                         @inputValue="payment.Address = $event"
                     />
                 </div>
@@ -584,7 +586,7 @@ const handleChangeStatsForm = () => {
                             : `Chi tiền cho ${payment.ObjectName}`
                     "
                     @inputValue="payment.Reason = $event"
-                    :disable="disableFiled.reason"
+                    :disable="state.disableFiled.reason"
                 />
                 <div class="row">
                     <div class="checkbox-wrapper">
@@ -598,7 +600,7 @@ const handleChangeStatsForm = () => {
                             bottom="8px"
                             marginRight="12px"
                             has-display-data-disable
-                            :disabled="disableFiled.employeeId"
+                            :disabled="state.disableFiled.employeeId"
                             @select="payment.EmployeeId = $event.optionId"
                         />
                     </div>
@@ -611,7 +613,7 @@ const handleChangeStatsForm = () => {
                         place-holder="số lượng"
                         place-holder-align="right"
                         :only-number="true"
-                        :disable="disableFiled.attachment"
+                        :disable="state.disableFiled.attachment"
                     />
                     <div class="row-text">chứng từ gốc</div>
                 </div>
@@ -624,7 +626,7 @@ const handleChangeStatsForm = () => {
                     bottom="8px"
                     width="166px"
                     :value="payment.PostedDate"
-                    :disable="disableFiled.postedDate"
+                    :disable="state.disableFiled.postedDate"
                     :status="error.PostedDate.status"
                     :textError="error.PostedDate.textError"
                     :statusPublic="error.status"
@@ -636,7 +638,7 @@ const handleChangeStatsForm = () => {
                     field-text="Ngày phiếu chi"
                     bottom="8px"
                     width="166px"
-                    :disable="disableFiled.refDate"
+                    :disable="state.disableFiled.refDate"
                     :value="payment.RefDate"
                     :status="error.RefDate.status"
                     :textError="error.RefDate.textError"
@@ -648,12 +650,13 @@ const handleChangeStatsForm = () => {
                     field-text="Số phiếu chi"
                     width="166px"
                     :value="payment.RefNo"
-                    :disable="disableFiled.refNo"
+                    :disable="state.disableFiled.refNo"
                     :status="error.RefNo.status"
                     :statusPublic="error.status"
                     :text-error="error.RefNo.textError"
                     @inputValue="payment.RefNo = $event"
                     @changeValue="error.RefNo.status = $event"
+                    :max-length="20"
                 />
             </div>
             <div class="container-right">
@@ -670,8 +673,6 @@ const handleChangeStatsForm = () => {
                 :reason="payment.Reason"
                 isEdit
                 ref="refTableDetail"
-                :is-click-row="isClickRow"
-                :editable="editable"
             />
 
             <div class="payment-action">
@@ -699,7 +700,7 @@ const handleChangeStatsForm = () => {
                 />
                 <button
                     ref="refSaveAndAddBtn"
-                    v-if="!isEditButton"
+                    v-if="!state.isEditButton"
                     type="submit"
                     class="btn btn-secondary payment-btn-save"
                     tabindex="0"
@@ -709,7 +710,7 @@ const handleChangeStatsForm = () => {
                 </button>
                 <button
                     ref="refSaveAndAddBtn"
-                    v-if="isEditButton"
+                    v-if="state.isEditButton"
                     type="submit"
                     class="btn btn-secondary payment-btn-save"
                     tabindex="0"

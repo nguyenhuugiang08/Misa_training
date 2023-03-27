@@ -31,6 +31,17 @@ const handleClickAction = (optionName, index, identityAction) => {
         console.log(error);
     }
 };
+
+const handleClickButton = () => {
+    try {
+        const indexAction = localStorage.getItem("actionSelected");
+        if (indexAction) {
+            emit("clickBtn", props.options?.[indexAction].identityAction);
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
 </script>
 
 <template>
@@ -38,7 +49,7 @@ const handleClickAction = (optionName, index, identityAction) => {
         <button
             :class="{ 'btn btn-primary': true, 'cbo-btn': true, 'btn-curved--left': isCurved }"
             :style="{ marginTop: marginTop && marginTop }"
-            @click="emit('clickBtn', localStorage.getItem('actionSelected'))"
+            @click="handleClickButton"
         >
             <span>{{ contentBtn }}</span>
         </button>
