@@ -128,12 +128,6 @@ export const usePayment = () => {
         const addPayment = async (payment) => {
             try {
                 const paymentId = await paymentApi.addPayment(payment);
-                const toastMessage = {
-                    toastMessage: MISA_RESOURCE.TOAST.ADD_PAYMENT_SUCCESS.TOAST_MESSAGE,
-                    statusMessage: MISA_RESOURCE.TOAST.ADD_PAYMENT_SUCCESS.STATUS_MESSAGE,
-                    status: MISA_RESOURCE.TOAST.ADD_PAYMENT_SUCCESS.STATUS,
-                };
-                setListToast(toastMessage);
                 return paymentId;
             } catch (error) {
                 console.log(error);
@@ -182,7 +176,7 @@ export const usePayment = () => {
          */
         const editPayement = async (payment, paymentId) => {
             try {
-                await paymentApi.editPayement(payment, paymentId);
+                return await paymentApi.editPayement(payment, paymentId);
             } catch (error) {
                 console.log(error);
             }

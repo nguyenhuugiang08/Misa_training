@@ -412,8 +412,11 @@ const changeCheckboxForeignCurrencyAccounting = () => {
                             :isTable="true"
                             :columns="MISA_RESOURCE.COLUMNS_NAME_COMBOBOX_ACCOUNT"
                             @select="
-                                account.ParentId = $event.optionId;
-                                account.Grade = $event.optionGrade + 1;
+                                account.ParentId =
+                                    $event.optionId === -1
+                                        ? MISA_RESOURCE.GUID_EMPTY
+                                        : $event.optionId;
+                                account.Grade = $event.optionGrade ? $event.optionGrade + 1 : 1;
                             "
                         />
                     </div>
@@ -513,15 +516,16 @@ const changeCheckboxForeignCurrencyAccounting = () => {
                         Cất và thêm
                     </button>
                 </div>
-                <label
+                <button
                     for="show-modal"
                     class="btn btn-secondary modal-btn-cancel"
                     tabindex="0"
                     ref="refCancelBtn"
                     @click="setIsForm()"
                     @keydown="handleSetTabindex"
-                    >Hủy</label
                 >
+                    Hủy
+                </button>
             </div>
 
             <div class="account-form__resize" @click="isResize = !isResize">

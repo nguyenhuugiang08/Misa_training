@@ -27,10 +27,8 @@ const {
     setPaymentDetailsDefault,
     setIndexRowEditable,
     setIdentityForm,
-    setDisableFiled,
     setIsEditButton,
     setIsClickRow,
-    setDisableFiledDefault,
     setEditable,
 } = inject("diy");
 const router = useRouter();
@@ -79,6 +77,14 @@ const payment = reactive({
     TotalAmount: state.totalPayment || 0,
 });
 
+watch(() => payment.Reason, () => {
+    try {
+        
+    } catch (error) {
+      console.log(error);
+    }
+})
+
 const { getObjects } = useObject();
 getObjects();
 
@@ -99,13 +105,15 @@ watchEffect(() => {
  * Hàm đóng form chi tiết phiếu chi
  * Created by: NHGiang - (16/03/23)
  */
-const handleCloseForm = () => {
+const handleCloseForm = async () => {
     try {
         router.go(-1);
-        setDisableFiledDefault();
         setIsClickRow(false);
         setIsEditButton(false);
         setIndexRowEditable(0);
+        await setPaymentDetailsDefault();
+        setObjectSelected({});
+        setPaymentDetailDefault();
     } catch (error) {
         console.log(error);
     }
@@ -142,8 +150,6 @@ const handleSubmit = async (identityButton) => {
                 paymentDetailTextErrors.value.push(error.DebitAccount.textError);
             if (error.CreditAccount.textError)
                 paymentDetailTextErrors.value.push(error.CreditAccount.textError);
-            if (error.ObjectId.textError)
-                paymentDetailTextErrors.value.push(error.ObjectId.textError);
         });
 
         if (!status) {
@@ -152,10 +158,12 @@ const handleSubmit = async (identityButton) => {
                 state.identityForm === MISA_ENUM.FORM_MODE.ADD ||
                 state.identityForm === MISA_ENUM.FORM_MODE.DUPLICATE
             ) {
+                // thực hiện thêm hoặc nhân bản phiếu chi
                 handleAddPayment(identityButton);
             }
 
             if (state.identityForm === MISA_ENUM.FORM_MODE.EDIT) {
+                //thực hiện sửa thông tin phiếu chi
                 handleEditPayment(identityButton);
             }
         } else {
@@ -172,8 +180,12 @@ const handleSubmit = async (identityButton) => {
  */
 const handleAddPayment = async (identityButton) => {
     try {
-        payment.RefDate.setHours(payment.RefDate.getHours() + MISA_ENUM.TIMEZONE_DIFFERENCE);
-        payment.PostedDate.setHours(payment.PostedDate.getHours() + MISA_ENUM.TIMEZONE_DIFFERENCE);
+        if (state.identityForm === MISA_ENUM.FORM_MODE.ADD) {
+            payment.RefDate.setHours(payment.RefDate.getHours() + MISA_ENUM.TIMEZONE_DIFFERENCE);
+            payment.PostedDate.setHours(
+                payment.PostedDate.getHours() + MISA_ENUM.TIMEZONE_DIFFERENCE
+            );
+        }
         await addPayment(payment)
             .then(async (data) => {
                 if (data) {
@@ -186,21 +198,6 @@ const handleAddPayment = async (identityButton) => {
                     paymentDetailIds.value = [...ids];
                     await getPaymentsByFilter();
                     if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE) {
-                        const listFielDisable = [
-                            "objectCode",
-                            "objectName",
-                            "address",
-                            "attachment",
-                            "employeeId",
-                            "postedDate",
-                            "reason",
-                            "reasonType",
-                            "receiver",
-                            "refDate",
-                            "refNo",
-                        ];
-                        setDisableFiled(listFielDisable, true);
-
                         isOpenError.value = false;
                         setIndexRowEditable(-1);
                         setIsClickRow(true);
@@ -247,49 +244,37 @@ const handleAddPayment = async (identityButton) => {
  */
 const handleEditPayment = async (identityButton) => {
     try {
-        await editPayement(payment, state.entitySelected.PaymentId || paymentIdAdded.value)
-            .then(async () => {
-                if (paymentDetailIds.value.length > 0) {
-                    const paymentDetails = state.paymentDetails.map((paymentDetail, index) => {
-                        return {
-                            ...paymentDetail,
-                            PaymentDetailId: paymentDetailIds.value[index],
-                        };
-                    });
-                    await editPaymentDetailsByPaymentId(paymentDetails);
-                } else {
-                    await editPaymentDetailsByPaymentId(state.paymentDetails);
-                }
-                await getPaymentsByFilter();
-                isOpenError.value = false;
-
-                if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE) {
-                    const listFielDisable = [
-                        "objectCode",
-                        "objectName",
-                        "address",
-                        "attachment",
-                        "employeeId",
-                        "postedDate",
-                        "reason",
-                        "reasonType",
-                        "receiver",
-                        "refDate",
-                        "refNo",
-                    ];
-                    setDisableFiled(listFielDisable, true);
+        await editPayement(payment, paymentIdAdded.value || state.entitySelected.PaymentId)
+            .then(async (data) => {
+                if (data) {
+                    if (paymentDetailIds.value.length > 0) {
+                        const paymentDetails = state.paymentDetails.map((paymentDetail, index) => {
+                            return {
+                                ...paymentDetail,
+                                PaymentDetailId: paymentDetailIds.value[index],
+                            };
+                        });
+                        await editPaymentDetailsByPaymentId(paymentDetails);
+                    } else {
+                        await editPaymentDetailsByPaymentId(state.paymentDetails);
+                    }
+                    await getPaymentsByFilter();
                     isOpenError.value = false;
-                    setIndexRowEditable(-1);
-                    setIsClickRow(true);
-                    setIsEditButton(true);
-                    setEditable(true);
-                }
 
-                if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE_CLOSE) {
-                    handleCloseForm();
-                }
+                    if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE) {
+                        isOpenError.value = false;
+                        setIndexRowEditable(-1);
+                        setIsClickRow(true);
+                        setIsEditButton(true);
+                        setEditable(true);
+                    }
 
-                if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE_ADD) {
+                    if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE_CLOSE) {
+                        handleCloseForm();
+                    }
+
+                    if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE_ADD) {
+                    }
                 }
             })
             .catch((isOpenError.value = true));
@@ -339,14 +324,14 @@ const docKeyDown = (e) => {
     if (e.ctrlKey && e.key === "s") {
         e.preventDefault();
         e.stopPropagation();
-        handleSubmit(MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE);
+        if (!state.editable) handleSubmit(MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE);
     }
 
     // Cất form và mở form thêm với phím tắt ctrl + shift + S
     if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "s") {
         e.preventDefault();
         e.stopPropagation();
-        handleSubmit(MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE_ADD);
+        if (!state.editable) handleSubmit(MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE_ADD);
     }
 
     // Đóng form với phím tắt ESC
@@ -361,7 +346,8 @@ const docKeyDown = (e) => {
 
     // xóa dòng với phím ctrl + delete
     if (e.ctrlKey && e.keyCode === MISA_ENUM.KEY_CODE.DELETE) {
-        deletePaymentDetails(state.paymentDetails.length - 1);
+        if (!state.editable && state.identityForm !== MISA_ENUM.FORM_MODE.EDIT)
+            deletePaymentDetails(state.paymentDetails.length - 1);
         if (state.paymentDetails.length - 1 === -1) {
             setPaymentDetailDefault();
         }
@@ -371,7 +357,14 @@ const docKeyDown = (e) => {
     if (e.ctrlKey && e.key.toLowerCase() === "q") {
         e.preventDefault();
         e.stopPropagation();
-        handleSubmit(MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE_CLOSE);
+        if (!state.editable) handleSubmit(MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE_CLOSE);
+    }
+
+    // sửa thông tin phiếu chi
+    if (e.ctrlKey && e.key.toLowerCase() === "e") {
+        e.preventDefault();
+        e.stopPropagation();
+        if (state.editable) handleChangeStatsForm();
     }
 };
 
@@ -430,7 +423,8 @@ watch(
  */
 const handleAddRowDetail = () => {
     try {
-        addPaymentDetails(state.paymentDetail);
+        if (!state.editable && state.identityForm !== MISA_ENUM.FORM_MODE.EDIT)
+            addPaymentDetails(state.paymentDetail);
     } catch (error) {
         console.log(error);
     }
@@ -462,19 +456,10 @@ watchEffect(() => {
 const handleChangeStatsForm = () => {
     try {
         setIdentityForm(MISA_ENUM.FORM_MODE.EDIT);
-        const listFieldEnable = [
-            "objectName",
-            "address",
-            "attachment",
-            "employeeId",
-            "reason",
-            "receiver",
-        ];
-        setDisableFiled(listFieldEnable, false);
         setIndexRowEditable(0);
         setIsEditButton(false);
         setIsClickRow(false);
-        setEditable(true);
+        setEditable(false);
     } catch (error) {
         console.log(error);
     }
@@ -494,7 +479,7 @@ const handleChangeStatsForm = () => {
                         :default="payment.ReasonType"
                         :options="MISA_RESOURCE.PAY_ACTIVE"
                         :width="'290px'"
-                        :disabled="state.disableFiled.reasonType"
+                        :disabled="state.editable"
                         has-display-data-disable
                         @select="payment.ReasonType = $event.optionId"
                     />
@@ -530,7 +515,7 @@ const handleChangeStatsForm = () => {
                             :columns="MISA_RESOURCE.COLUMNS_NAME_COMBOBOX_OBJECT"
                             bottom="8px"
                             has-display-data-disable
-                            :disabled="state.disableFiled.objectCode"
+                            :disabled="state.editable"
                             :isShiftTab="true"
                             marginRight="12px"
                             @focusBtn="handleSetReverseTabindex"
@@ -553,7 +538,7 @@ const handleChangeStatsForm = () => {
                         width="424px"
                         bottom="8px"
                         :value="payment.ObjectName"
-                        :disable="state.disableFiled.objectName"
+                        :disable="state.editable"
                         @inputValue="payment.ObjectName = $event"
                     />
                 </div>
@@ -564,7 +549,7 @@ const handleChangeStatsForm = () => {
                         bottom="8px"
                         margin-right="12px"
                         :value="payment.Receiver"
-                        :disable="state.disableFiled.receiver"
+                        :disable="state.editable"
                         @inputValue="payment.Receiver = $event"
                     />
                     <m-input
@@ -572,7 +557,7 @@ const handleChangeStatsForm = () => {
                         width="424px"
                         bottom="8px"
                         :value="payment.Address"
-                        :disable="state.disableFiled.address"
+                        :disable="state.editable"
                         @inputValue="payment.Address = $event"
                     />
                 </div>
@@ -586,7 +571,7 @@ const handleChangeStatsForm = () => {
                             : `Chi tiền cho ${payment.ObjectName}`
                     "
                     @inputValue="payment.Reason = $event"
-                    :disable="state.disableFiled.reason"
+                    :disable="state.editable"
                 />
                 <div class="row">
                     <div class="checkbox-wrapper">
@@ -600,7 +585,7 @@ const handleChangeStatsForm = () => {
                             bottom="8px"
                             marginRight="12px"
                             has-display-data-disable
-                            :disabled="state.disableFiled.employeeId"
+                            :disabled="state.editable"
                             @select="payment.EmployeeId = $event.optionId"
                         />
                     </div>
@@ -613,7 +598,7 @@ const handleChangeStatsForm = () => {
                         place-holder="số lượng"
                         place-holder-align="right"
                         :only-number="true"
-                        :disable="state.disableFiled.attachment"
+                        :disable="state.editable"
                     />
                     <div class="row-text">chứng từ gốc</div>
                 </div>
@@ -626,7 +611,7 @@ const handleChangeStatsForm = () => {
                     bottom="8px"
                     width="166px"
                     :value="payment.PostedDate"
-                    :disable="state.disableFiled.postedDate"
+                    :disable="state.editable"
                     :status="error.PostedDate.status"
                     :textError="error.PostedDate.textError"
                     :statusPublic="error.status"
@@ -638,7 +623,7 @@ const handleChangeStatsForm = () => {
                     field-text="Ngày phiếu chi"
                     bottom="8px"
                     width="166px"
-                    :disable="state.disableFiled.refDate"
+                    :disable="state.editable"
                     :value="payment.RefDate"
                     :status="error.RefDate.status"
                     :textError="error.RefDate.textError"
@@ -650,7 +635,7 @@ const handleChangeStatsForm = () => {
                     field-text="Số phiếu chi"
                     width="166px"
                     :value="payment.RefNo"
-                    :disable="state.disableFiled.refNo"
+                    :disable="state.editable"
                     :status="error.RefNo.status"
                     :statusPublic="error.status"
                     :text-error="error.RefNo.textError"
@@ -671,7 +656,7 @@ const handleChangeStatsForm = () => {
                 :columns="MISA_RESOURCE.COLUMNS_NAME_TABLE_DETAIL"
                 :has-column-delete="true"
                 :reason="payment.Reason"
-                isEdit
+                :isEdit="!state.editable"
                 ref="refTableDetail"
             />
 
@@ -679,13 +664,19 @@ const handleChangeStatsForm = () => {
                 <button
                     class="btn btn-secondary payment-action__btn btn-add-row"
                     @click="handleAddRowDetail"
-                    :class="{ 'btn-disable': disable }"
+                    :class="{
+                        'btn-disable-payment':
+                            state.editable || state.identityForm === MISA_ENUM.FORM_MODE.EDIT,
+                    }"
                 >
                     Thêm dòng
                 </button>
                 <button
                     class="btn btn-secondary payment-action__btn"
-                    :class="{ 'btn-disable': disable }"
+                    :class="{
+                        'btn-disable-payment':
+                            state.editable || state.identityForm === MISA_ENUM.FORM_MODE.EDIT,
+                    }"
                 >
                     Xóa hết dòng
                 </button>
@@ -712,7 +703,7 @@ const handleChangeStatsForm = () => {
                     ref="refSaveAndAddBtn"
                     v-if="state.isEditButton"
                     type="submit"
-                    class="btn btn-secondary payment-btn-save"
+                    class="btn btn-secondary payment-btn-edit"
                     tabindex="0"
                     @click="handleChangeStatsForm"
                 >
@@ -738,7 +729,7 @@ const handleChangeStatsForm = () => {
                 :status="toast.status"
             />
         </div>
-        <div class="modal-error" v-if="isOpenError">
+        <div class="modal-error" v-if="error.status && isOpenError">
             <m-pop-up-error
                 :title="'Lỗi'"
                 :text-error="
@@ -788,6 +779,35 @@ const handleChangeStatsForm = () => {
 }
 
 .payment-btn-save:hover::after {
+    display: block;
+}
+
+.payment-btn-edit {
+    margin: 0 8px;
+    color: #fff;
+    background-color: transparent;
+    border: 1px solid #8d9096;
+}
+
+.payment-btn-edit:hover {
+    background-color: #2f3034;
+}
+
+.payment-btn-edit::after {
+    content: "Cất (Ctrl + E)";
+    position: absolute;
+    background-color: #434242;
+    color: #fff;
+    top: -30px;
+    width: max-content;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: none;
+    line-height: 18px;
+    animation: identifier 0.3s ease-in;
+}
+
+.payment-btn-edit:hover::after {
     display: block;
 }
 
@@ -863,14 +883,14 @@ const handleChangeStatsForm = () => {
     opacity: 1;
 }
 
-.btn-disable {
+.btn-disable-payment {
     border: 1px solid #8d9096;
     color: #afafaf;
     background: 0 0;
     cursor: default;
 }
 
-.btn-disable:hover {
-    background: 0 0 !important;
+.btn-disable-payment:hover {
+    background: 0 0;
 }
 </style>

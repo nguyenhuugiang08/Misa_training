@@ -1,12 +1,13 @@
+import { MISA_RESOURCE } from "../base/resource";
 import paymentDetailApi from "../api/paymentDetailApi";
 import diy from "../store/diy";
-import { ref } from "vue";
 
 const {
     setPaymentDetails,
     setTotalPagePaymentDetail,
     setTotalRecordPaymentDetail,
     setPaymentIdFilter,
+    setListToast,
 } = diy;
 
 export const usePaymentDeatil = () => {
@@ -20,6 +21,12 @@ export const usePaymentDeatil = () => {
         const insertPaymentDetails = async (paymentDetails) => {
             try {
                 const ids = await paymentDetailApi.insertPaymentDetails(paymentDetails);
+                const toastMessage = {
+                    toastMessage: MISA_RESOURCE.TOAST.ADD_PAYMENT_SUCCESS.TOAST_MESSAGE,
+                    statusMessage: MISA_RESOURCE.TOAST.ADD_PAYMENT_SUCCESS.STATUS_MESSAGE,
+                    status: MISA_RESOURCE.TOAST.ADD_PAYMENT_SUCCESS.STATUS,
+                };
+                setListToast(toastMessage);
                 return ids;
             } catch (error) {
                 console.log(error);

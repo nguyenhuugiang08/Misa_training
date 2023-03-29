@@ -17,7 +17,8 @@ const props = defineProps({
 
 const { deletePaymentById, getPaymentsByFilter } = usePayment();
 const { getPaymentDetailsByPaymentId } = usePaymentDeatil();
-const { state, setListItemChecked, setListPageChecked, setRowPaymentSelected } = inject("diy");
+const { state, setListItemChecked, setListPageChecked, setRowPaymentSelected, setlistAllEntities } =
+    inject("diy");
 
 const isPopUp = reactive({
     isOpenWarning: false, // Trạng thái Đóng/Mở pop up warning
@@ -162,8 +163,12 @@ const handleShowWarning = (event) => {
  *  Xử lý submit form khi xóa nhân viên
  * CreatedBy: NHGiang
  */
-const hanldeSubmitFormDelete = async (event) => {
+const hanldeSubmitFormDelete = async () => {
     try {
+        const newListAllEntities = state.listAllEntities.filter(
+            (entity) => entity.PaymentId !== id.value
+        );
+        setlistAllEntities(newListAllEntities);
         await deletePaymentById(id.value);
         await getPaymentsByFilter(state.keyword, pageSize.value, pageNumber.value);
     } catch (err) {

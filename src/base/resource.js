@@ -56,6 +56,7 @@ export const MISA_RESOURCE = {
     },
     RefNoText: {
         blank: "Số phiếu chi không được để trống.",
+        over: "Sô phiếu chi không được lớn hơn 20 ký tự"
     },
     PostedDateText: {
         blank: "Ngày hạch toán không được để trống.",

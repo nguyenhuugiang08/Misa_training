@@ -63,10 +63,6 @@ const error = reactive({
         textError: "",
         status: false,
     },
-    ObjectId: {
-        textError: "",
-        status: false,
-    },
     DebitAccount: {
         textError: "",
         status: false,
@@ -385,12 +381,15 @@ const useValidate = ({
         }
 
         if (payment) {
-
             // Validate số phiếu chi
             if (!payment.RefNo) {
                 setError("RefNo", "blank");
             } else {
-                setDataValid("RefNo");
+                if (payment.RefNo.length > 20) {
+                    setError("RefNo", "over");
+                } else {
+                    setDataValid("RefNo");
+                }
             }
 
             // Validate ngày phiếu chi
@@ -414,36 +413,33 @@ const useValidate = ({
 
         if (paymentDetails?.length > 0) {
             paymentDetailErrors = [];
-            paymentDetails.forEach((element, index) => {
-                // Validate đối tượng detail
-                if (!element.ObjectId) {
-                    setError("ObjectId", "blank");
-                } else {
-                    setDataValid("ObjectId");
-                }
-
+            paymentDetails.forEach((element) => {
                 // Validate tài khoản có
-                if (!element.DebitAccount) {
+                if (
+                    !element.DebitAccountName ||
+                    !element.DebitAccount === MISA_RESOURCE.GUID_EMPTY
+                ) {
                     setError("DebitAccount", "blank");
                 } else {
                     setDataValid("DebitAccount");
                 }
 
                 // Validate tài khoản nợ
-                if (!element.CreditAccount) {
+                if (
+                    !element.CreditAccountName ||
+                    !element.CreditAccount === MISA_RESOURCE.GUID_EMPTY
+                ) {
                     setError("CreditAccount", "blank");
                 } else {
                     setDataValid("CreditAccount");
                 }
 
-                const ObjectId = { ...error.ObjectId };
                 const DebitAccount = { ...error.DebitAccount };
                 const CreditAccount = { ...error.CreditAccount };
                 const errorPaymentDetail = {
-                    ObjectId,
                     DebitAccount,
                     CreditAccount,
-                    status: ObjectId.status || DebitAccount.status || CreditAccount.status,
+                    status: DebitAccount.status || CreditAccount.status,
                 };
                 paymentDetailErrors.push(errorPaymentDetail);
 

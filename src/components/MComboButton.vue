@@ -1,5 +1,6 @@
 <script setup>
-import { ref } from "vue";
+import { MISA_ENUM } from "../base/enum";
+import { ref, inject } from "vue";
 
 const props = defineProps({
     options: { type: Array, default: [] },
@@ -9,6 +10,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["clickBtn"]);
+const { state } = inject("diy");
 
 const isOpen = ref(false); // Trạng thái Đóng/Mở của ô chọn
 const contentBtn = ref(props.default); // Giá trị mặc định của nút
@@ -23,21 +25,36 @@ const indexTooltip = ref(null); // Index của đối tượng tương ứng v�
  */
 const handleClickAction = (optionName, index, identityAction) => {
     try {
-        isOpen.value = false;
-        contentBtn.value = optionName;
-        localStorage.setItem("actionSelected", index);
-        emit("clickBtn", identityAction);
+        if (!state.editable) {
+            isOpen.value = false;
+            contentBtn.value = optionName;
+            localStorage.setItem("actionSelected", index);
+            emit("clickBtn", identityAction);
+        }
     } catch (error) {
         console.log(error);
     }
 };
 
+/**
+ * Hàm click button
+ * Created by: NHGiang - (28/03/23)
+ */
 const handleClickButton = () => {
     try {
-        const indexAction = localStorage.getItem("actionSelected");
-        if (indexAction) {
+        if (!state.editable) {
+            const indexAction =
+                localStorage.getItem("actionSelected") || MISA_ENUM.ACTION_SELECTED_DEFAULT;
             emit("clickBtn", props.options?.[indexAction].identityAction);
         }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+const handleClickOutside = () => {
+    try {
+        isOpen.value = false;
     } catch (error) {
         console.log(error);
     }
@@ -47,16 +64,26 @@ const handleClickButton = () => {
 <template>
     <div class="cbo-btn-wrapper">
         <button
-            :class="{ 'btn btn-primary': true, 'cbo-btn': true, 'btn-curved--left': isCurved }"
+            :class="{
+                'btn btn-primary': true,
+                'cbo-btn': true,
+                'btn-curved--left': isCurved,
+                'cbo-disable': state.editable,
+            }"
             :style="{ marginTop: marginTop && marginTop }"
             @click="handleClickButton"
         >
             <span>{{ contentBtn }}</span>
         </button>
         <div
-            :class="{ 'cbo-icon': true, 'btn-curved--right': isCurved }"
+            :class="{
+                'cbo-icon': true,
+                'btn-curved--right': isCurved,
+                'cbo-disable': state.editable,
+            }"
             :style="{ marginTop: marginTop && marginTop }"
-            @click="isOpen = !isOpen"
+            @click="isOpen = !state.editable ? !isOpen : false"
+            v-click-outside-element="handleClickOutside"
             tabindex="0"
         >
             <div class="cbo-btn-icon"></div>

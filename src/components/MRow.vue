@@ -15,7 +15,7 @@ const props = defineProps({
     hasCheckbox: Boolean,
 });
 
-const { getPaymentById } = usePayment();
+const { getPaymentById, getNewRefNo } = usePayment();
 const { getPaymentDetailsByPaymentId } = usePaymentDeatil();
 
 const emit = defineEmits(["check", "displayWarning"]);
@@ -28,8 +28,8 @@ const {
     state,
     setIdentityForm,
     setRowPaymentSelected,
-    setDisableFiled,
     setIsClickRow,
+    setEditable,
     setIsEditButton,
     setIndexRowEditable,
 } = inject("diy");
@@ -44,8 +44,8 @@ const handleCheckItem = (itemId) => {
 };
 
 /**
- * Hàm xử lý Mở form sửa thông tin nhân viên và bindding dữ liệu vào form
- * @param {String} employeeId -- Id của nhân viên được chọn
+ * Hàm xử lý Mở form sửa thông tin phiếu chi và bindding dữ liệu vào form
+ * @param {String} employeeId -- Id của phiếu chi được chọn
  * Created by: NHGiang - (20/02/23)
  */
 const handleEditPayment = async (paymentId) => {
@@ -55,20 +55,7 @@ const handleEditPayment = async (paymentId) => {
         router.push("/pay/pay-detail");
         handleSetStatusForm();
         setIdentityForm(MISA_ENUM.FORM_MODE.EDIT);
-        const listFielDisable = [
-            "objectCode",
-            "objectName",
-            "address",
-            "attachment",
-            "employeeId",
-            "postedDate",
-            "reason",
-            "reasonType",
-            "receiver",
-            "refDate",
-            "refNo",
-        ];
-        setDisableFiled(listFielDisable, true);
+        setEditable(true);
         setIndexRowEditable(-1);
         setIsClickRow(true);
         setIsEditButton(true);
@@ -78,14 +65,21 @@ const handleEditPayment = async (paymentId) => {
 };
 
 /**
- * Hàm xử lý Mở form nhân bản thông tin nhân viên và bindding dữ liệu vào form
- * @param {String} employeeId -- Id của nhân viên được chọn
+ * Hàm xử lý Mở form nhân bản thông tin phiếu chi và bindding dữ liệu vào form
+ * @param {String} employeeId -- Id của phiếu chi được chọn
  * Created by: NHGiang - (20/02/23)
  */
-const handleDuplicateEmployee = async (paymentId) => {
+const handleDuplicatePayment = async (paymentId) => {
     try {
         await getPaymentById(paymentId);
+        await getNewRefNo();
         router.push("/pay/pay-detail");
+        handleSetStatusForm();
+        setIdentityForm(MISA_ENUM.FORM_MODE.DUPLICATE);
+        setEditable(false);
+        setIndexRowEditable(0);
+        setIsClickRow(false);
+        setIsEditButton(false);
     } catch (error) {
         console.log(error);
     }
@@ -213,7 +207,7 @@ const handleClickOutside = () => {
                 class="tbl-col__action-item"
                 @click="
                     isShowList = false;
-                    handleDuplicateEmployee(entity.PaymentId);
+                    handleDuplicatePayment(entity.PaymentId);
                 "
             >
                 Nhân bản

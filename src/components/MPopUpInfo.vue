@@ -1,6 +1,6 @@
 <script setup>
 import { MISA_ENUM } from "../base/enum";
-import { onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 
 const props = defineProps({
     title: { type: String, required: true },
@@ -8,6 +8,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["closeInfo"]);
+const refYesButton = ref(null); // Tham chiếu tới button có trong DOM
 
 /**
  * Xử lý đóng pop up info
@@ -63,6 +64,7 @@ const docKeyDown = (e) => {
  */
 onMounted(() => {
     document.addEventListener("keydown", docKeyDown, false);
+    refYesButton.value.focus();
 });
 
 /**
@@ -112,6 +114,7 @@ onUnmounted(() => {
                     Không
                 </button>
                 <button
+                    ref="refYesButton"
                     type="submit"
                     class="btn btn-primary"
                     tabindex="0"
@@ -120,12 +123,13 @@ onUnmounted(() => {
                     Có
                 </button>
             </div>
-            <label
+            <button
                 for="show-modal"
                 class="btn btn-secondary modal-btn-cancel"
                 @click="handleClosePopUp"
-                >Hủy</label
             >
+                Hủy
+            </button>
         </div>
     </div>
 </template>

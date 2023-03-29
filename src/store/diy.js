@@ -59,31 +59,9 @@ const state = reactive({
     totalRecordPaymentDetail: 0, // tổng số trang phiếu chi chi tiết UI Detail
     paymentIdFilter: "", // ID của phiếu chi dùng để lấy danh sách các chi tiết phiếu chi
     listAllAccounts: [], // danh sách tất cả các tài khoản
-    // trạng thái disable của các trường nhập dữ liệu UI payment form
-    disableFiled: {
-        objectCode: false,
-        objectName: false,
-        address: false,
-        attachment: false,
-        employeeId: false,
-        postedDate: false,
-        reason: false,
-        reasonType: false,
-        receiver: false,
-        refDate: false,
-        refNo: false,
-    },
-    // trạng thái disable của các trường nhập dữ liệu trên Row detail
-    disableFiledRow: {
-        objectCode: false,
-        description: false,
-        amount: false,
-        debitAccount: false,
-        creditAccount: false,
-    },
     isClickRow: false, // trạng thái có thể click dòng UI detail hay không
     isEditButton: false, // trạng thái của nút submit UI payment form (cất hoặc sửa)
-    editable: false,
+    editable: false, // trạng thái disable các field nhập liệu UI payment detial(true: Disable, false: Enable)
 });
 
 /**
@@ -590,47 +568,6 @@ const setListAllAccounts = (accounts) => {
 };
 
 /**
- * Hàm set trạng thái các trường nhập liệu trên UI payment form
- * @param {*} listField
- * @param {*} status
- */
-const setDisableFiled = (listField, status) => {
-    try {
-        listField.forEach((element) => {
-            state.disableFiled[`${element}`] = status;
-        });
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-/**
- * Hàm set trạng thái các trường nhập liệu trên UI payment form
- * @param {*} listField
- * @param {*} status
- * Created by: NHGiang - (27/03/23)
- */
-const setDisableFiledDefault = () => {
-    try {
-        state.disableFiled = {
-            objectCode: false,
-            objectName: false,
-            address: false,
-            attachment: false,
-            employeeId: false,
-            postedDate: false,
-            reason: false,
-            reasonType: false,
-            receiver: false,
-            refDate: false,
-            refNo: false,
-        };
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-/**
  * hàm set trạng thái click row detail
  * Created by: NHGiang - (27/03/23)
  */
@@ -649,41 +586,6 @@ const setIsClickRow = (status) => {
 const setIsEditButton = (status) => {
     try {
         state.isEditButton = status;
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-/**
- * Hàm set trạng thái các trường nhập liệu Row detail
- * @param {*} listField
- * @param {*} status
- * Created by: NHGiang - (27/03/23)
- */
-const setDisableFiledRowDefault = () => {
-    try {
-        state.disableFiledRow = {
-            objectCode: false,
-            description: false,
-            amount: false,
-            debitAccount: false,
-            creditAccount: false,
-        };
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-/**
- * Hàm set trạng thái các trường nhập liệu trên UI payment form
- * @param {*} listField
- * @param {*} status
- */
-const setDisableFiledRow = (listField, status) => {
-    try {
-        listField.forEach((element) => {
-            state.disableFiledRow[`${element}`] = status;
-        });
     } catch (error) {
         console.log(error);
     }
@@ -742,11 +644,7 @@ export default {
     setPaymentIdFilter,
     setPaymentDetailDefault,
     setListAllAccounts,
-    setDisableFiled,
     setIsClickRow,
     setIsEditButton,
-    setDisableFiledDefault,
-    setDisableFiledRow,
-    setDisableFiledRowDefault,
     setEditable,
 };

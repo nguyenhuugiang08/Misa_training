@@ -68,4 +68,5 @@ export const MISA_ENUM = {
         SAVE: 0, // Cất
         SAVE_ADD: 1, // Cất và thêm
     },
+    ACTION_SELECTED_DEFAULT: 0, // hành động mặc định combo button UI Payment detail (Cất và đóng)
 };

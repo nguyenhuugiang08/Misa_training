@@ -19,6 +19,7 @@ const pageSize = ref(20);
 const page = ref(1);
 const router = useRouter();
 const route = useRoute();
+const optionId = ref(MISA_ENUM.pageSizeOptions[1].optionId);
 
 /**
  * Theo dõi sự thay đổi pageSize từ URL
@@ -74,6 +75,7 @@ const handleChangePageSize = async (pageSize, pageNumber = 1) => {
                 query: { pageSize: pageSize, pageNumber: pageNumber },
             });
         }
+        optionId.value = pageSize;
         isLoading.value = true;
         await props.funcFilter(props.keyword || state.keyword, pageSize, pageNumber);
         isLoading.value = false;
@@ -113,7 +115,7 @@ const handleChangePageNumber = async (pageNumber) => {
         <div style="display: flex; align-items: center">
             <m-checkbox
                 :options="MISA_ENUM.pageSizeOptions"
-                :default="MISA_ENUM.pageSizeOptions[1].optionId"
+                :default="optionId"
                 :is-top="true"
                 :width="'200px'"
                 :is-absolute="true"

@@ -20,8 +20,6 @@
     font-family: notosans-regular;
     font-size: 13px;
     line-height: 18px;
-    outline-color: #666;
-    outline-width: 3px;
 }
 
 :root {
@@ -160,4 +158,8 @@ body {
 
 .not-found img {
     margin: 50px 0 12px 0;
+}
+
+button:focus-visible {
+    outline: 2px solid #cdcdcd;
 }
