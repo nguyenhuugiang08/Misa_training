@@ -54,7 +54,7 @@ watch(
 const dataShow = props.columns.find((option) => option.dataShow === true)?.identityOption;
 
 // Emit các sự kiện ra ngoài component cha
-const emit = defineEmits(["select", "changeValue", "focusBtn"]);
+const emit = defineEmits(["select", "changeValue", "focusBtn", "handleTab"]);
 
 /**
  * Hiển thị tên option được chọn lên giao diện.
@@ -228,11 +228,13 @@ const handleInputKeydown = (event) => {
                 break;
             case MISA_ENUM.KEY_CODE.TAB: // Khi ấn phím enter
                 isOpen.value = false;
+                emit("handleTab", event);
                 break;
             default:
                 break;
         }
 
+        // Khi ấn shift tab
         if (props.isShiftTab && event.shiftKey && event.keyCode === MISA_ENUM.KEY_CODE.TAB) {
             event.preventDefault();
             emit("focusBtn");

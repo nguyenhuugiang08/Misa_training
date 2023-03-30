@@ -41,10 +41,13 @@ export const MISA_ENUM = {
         ENTER: 13, // phím enter
         DOWN_ARROW: 40, // phím mũi tên xuống
         UP_ARROW: 38, // phím mũi tên lên
+        RIGHT_ARROW: 39, // phím mũi tên lên
+        LEFT_ARROW: 37, // phím mũi tên lên
         ESCAPE: 27, // phím esc
         TAB: 9, // phím tab
         INSERT: 45, // phím insert
         DELETE: 46, // phím delete
+        BACKSPACE: 8, // phím backspace
     },
     STATUS_CODE: {
         BAD_REQUEST: 400, // status code 400

@@ -30,6 +30,7 @@ const {
     setIsEditButton,
     setIsClickRow,
     setEditable,
+    setEmptyPaymentDetails,
 } = inject("diy");
 const router = useRouter();
 const refTableDetail = ref(null); // Tham chiếu tới bảng detail
@@ -77,13 +78,26 @@ const payment = reactive({
     TotalAmount: state.totalPayment || 0,
 });
 
-watch(() => payment.Reason, () => {
-    try {
-        
-    } catch (error) {
-      console.log(error);
+watch(
+    () => payment.ObjectName,
+    (newValue) => {
+        try {
+            debugger;
+            const objectNames = state.objects.map((object) => object.optionName);
+
+            if (objectNames.includes(newValue)) {
+                const arrayString = payment.Reason.split(MISA_RESOURCE.REASON_PAYMENT_DEFAULT);
+                if (objectNames.includes(arrayString[1])) {
+                    payment.Reason = `${MISA_RESOURCE.REASON_PAYMENT_DEFAULT}${newValue}`;
+                }
+            } else {
+                payment.Reason = `${MISA_RESOURCE.REASON_PAYMENT_DEFAULT}${newValue}`;
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
-})
+);
 
 const { getObjects } = useObject();
 getObjects();
@@ -464,6 +478,18 @@ const handleChangeStatsForm = () => {
         console.log(error);
     }
 };
+
+/**
+ * Hàm thực hiện xóa hết dòng
+ * Created by: NHGiang - (29/03/23)
+ */
+const handleDeleteAllRows = () => {
+    try {
+        setEmptyPaymentDetails();
+    } catch (error) {
+        console.log(error);
+    }
+};
 </script>
 
 <template>
@@ -677,6 +703,7 @@ const handleChangeStatsForm = () => {
                         'btn-disable-payment':
                             state.editable || state.identityForm === MISA_ENUM.FORM_MODE.EDIT,
                     }"
+                    @click="handleDeleteAllRows"
                 >
                     Xóa hết dòng
                 </button>

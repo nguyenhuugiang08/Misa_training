@@ -68,17 +68,17 @@ watchEffect(() => {
                 :is-edit="isEdit"
                 :reason="reason"
                 :index="index"
-                tabindex="0"
+                tabindex="-1"
                 ref="refRowDetail"
             />
-            <div v-if="!entities.length" class="not-found">
+            <div v-if="!entities.length && !props.isEdit" class="not-found">
                 <img
                     src="https://actappg2.misacdn.net/img/bg_report_nodata.76e50bd8.svg"
                     alt="logo NotFound"
                 />
                 <span style="margin-bottom: 80px">Không có dũ liệu</span>
             </div>
-            <tr class="tbl-row" v-if="entities.length">
+            <tr class="tbl-row" v-if="props.isEdit">
                 <th></th>
                 <th style="padding-left: 16px; border-left: unset">Tổng</th>
                 <th></th>

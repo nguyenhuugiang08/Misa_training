@@ -1,6 +1,8 @@
 <script setup>
+import { MISA_ENUM } from "../base/enum";
 import { ref, watch } from "vue";
 import { formatMoney } from "../utilities/formatMoney";
+
 const props = defineProps({
     fieldText: String,
     required: { type: Boolean, default: false },
@@ -63,15 +65,21 @@ watch(
  * Xử lý chỉ cho nhập số
  * CreatedBy: NHGiang
  */
-const handleCheckIsNumber = (e) => {
+const handleCheckIsNumber = (evt) => {
     try {
+        evt = evt ? evt : window.event;
+        var charCode = evt.which ? evt.which : evt.keyCode;
         if (
-            (e.keyCode < 48 || e.keyCode > 57) &&
-            (e.keycode < 96 || e.keyCode > 105) &&
-            e.keyCode !== 8 &&
-            e.keyCode !== 144
+            /^\d+$/.test(evt.key) ||
+            charCode === MISA_ENUM.KEY_CODE.TAB ||
+            charCode === MISA_ENUM.KEY_CODE.BACKSPACE ||
+            charCode === MISA_ENUM.KEY_CODE.DELETE ||
+            charCode === MISA_ENUM.KEY_CODE.RIGHT_ARROW ||
+            charCode === MISA_ENUM.KEY_CODE.LEFT_ARROW
         ) {
-            e.preventDefault();
+            return true;
+        } else {
+            evt.preventDefault();
         }
     } catch (error) {
         console.log(error);

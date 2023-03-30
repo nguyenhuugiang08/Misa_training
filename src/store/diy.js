@@ -604,6 +604,18 @@ const setEditable = (status) => {
     }
 };
 
+/**
+ * Hàm thực hiện xóa hết dòng UI detail
+ * Created by: NHGiang - (29/03/23)
+ */
+const setEmptyPaymentDetails = () => {
+    try {
+        state.paymentDetails = [];
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 export default {
     state: readonly(state),
     setIsSidebar,
@@ -647,4 +659,5 @@ export default {
     setIsClickRow,
     setIsEditButton,
     setEditable,
+    setEmptyPaymentDetails,
 };

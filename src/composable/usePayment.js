@@ -95,9 +95,9 @@ export const usePayment = () => {
                 await paymentApi.deleteMultiplePayments(paymentIds);
 
                 const toastMessage = {
-                    toastMessage: MISA_RESOURCE.TOAST.DELETE_MULTIPLE_SUCCESS.TOAST_MESSAGE,
-                    statusMessage: MISA_RESOURCE.TOAST.DELETE_MULTIPLE_SUCCESS.STATUS_MESSAGE,
-                    status: MISA_RESOURCE.TOAST.DELETE_MULTIPLE_SUCCESS.STATUS,
+                    toastMessage: MISA_RESOURCE.TOAST.DELETE_MULTIPLE_PAYMENT_SUCCESS.TOAST_MESSAGE,
+                    statusMessage: MISA_RESOURCE.TOAST.DELETE_MULTIPLE_PAYMENT_SUCCESS.STATUS_MESSAGE,
+                    status: MISA_RESOURCE.TOAST.DELETE_MULTIPLE_PAYMENT_SUCCESS.STATUS,
                 };
                 setListToast(toastMessage);
                 setListItemChecked([]);

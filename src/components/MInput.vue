@@ -1,4 +1,5 @@
 <script setup>
+import { MISA_ENUM } from "../base/enum";
 import { ref, onMounted, watch } from "vue";
 
 // Định nghĩa các props nhận vào
@@ -27,7 +28,7 @@ const props = defineProps({
 const refInput = ref(null);
 
 // Định nghĩa các hàm emit ra ngoài
-const emit = defineEmits(["inputValue", "changeValue"]);
+const emit = defineEmits(["inputValue", "changeValue", "handleShiftTab"]);
 
 onMounted(() => {
     try {
@@ -87,10 +88,17 @@ const handleCheckIsNumber = (evt) => {
         if (props.onlyNumber) {
             evt = evt ? evt : window.event;
             var charCode = evt.which ? evt.which : evt.keyCode;
-            if (charCode > 31 && (charCode < 48 || charCode > 57) && charCode !== 46) {
-                evt.preventDefault();
-            } else {
+            if (
+                /^\d+$/.test(evt.key) ||
+                charCode === MISA_ENUM.KEY_CODE.TAB ||
+                charCode === MISA_ENUM.KEY_CODE.BACKSPACE ||
+                charCode === MISA_ENUM.KEY_CODE.DELETE ||
+                charCode === MISA_ENUM.KEY_CODE.RIGHT_ARROW ||
+                charCode === MISA_ENUM.KEY_CODE.LEFT_ARROW
+            ) {
                 return true;
+            } else {
+                evt.preventDefault();
             }
         }
     } catch (error) {
@@ -120,6 +128,7 @@ defineExpose({ handleFocusInput });
             :value="value"
             @input="handleEmitInputValue($event.target.value)"
             @keydown="handleCheckIsNumber($event)"
+            @keydown.tab="emit('handleShiftTab')"
             :placeHolder="placeHolder"
             ref="refInput"
             :disabled="disable"

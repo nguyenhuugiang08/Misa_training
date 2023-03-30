@@ -445,7 +445,7 @@ const changeCheckboxForeignCurrencyAccounting = () => {
                         <textarea
                             class="account-form__textarea"
                             :value="account.Description"
-                            @change="account.Description = $event.target.value"
+                            @input="account.Description = $event.target.value"
                         ></textarea>
                     </div>
                 </div>

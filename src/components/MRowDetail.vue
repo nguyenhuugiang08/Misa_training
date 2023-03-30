@@ -7,6 +7,7 @@ import { MISA_RESOURCE } from "../base/resource";
 import { useAccount } from "../composable/useAccount";
 import { formatMoney } from "../utilities/formatMoney";
 import { paymentDetailErrors, error } from "../utilities/validateForm";
+import { MISA_ENUM } from "../base/enum";
 
 const props = defineProps({
     numericalOrder: Number,
@@ -92,6 +93,33 @@ watch(
     }
 );
 
+/**
+ * Hàm xử lý tab
+ * Created by: NHGiang - (30/03/23)
+ */
+const handleTab = (e) => {
+    try {
+        if (!e.shiftKey) {
+            const totalPaymentDetail = state.paymentDetails.length;
+            if (props.index < totalPaymentDetail - 1) {
+                setIndexRowEditable(props.index + 1);
+            }
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+const handleShiftTab = () => {
+    try {
+        if (props.index > 0) {
+            setIndexRowEditable(props.index - 1);
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 defineExpose({ handleFocus });
 </script>
 
@@ -105,6 +133,7 @@ defineExpose({ handleFocus });
         }"
     >
         <td
+            tabindex="-1"
             class="tbl-col tbl-col__first"
             :style="{
                 background:
@@ -129,6 +158,7 @@ defineExpose({ handleFocus });
                             : `Chi tiền cho ${paymentDetail.ObjectName}`
                     "
                     @inputValue="paymentDetail.Description = $event"
+                    @keydown.shift.tab="handleShiftTab"
                 />
             </span>
             <span v-if="!isEdit">{{ state.paymentDetails[index]?.Description }}</span>
@@ -186,7 +216,6 @@ defineExpose({ handleFocus });
                                 $event.optionId === -1 ? MISA_RESOURCE.GUID_EMPTY : $event.optionId;
                             paymentDetail.CreditAccountName = $event.optionName;
                         "
-                        @changeValue="paymentDetailErrors[index].CreditAccount.status = false"
                     />
                 </div>
                 <span v-if="!isEdit">{{ state.paymentDetails[index]?.CreditAccountName }}</span>
@@ -227,6 +256,7 @@ defineExpose({ handleFocus });
                             paymentDetail.ObjectCode = $event.optionCode;
                             paymentDetail.ObjectName = $event.optionName;
                         "
+                        @handleTab="handleTab($event)"
                     />
                 </div>
                 <span v-if="!isEdit">{{ state.paymentDetails[index]?.ObjectCode }}</span>
