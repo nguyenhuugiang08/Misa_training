@@ -5,6 +5,7 @@ import { onMounted, onUnmounted } from "vue";
 const props = defineProps({
     title: { type: String, required: true },
     textInfo: { type: String, required: true },
+    isPrimary: Boolean,
 });
 
 const emit = defineEmits(["closeWarning"]);
@@ -114,7 +115,13 @@ onUnmounted(() => {
             >
                 Không
             </button>
-            <button type="submit" class="btn btn-danger" tabindex="0" @click="handleSubmitForm">
+            <button
+                type="submit"
+                :class="{ 'btn-primary': isPrimary, 'btn-danger': !isPrimary }"
+                class="btn"
+                tabindex="0"
+                @click="handleSubmitForm"
+            >
                 Có
             </button>
         </div>

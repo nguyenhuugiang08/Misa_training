@@ -360,8 +360,7 @@ const docKeyDown = (e) => {
 
     // xóa dòng với phím ctrl + delete
     if (e.ctrlKey && e.keyCode === MISA_ENUM.KEY_CODE.DELETE) {
-        if (!state.editable && state.identityForm !== MISA_ENUM.FORM_MODE.EDIT)
-            deletePaymentDetails(state.paymentDetails.length - 1);
+        if (!state.editable) deletePaymentDetails(state.paymentDetails.length - 1);
         if (state.paymentDetails.length - 1 === -1) {
             setPaymentDetailDefault();
         }
@@ -437,8 +436,12 @@ watch(
  */
 const handleAddRowDetail = () => {
     try {
-        if (!state.editable && state.identityForm !== MISA_ENUM.FORM_MODE.EDIT)
-            addPaymentDetails(state.paymentDetail);
+        const totalPaymentDetail = state.paymentDetails.length;
+        const newPaymentDetail = {
+            ...state.paymentDetails[totalPaymentDetail - 1],
+            PaymentDetailId: MISA_RESOURCE.GUID_EMPTY,
+        };
+        if (!state.editable) addPaymentDetails(newPaymentDetail);
     } catch (error) {
         console.log(error);
     }
@@ -485,7 +488,7 @@ const handleChangeStatsForm = () => {
  */
 const handleDeleteAllRows = () => {
     try {
-        setEmptyPaymentDetails();
+        if (!state.editable) setEmptyPaymentDetails();
     } catch (error) {
         console.log(error);
     }
@@ -547,9 +550,10 @@ const handleDeleteAllRows = () => {
                             @focusBtn="handleSetReverseTabindex"
                             @select="
                                 payment.ObjectId = $event.optionId;
-                                payment.ObjectName = $event.optionName;
+                                payment.ObjectName =
+                                    $event.optionId !== -1 ? $event.optionName : '';
                                 payment.Address = $event.optionAddress;
-                                payment.Receiver = $event.optionName;
+                                payment.Receiver = $event.optionId !== -1 ? $event.optionName : '';
                                 payment.ObjectCode = $event.optionCode;
                                 setObjectSelected({
                                     optionId: $event.optionId,
@@ -691,8 +695,7 @@ const handleDeleteAllRows = () => {
                     class="btn btn-secondary payment-action__btn btn-add-row"
                     @click="handleAddRowDetail"
                     :class="{
-                        'btn-disable-payment':
-                            state.editable || state.identityForm === MISA_ENUM.FORM_MODE.EDIT,
+                        'btn-disable-payment': state.editable,
                     }"
                 >
                     Thêm dòng
@@ -700,8 +703,7 @@ const handleDeleteAllRows = () => {
                 <button
                     class="btn btn-secondary payment-action__btn"
                     :class="{
-                        'btn-disable-payment':
-                            state.editable || state.identityForm === MISA_ENUM.FORM_MODE.EDIT,
+                        'btn-disable-payment': state.editable,
                     }"
                     @click="handleDeleteAllRows"
                 >

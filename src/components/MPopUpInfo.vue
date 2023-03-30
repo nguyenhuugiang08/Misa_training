@@ -8,7 +8,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["closeInfo"]);
-const refYesButton = ref(null); // Tham chiếu tới button có trong DOM
+const refNoButton = ref(null); // Tham chiếu tới button có trong DOM
 
 /**
  * Xử lý đóng pop up info
@@ -64,7 +64,7 @@ const docKeyDown = (e) => {
  */
 onMounted(() => {
     document.addEventListener("keydown", docKeyDown, false);
-    refYesButton.value.focus();
+    refNoButton.value.focus();
 });
 
 /**
@@ -106,6 +106,7 @@ onUnmounted(() => {
         <div class="modal-footer modal-confirm__footer modal-confirm__footer--info">
             <div class="modal-footer__wrapper">
                 <button
+                    ref="refNoButton"
                     type="submit"
                     class="btn btn-secondary modal-btn__secondary"
                     tabindex="0"
@@ -114,7 +115,6 @@ onUnmounted(() => {
                     Không
                 </button>
                 <button
-                    ref="refYesButton"
                     type="submit"
                     class="btn btn-primary"
                     tabindex="0"

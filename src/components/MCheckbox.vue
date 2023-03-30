@@ -158,10 +158,32 @@ const handleSearchOption = (keyword) => {
         isOpen.value = true;
         selected.value = keyword;
 
-        // thực hiện tìm kiếm option theo từ khóa nhập
-        optionSearch.value = props.options.filter((option) =>
-            option.optionName.toLowerCase().includes(keyword.toLowerCase())
-        );
+        if (props.isTable) {
+            // thực hiện tìm kiếm option theo từ khóa nhập
+            const optionSearchTable = [];
+            let optionIdTable = [];
+
+            props.columns.forEach((column) => {
+                props.options.forEach((option) => {
+                    if (
+                        option[`${column.identityOption}`]
+                            .toLowerCase()
+                            .includes(keyword.toLowerCase()) &&
+                        !optionIdTable.includes(option.optionId)
+                    ) {
+                        optionSearchTable.push(option);
+                        optionIdTable = optionSearchTable.map((opt) => opt.optionId);
+                    }
+                });
+            });
+
+            optionSearch.value = optionSearchTable;
+        } else {
+            // thực hiện tìm kiếm option theo từ khóa nhập
+            optionSearch.value = props.options.filter((option) =>
+                option.optionName.toLowerCase().includes(keyword.toLowerCase())
+            );
+        }
         /**
          * - Nếu giá trị nhập trùng với 1 option -> gửi giá trị nhập -> hợp lệ
          * - Nếu không trùng -> gửi giá trị nhập -> không có trong danh mục

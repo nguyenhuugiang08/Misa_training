@@ -65,18 +65,16 @@ const handleFocus = () => {
     }
 };
 
-watch(
-    () => state.objectSelected,
-    (newValue) => {
-        try {
-            paymentDetail.ObjectId = newValue.optionId;
-            paymentDetail.ObjectName = newValue.optionName;
-            paymentDetail.ObjectCode = newValue.optionCode;
-        } catch (error) {
-            console.log(error);
-        }
+watchEffect(() => {
+    try {
+        if (paymentDetail.ObjectId === MISA_RESOURCE.GUID_EMPTY)
+            paymentDetail.ObjectId = state.objectSelected.optionId;
+        if (!paymentDetail.ObjectName) paymentDetail.ObjectName = state.objectSelected.optionName;
+        if (!paymentDetail.ObjectCode) paymentDetail.ObjectCode = state.objectSelected.optionCode;
+    } catch (error) {
+        console.log(error);
     }
-);
+});
 
 watch(
     () => props.reason,
@@ -279,11 +277,7 @@ defineExpose({ handleFocus });
         >
             <div
                 class="delete-icon"
-                @click.stop="
-                    !state.editable &&
-                        state.identityForm !== MISA_ENUM.FORM_MODE.EDIT &&
-                        deletePaymentDetails(index)
-                "
+                @click.stop="!state.editable && deletePaymentDetails(index)"
             ></div>
         </td>
     </tr>

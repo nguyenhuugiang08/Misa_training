@@ -149,7 +149,7 @@ export const useAccount = () => {
                     status: MISA_RESOURCE.TOAST.ADD_ACCOUNT_SUCCESS.STATUS,
                 };
                 setListToast(toastMessage);
-                setIsForm();
+                await setIsForm();
 
                 if (identityAction === MISA_ENUM.STATUS_SAVE_ACCOUNT.SAVE_ADD) {
                     setIsForm();

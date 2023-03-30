@@ -254,6 +254,7 @@ const handleActiveAccount = async (accountId, isActive, isParent, hasActiveChild
             "
             @closeWarning="isShowPopupActiveChild = false"
             @submitForm="handleActiveAccount(data.AccountId, data.IsActive, data.IsParent, false)"
+            :isPrimary="true"
         />
     </div>
 </template>
