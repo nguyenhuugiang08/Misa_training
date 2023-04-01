@@ -77,6 +77,9 @@ export const MISA_RESOURCE = {
     ObjectCodeText: {
         blank: "Dữ liệu <Mã đối tượng> không có trong danh mục.",
     },
+    PaymentDetailsText: {
+        blank: "Bạn phải nhập chứng từ chi tiết.",
+    },
     FORM_TITLE: {
         ADD: "Thêm nhân viên", // tiêu đề form thêm
         EDIT: "Sửa thông tin nhân viên", // tiêu đề form sửa
@@ -582,6 +585,10 @@ export const MISA_RESOURCE = {
         TITLE_DELETE_ACCOUNT_PARENT: {
             title: "Xóa không thành công",
             text: "Bạn phải xóa tất cả các tài khoản con trước khi xóa tài khoản cha.",
+        },
+        TITLE_DELETE_ACCOUNT_ARISE_DATA: {
+            title: "Xóa không thành công",
+            text: "Tài khoản đã có phát sinh trên các danh mục, chứng từ.",
         },
         TITLE_CONFIRM_ACTIVE_ACCOUNT_CHILD: {
             title: "Xác nhận",

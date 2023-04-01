@@ -72,10 +72,27 @@ export const usePaymentDeatil = () => {
             }
         };
 
+        /**
+         * Hàm lấy danh sách phiếu chi chi tiết theo ID của tài khoản
+         * @param {*} accountId -- ID của tài khoản
+         * @returns
+         */
+        const getPaymentDetailsByAccountId = async (accountId) => {
+            try {
+                const paymentDetails = await paymentDetailApi.getPaymentDetailsByAccountId(
+                    accountId
+                );
+                return paymentDetails;
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
         return {
             insertPaymentDetails,
             getPaymentDetailsByPaymentId,
             editPaymentDetailsByPaymentId,
+            getPaymentDetailsByAccountId,
         };
     } catch (error) {
         console.log(error);

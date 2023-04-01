@@ -1,4 +1,53 @@
-<script setup></script>
+<script setup>
+import { MISA_ENUM } from "../base/enum";
+import { inject } from "vue";
+import { usePayment } from "../composable/usePayment";
+import { useRouter } from "vue-router";
+import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
+
+const {
+    setEntitySelected,
+    setObjectSelected,
+    setIdentityForm,
+    setPaymentDetailsDefault,
+    setPaymentDetail,
+    setEditable,
+} = inject("diy");
+
+const { getNewRefNo } = usePayment();
+const router = useRouter();
+
+/**
+ * Thực hiện hiển thị form chi tiết phiếu chi
+ * Created by: NHGiang - (15/03/23)
+ */
+const handleShowPaymentDetail = async () => {
+    try {
+        setEntitySelected({});
+        setObjectSelected({});
+        await getNewRefNo();
+        setIdentityForm(MISA_ENUM.FORM_MODE.ADD);
+        handleSetStatusForm();
+        router.push("/pay/pay-detail");
+        setPaymentDetailsDefault();
+        setPaymentDetail({
+            PaymentId: "",
+            ObjectId: "",
+            ObjectCode: "",
+            ObjectName: "",
+            Amount: 0,
+            DebitAccount: "",
+            DebitAccountName: "",
+            CreditAccount: "",
+            CreditAccountName: "",
+            Description: "",
+        });
+        setEditable(false);
+    } catch (error) {
+        console.log(error);
+    }
+};
+</script>
 
 <template>
     <div class="wrapper-procedure">
@@ -7,7 +56,7 @@
             <div class="procedure-content">
                 <img src="https://actappg2.misacdn.net/img/qt_TienMat.1f64b87b.svg" alt="ảnh" />
                 <router-link to="/cash/procedure" class="revice"> Thu tiền </router-link>
-                <router-link to="/pay/pay-detail" class="payment"> Chi tiền </router-link>
+                <div class="payment" @click="handleShowPaymentDetail">Chi tiền</div>
                 <router-link to="/cash/procedure" class="audit"> Kiểm kê quỹ </router-link>
             </div>
         </div>

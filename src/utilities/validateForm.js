@@ -71,6 +71,10 @@ const error = reactive({
         textError: "",
         status: false,
     },
+    PaymentDetails: {
+        textError: "",
+        status: false,
+    },
     status: false,
 });
 
@@ -411,48 +415,51 @@ const useValidate = ({
             }
         }
 
-        if (paymentDetails?.length > 0) {
-            paymentDetailErrors = [];
-            paymentDetails.forEach((element) => {
-                // Validate tài khoản có
-                if (
-                    !element.DebitAccountName ||
-                    !element.DebitAccount === MISA_RESOURCE.GUID_EMPTY
-                ) {
-                    setError("DebitAccount", "blank");
-                } else {
-                    setDataValid("DebitAccount");
-                }
-
-                // Validate tài khoản nợ
-                if (
-                    !element.CreditAccountName ||
-                    !element.CreditAccount === MISA_RESOURCE.GUID_EMPTY
-                ) {
-                    setError("CreditAccount", "blank");
-                } else {
-                    setDataValid("CreditAccount");
-                }
-
-                const DebitAccount = { ...error.DebitAccount };
-                const CreditAccount = { ...error.CreditAccount };
-                const errorPaymentDetail = {
-                    DebitAccount,
-                    CreditAccount,
-                    status: DebitAccount.status || CreditAccount.status,
-                };
-                paymentDetailErrors.push(errorPaymentDetail);
-
-                paymentDetailErrors?.forEach((error) => {
-                    if (error.status) {
-                        statusPayemtnDetail = true;
+        if (paymentDetails) {
+            if (paymentDetails?.length > 0) {
+                paymentDetailErrors = [];
+                paymentDetails.forEach((element) => {
+                    // Validate tài khoản có
+                    if (
+                        !element.DebitAccountName ||
+                        !element.DebitAccount === MISA_RESOURCE.GUID_EMPTY
+                    ) {
+                        setError("DebitAccount", "blank");
                     } else {
-                        statusPayemtnDetail = false;
+                        setDataValid("DebitAccount");
                     }
-                });
-            });
-        }
 
+                    // Validate tài khoản nợ
+                    if (
+                        !element.CreditAccountName ||
+                        !element.CreditAccount === MISA_RESOURCE.GUID_EMPTY
+                    ) {
+                        setError("CreditAccount", "blank");
+                    } else {
+                        setDataValid("CreditAccount");
+                    }
+
+                    const DebitAccount = { ...error.DebitAccount };
+                    const CreditAccount = { ...error.CreditAccount };
+                    const errorPaymentDetail = {
+                        DebitAccount,
+                        CreditAccount,
+                        status: DebitAccount.status || CreditAccount.status,
+                    };
+                    paymentDetailErrors.push(errorPaymentDetail);
+
+                    paymentDetailErrors?.forEach((error) => {
+                        if (error.status) {
+                            statusPayemtnDetail = true;
+                        } else {
+                            statusPayemtnDetail = false;
+                        }
+                    });
+                });
+            } else {
+                setError("PaymentDetails", "blank");
+            }
+        }
         error.status =
             error.EmployeeCode.status ||
             error.FullName.status ||
@@ -468,6 +475,7 @@ const useValidate = ({
             error.RefDate.status ||
             error.RefNo.status ||
             statusPayemtnDetail ||
+            error.PaymentDetails.status ||
             error.AccountNumber.status;
 
         return error.status;

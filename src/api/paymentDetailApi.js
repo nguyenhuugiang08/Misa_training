@@ -50,6 +50,23 @@ const paymentDetailApi = {
             console.log(error);
         }
     },
+
+    /**
+     * Hàm lấy danh sách phiếu chi chi tiết theo ID của tài khoản
+     * @param {*} accountId -- ID của tài khoản
+     * @returns 
+     */
+    getPaymentDetailsByAccountId: (accountId) => {
+        try {
+            return axiosClient.get(`${baseUrl}/accountId`, {
+                params: {
+                    accountId: accountId,
+                },
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    },
 };
 
 export default paymentDetailApi;

@@ -168,11 +168,11 @@ defineExpose({ handleFocus });
             <span class="tbl-detail-text">
                 <div class="checkbox-wrapper" v-if="isEdit && index === state.indexRowEditable">
                     <m-checkbox
+                        v-if="state.listAllAccounts.length"
                         width="130px"
                         bottom="2px"
                         :default="paymentDetail.DebitAccount"
                         :options="
-                            state.listAllAccounts.length &&
                             state.listAllAccounts.filter((account) => account.optionGrade !== 1)
                         "
                         :isTable="true"
@@ -197,11 +197,11 @@ defineExpose({ handleFocus });
             <span class="tbl-detail-text">
                 <div class="checkbox-wrapper" v-if="isEdit && index === state.indexRowEditable">
                     <m-checkbox
+                        v-if="state.listAllAccounts.length"
                         width="130px"
                         bottom="2px"
                         :default="paymentDetail.CreditAccount"
                         :options="
-                            state.listAllAccounts.length &&
                             state.listAllAccounts.filter((account) => account.optionGrade !== 1)
                         "
                         :isTable="true"

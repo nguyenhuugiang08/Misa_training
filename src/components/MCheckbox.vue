@@ -114,13 +114,16 @@ watchEffect(() => {
     try {
         if (props.default || props.default === 0) {
             const defaultValue = handleDefaultValue(props.default);
-            if (props.default === MISA_RESOURCE.GUID_EMPTY) {
+            if (props.default === MISA_RESOURCE.GUID_EMPTY && count.value < 1) {
                 selected.value = null;
+                count.value++;
             }
+
             if (defaultValue && count.value < 1) {
                 selected.value = defaultValue;
                 count.value++;
             }
+
             indexOptionSelected.value = optionSearch.value.findIndex(
                 (option) => option?.optionId === props.default
             );
@@ -162,8 +165,10 @@ const handleSearchOption = (keyword) => {
             // thực hiện tìm kiếm option theo từ khóa nhập
             const optionSearchTable = [];
             let optionIdTable = [];
+            let optionShowData = "";
 
             props.columns.forEach((column) => {
+                if (column.dataShow) optionShowData = column.identityOption;
                 props.options.forEach((option) => {
                     if (
                         option[`${column.identityOption}`]
@@ -178,26 +183,34 @@ const handleSearchOption = (keyword) => {
             });
 
             optionSearch.value = optionSearchTable;
+
+            if (optionSearch.value.length > 0) {
+                emit("select", { ...optionSearch.value[0], [optionShowData]: keyword });
+            }
+
+            if (keyword === "") {
+                emit("select", {
+                    ...optionSearch.value[0],
+                    [optionShowData]: keyword,
+                    optionId: MISA_RESOURCE.GUID_EMPTY,
+                    optionGrade: 0,
+                });
+            }
         } else {
             // thực hiện tìm kiếm option theo từ khóa nhập
             optionSearch.value = props.options.filter((option) =>
                 option.optionName.toLowerCase().includes(keyword.toLowerCase())
             );
-        }
-        /**
-         * - Nếu giá trị nhập trùng với 1 option -> gửi giá trị nhập -> hợp lệ
-         * - Nếu không trùng -> gửi giá trị nhập -> không có trong danh mục
-         */
-        if (optionSearch.value.length === 1) {
-            const newOptionId = props.options.find(
-                (option) => option.optionName === keyword
-            )?.optionId;
-            emit("select", { optionId: newOptionId, optionName: keyword });
-        } else {
-            emit("select", {
-                optionId: -1,
-                optionName: keyword,
-            });
+            /**
+             * - Nếu giá trị nhập trùng với 1 option -> gửi giá trị nhập -> hợp lệ
+             * - Nếu không trùng -> gửi giá trị nhập -> không có trong danh mục
+             */
+            if (optionSearch.value.length > 0) {
+                const newOptionId = props.options.find(
+                    (option) => option.optionName === keyword
+                )?.optionId;
+                emit("select", { optionId: newOptionId, optionName: keyword });
+            }
         }
     } catch (error) {
         console.log(error);

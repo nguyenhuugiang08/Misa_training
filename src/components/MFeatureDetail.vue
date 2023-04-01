@@ -7,8 +7,10 @@ import MPopUpWarning from "./MPopUpWarning.vue";
 import MPopUpError from "./MPopUpError.vue";
 import accountApi from "../api/accountApi";
 import { handleSetStatusForm } from "../utilities/setDefaultStateForm";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
+import { usePaymentDeatil } from "../composable/usePaymentDetail";
 
+const isShowWarning = ref(false);
 const isShowList = ref(false); // Trạng thái ẩn hiện danh sách chức năng (Nhân bản, Xóa)
 const toDropList = ref(0); // Khoảng cách của danh sách chức năng so với top của cửa số trình duyệt
 const isShowPopup = ref(false); // trạng thái đóng mở popup cảnh báo khi xóa
@@ -30,6 +32,8 @@ const {
     deleteAccountChild,
     updateIsActiveAccount,
 } = useAccount();
+
+const { getPaymentDetailsByAccountId } = usePaymentDeatil();
 
 /**
  * Lấy ra số lượng bản ghi trên 1 trang sử dụng vue-router
@@ -131,13 +135,19 @@ const handleOpenDuplicateForm = async (accountId) => {
  */
 const handleDeleteAccount = async (accountId, parentId) => {
     try {
+        isShowPopup.value = false;
         if (parentId) {
-            await deleteAccountChild(accountId, parentId);
+            const paymentDetails = await getPaymentDetailsByAccountId(accountId);
+            if (paymentDetails.length) {
+                isShowWarning.value = true;
+            } else {
+                await deleteAccountChild(accountId, parentId);
+                await getAccountsByFilter(state.keyword, pageSize.value, pageNumber.value);
+            }
         } else {
             await deleteAccount(accountId);
+            await getAccountsByFilter(state.keyword, pageSize.value, pageNumber.value);
         }
-        isShowPopup.value = false;
-        await getAccountsByFilter();
     } catch (error) {
         console.log(error);
     }
@@ -242,6 +252,14 @@ const handleActiveAccount = async (accountId, isActive, isParent, hasActiveChild
             :title="MISA_RESOURCE.TITLE.TITLE_DELETE_ACCOUNT_PARENT.title"
             :text-error="MISA_RESOURCE.TITLE.TITLE_DELETE_ACCOUNT_PARENT.text"
             @closeError="isShowPopup = false"
+        />
+    </div>
+    <div class="overlay" v-if="isShowWarning">
+        <m-pop-up-error
+            v-if="isShowWarning"
+            :title="MISA_RESOURCE.TITLE.TITLE_DELETE_ACCOUNT_ARISE_DATA.title"
+            :text-error="MISA_RESOURCE.TITLE.TITLE_DELETE_ACCOUNT_ARISE_DATA.text"
+            @closeError="isShowWarning = false"
         />
     </div>
     <div class="overlay" v-if="isShowPopupActiveChild">

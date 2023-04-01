@@ -48,9 +48,6 @@ const refSaveAndAddBtn = ref(null); // Tham chiếu tới button cất
 onMounted(() => {
     try {
         today.value = new Date();
-        if (state.newRefNo && state.identityForm === MISA_ENUM.FORM_MODE.ADD) {
-            payment.RefNo = state.newRefNo;
-        }
         if (refObjectCode.value) {
             refObjectCode.value.handleFocusCombobox();
         }
@@ -78,11 +75,22 @@ const payment = reactive({
     TotalAmount: state.totalPayment || 0,
 });
 
+watchEffect(() => {
+    try {
+        if (
+            state.identityForm === MISA_ENUM.FORM_MODE.ADD ||
+            state.identityForm === MISA_ENUM.FORM_MODE.DUPLICATE
+        )
+            payment.RefNo = state.newRefNo;
+    } catch (error) {
+        console.log(error);
+    }
+});
+
 watch(
     () => payment.ObjectName,
     (newValue) => {
         try {
-            debugger;
             const objectNames = state.objects.map((object) => object.optionName);
 
             if (objectNames.includes(newValue)) {
@@ -472,6 +480,7 @@ watchEffect(() => {
  */
 const handleChangeStatsForm = () => {
     try {
+        refObjectCode.value.handleFocusCombobox();
         setIdentityForm(MISA_ENUM.FORM_MODE.EDIT);
         setIndexRowEditable(0);
         setIsEditButton(false);
@@ -518,7 +527,7 @@ const handleDeleteAllRows = () => {
                 <div class="m-icon">
                     <div class="instruct-icon"></div>
                 </div>
-                <router-link to="/" class="instruct-link">Hướng dẫn</router-link>
+                <router-link to="/" class="instruct-link" tabindex="-1">Hướng dẫn</router-link>
                 <div class="m-icon m-icon__second" @click="isOpenPopupConstruction = true">
                     <div class="setting-icon"></div>
                 </div>
@@ -765,7 +774,8 @@ const handleDeleteAllRows = () => {
                     error.RefDate.textError ||
                     error.RefNo.textError ||
                     error.PostedDate.textError ||
-                    paymentDetailTextErrors?.[0]
+                    paymentDetailTextErrors?.[0] ||
+                    error.PaymentDetails.textError
                 "
                 @closeError="isOpenError = !isOpenError"
             />
