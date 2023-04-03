@@ -14,7 +14,7 @@ watch(
     () => props.indexSelected,
     (newValue) => {
         if (!props.isTable) {
-            const liH = refItem.value[newValue]?.clientHeight;
+            const liH = refItem.value?.[newValue]?.clientHeight;
             refList.value.scrollTop = liH * newValue;
         }
     }

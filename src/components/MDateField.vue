@@ -100,7 +100,7 @@ onMounted(() => {
 
                 if (this.value.length === 10) {
                     if (handleCheckFormat(MISA_RESOURCE.REGEX.DATE, this.value)) {
-                        date.value = new Date(convertDatetime(this.value));
+                        date.value = new Date(convertDatetime(this.value, true));
                     } else {
                         date.value = new Date();
                     }
@@ -146,6 +146,7 @@ watch(
     () => date.value,
     (newValue) => {
         try {
+            console.log(newValue);
             emit("dateField", newValue);
         } catch (error) {
             console.log(error);

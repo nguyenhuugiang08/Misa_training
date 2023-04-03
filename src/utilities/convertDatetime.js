@@ -18,7 +18,7 @@ export const convertDatetime = (dateString, isJson) => {
 
             const newDateTime = new Date(newDateString);
             if (isJson) {
-                newDateTime.setHours(newDateTime.getHours() + 24);
+                newDateTime.setHours(newDateTime.getHours() + 23);
             }
 
             return dtFormat.format(newDateTime);

@@ -202,12 +202,12 @@ const handleSubmit = async (identityButton) => {
  */
 const handleAddPayment = async (identityButton) => {
     try {
-        if (state.identityForm === MISA_ENUM.FORM_MODE.ADD) {
-            payment.RefDate.setHours(payment.RefDate.getHours() + MISA_ENUM.TIMEZONE_DIFFERENCE);
-            payment.PostedDate.setHours(
-                payment.PostedDate.getHours() + MISA_ENUM.TIMEZONE_DIFFERENCE
-            );
+        if (state.identityForm === MISA_ENUM.FORM_MODE.DUPLICATE) {
+            payment.RefDate = new Date(payment.RefDate);
+            payment.PostedDate = new Date(payment.PostedDate);
         }
+        payment.RefDate.setHours(payment.RefDate.getHours() + MISA_ENUM.TIMEZONE_DIFFERENCE);
+        payment.PostedDate.setHours(payment.PostedDate.getHours() + MISA_ENUM.TIMEZONE_DIFFERENCE);
         await addPayment(payment)
             .then(async (data) => {
                 if (data) {
@@ -266,6 +266,10 @@ const handleAddPayment = async (identityButton) => {
  */
 const handleEditPayment = async (identityButton) => {
     try {
+        payment.RefDate = new Date(payment.RefDate);
+        payment.PostedDate = new Date(payment.PostedDate);
+        payment.RefDate.setHours(payment.RefDate.getHours() + MISA_ENUM.TIMEZONE_DIFFERENCE);
+        payment.PostedDate.setHours(payment.PostedDate.getHours() + MISA_ENUM.TIMEZONE_DIFFERENCE);
         await editPayement(payment, paymentIdAdded.value || state.entitySelected.PaymentId)
             .then(async (data) => {
                 if (data) {

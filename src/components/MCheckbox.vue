@@ -210,6 +210,8 @@ const handleSearchOption = (keyword) => {
                     (option) => option.optionName === keyword
                 )?.optionId;
                 emit("select", { optionId: newOptionId, optionName: keyword });
+            } else {
+                emit("select", { optionId: -1, optionName: keyword });
             }
         }
     } catch (error) {
@@ -380,6 +382,7 @@ defineExpose({ refList, refItem, handleFocusCombobox });
         <div
             v-if="status"
             class="error-checkbox"
+            :class="{ 'error-checkbox__has-label': textLabel }"
             :style="{ display: isShowError ? 'block' : 'none' }"
         >
             {{ textError }}
@@ -462,6 +465,35 @@ defineExpose({ refList, refItem, handleFocusCombobox });
 }
 
 .error-checkbox::before {
+    content: "";
+    position: absolute;
+    height: 0;
+    width: 0;
+    border: 8px solid;
+    border-color: transparent transparent #f65d5d transparent;
+    top: -11px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.error-checkbox__has-label {
+    position: absolute;
+    padding: 4px 8px;
+    background: #f65d5d;
+    color: #fff;
+    border-radius: 4px;
+    z-index: 99;
+    text-align: center;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+    top: 52px;
+    font-weight: 400;
+    display: none;
+    white-space: normal;
+}
+
+.error-checkbox__has-label::before {
     content: "";
     position: absolute;
     height: 0;
