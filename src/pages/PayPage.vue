@@ -373,6 +373,7 @@ onUnmounted(() => {
             <m-table-detail
                 :columns="MISA_RESOURCE.COLUMNS_NAME_PAYMENT_DETAIL"
                 :entities="state.paymentDetails"
+                :is-scroll="true"
             />
             <div class="detail-payment__paging">
                 <m-pagination

@@ -9,6 +9,7 @@ const props = defineProps({
     hasColumnDelete: Boolean,
     isEdit: Boolean,
     reason: String,
+    isScroll: Boolean,
 });
 
 const { state, setTotalPayment } = inject("diy");
@@ -33,7 +34,7 @@ watchEffect(() => {
 
 <template>
     <table class="tbl" tabindex="-1">
-        <tbody class="tb-detail" tabindex="-1">
+        <tbody class="tb-detail" :class="{ 'tb-detail--scroll': isScroll }" tabindex="-1">
             <tr class="tbl-row" tabindex="-1">
                 <th
                     :class="`tbl-col ${column.isMoney && 'tbl-col--money'} ${
@@ -48,6 +49,7 @@ watchEffect(() => {
                         minWidth: column.width,
                         textAlign: column.align,
                         paddingLeft: column.padding,
+                        zIndex: 99,
                     }"
                     v-for="(column, index) in columns"
                     :key="index"
@@ -101,6 +103,12 @@ watchEffect(() => {
 .tb-detail {
     height: max-content !important;
     overflow: unset !important;
+}
+
+.tb-detail--scroll {
+    height: max-content;
+    max-height: 190px !important;
+    overflow: scroll !important;
 }
 
 .tbl-detail-tooltip {

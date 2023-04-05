@@ -112,6 +112,7 @@ progress {
     justify-content: space-between;
     align-items: center;
     flex-direction: row-reverse;
+    z-index: 99;
 }
 
 .btn-import-prev {
