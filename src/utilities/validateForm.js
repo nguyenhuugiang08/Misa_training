@@ -456,6 +456,7 @@ const useValidate = ({
                         }
                     });
                 });
+                setDataValid("PaymentDetails");
             } else {
                 setError("PaymentDetails", "blank");
             }

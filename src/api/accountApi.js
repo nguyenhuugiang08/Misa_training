@@ -102,7 +102,7 @@ const accountApi = {
                     id: accountId,
                     parentId: parentId,
                 },
-            });
+            }); 
         } catch (error) {
             console.log(error);
         }

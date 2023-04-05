@@ -7,7 +7,6 @@ import { MISA_RESOURCE } from "../base/resource";
 import { useAccount } from "../composable/useAccount";
 import { formatMoney } from "../utilities/formatMoney";
 import { paymentDetailErrors, error } from "../utilities/validateForm";
-import { MISA_ENUM } from "../base/enum";
 
 const props = defineProps({
     numericalOrder: Number,
@@ -161,7 +160,7 @@ defineExpose({ handleFocus });
             </span>
             <span v-if="!isEdit">{{ state.paymentDetails[index]?.Description }}</span>
             <span v-if="isEdit && !(index === state.indexRowEditable)">{{
-                state.paymentDetails[index]?.Description
+                paymentDetail.Description
             }}</span>
         </td>
         <td class="tbl-col">

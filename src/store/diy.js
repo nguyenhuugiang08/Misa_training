@@ -34,7 +34,7 @@ const state = reactive({
             DebitAccountName: "",
             CreditAccount: "",
             CreditAccountName: "",
-            Description: "",
+            Description: MISA_RESOURCE.REASON_PAYMENT_DEFAULT,
         },
     ], // Mảng các chi tiết phiếu chi trên UI detail
     paymentDetail: {
@@ -345,7 +345,7 @@ const setPaymentDetailsDefault = () => {
                 DebitAccountName: "",
                 CreditAccount: "",
                 CreditAccountName: "",
-                Description: "",
+                Description: MISA_RESOURCE.REASON_PAYMENT_DEFAULT,
             },
         ];
     } catch (error) {
@@ -435,7 +435,7 @@ const setPaymentDetailDefault = () => {
             DebitAccountName: "",
             CreditAccount: "",
             CreditAccountName: "",
-            Description: "",
+            Description: MISA_RESOURCE.REASON_PAYMENT_DEFAULT,
         };
     } catch (error) {
         console.log(error);

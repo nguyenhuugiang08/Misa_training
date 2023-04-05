@@ -50,41 +50,41 @@ const account = reactive({
     IsTrackSaleContract: state.entitySelected?.IsTrackSaleContract || false,
     IsTrackExpenseItem: state.entitySelected?.IsTrackExpenseItem || false,
     IsTrackItem: state.entitySelected?.IsTrackItem || false,
-    Object: state.entitySelected?.Object || 1,
+    Object: state.entitySelected?.Object || MISA_ENUM.TRACK_TYPE.ONLY_WARMING,
     Job:
-        state.entitySelected?.Job === 0
+        state.entitySelected?.Job === MISA_ENUM.TRACK_TYPE.REQUIRED
             ? MISA_RESOURCE.TRACK_TYPE[0].optionId
             : MISA_RESOURCE.TRACK_TYPE[1].optionId,
     Order:
-        state.entitySelected?.Order === 0
+        state.entitySelected?.Order === MISA_ENUM.TRACK_TYPE.REQUIRED
             ? MISA_RESOURCE.TRACK_TYPE[0].optionId
             : MISA_RESOURCE.TRACK_TYPE[1].optionId,
     PurchaseContract:
-        state.entitySelected?.PurchaseContract === 0
+        state.entitySelected?.PurchaseContract === MISA_ENUM.TRACK_TYPE.REQUIRED
             ? MISA_RESOURCE.TRACK_TYPE[0].optionId
             : MISA_RESOURCE.TRACK_TYPE[1].optionId,
     OrganizationUnit:
-        state.entitySelected?.OrganizationUnit === 0
+        state.entitySelected?.OrganizationUnit === MISA_ENUM.TRACK_TYPE.REQUIRED
             ? MISA_RESOURCE.TRACK_TYPE[0].optionId
             : MISA_RESOURCE.TRACK_TYPE[1].optionId,
     BankAccount:
-        state.entitySelected?.BankAccount === 0
+        state.entitySelected?.BankAccount === MISA_ENUM.TRACK_TYPE.REQUIRED
             ? MISA_RESOURCE.TRACK_TYPE[0].optionId
             : MISA_RESOURCE.TRACK_TYPE[1].optionId,
     ProjectWork:
-        state.entitySelected?.ProjectWork === 0
+        state.entitySelected?.ProjectWork === MISA_ENUM.TRACK_TYPE.REQUIRED
             ? MISA_RESOURCE.TRACK_TYPE[0].optionId
             : MISA_RESOURCE.TRACK_TYPE[1].optionId,
     SaleContract:
-        state.entitySelected?.SaleContract === 0
+        state.entitySelected?.SaleContract === MISA_ENUM.TRACK_TYPE.REQUIRED
             ? MISA_RESOURCE.TRACK_TYPE[0].optionId
             : MISA_RESOURCE.TRACK_TYPE[1].optionId,
     ExpenseItem:
-        state.entitySelected?.ExpenseItem === 0
+        state.entitySelected?.ExpenseItem === MISA_ENUM.TRACK_TYPE.REQUIRED
             ? MISA_RESOURCE.TRACK_TYPE[0].optionId
             : MISA_RESOURCE.TRACK_TYPE[1].optionId,
     Item:
-        state.entitySelected?.Item === 0
+        state.entitySelected?.Item === MISA_ENUM.TRACK_TYPE.REQUIRED
             ? MISA_RESOURCE.TRACK_TYPE[0].optionId
             : MISA_RESOURCE.TRACK_TYPE[1].optionId,
     Grade: state.entitySelected?.Grade || state.gradeAccountSelected + 1,
@@ -106,7 +106,9 @@ watch(
 );
 
 /**
- * Hàm xử lý submit form
+ * Hàm thực hiện submit form tài khoản
+ * @param {*} identityAction -- Cất hoặc cất và thêm
+ * Created by: NHGiang - (4/4/2023)
  */
 const handleSubmit = async (identityAction) => {
     try {
@@ -190,7 +192,7 @@ const handleCloseForm = () => {
         const { TypeName, ...restAccount } = account;
         if (state.identityForm === MISA_ENUM.FORM_MODE.ADD) {
             accountToCompare = {
-                ParentId: "00000000-0000-0000-0000-000000000000",
+                ParentId: state.parentId || MISA_RESOURCE.GUID_EMPTY,
                 AccountNumber: "",
                 AccountName: "",
                 EnglishName: "",
@@ -209,17 +211,17 @@ const handleCloseForm = () => {
                 IsTrackSaleContract: false,
                 IsTrackExpenseItem: false,
                 IsTrackItem: false,
-                Object: 1,
-                Job: 1,
-                Order: 1,
-                PurchaseContract: 1,
-                OrganizationUnit: 1,
-                BankAccount: 1,
-                ProjectWork: 1,
-                SaleContract: 1,
-                ExpenseItem: 1,
-                Item: 1,
-                Grade: 1,
+                Object: MISA_ENUM.TRACK_TYPE.ONLY_WARMING,
+                Job: MISA_ENUM.TRACK_TYPE.ONLY_WARMING,
+                Order: MISA_ENUM.TRACK_TYPE.ONLY_WARMING,
+                PurchaseContract: MISA_ENUM.TRACK_TYPE.ONLY_WARMING,
+                OrganizationUnit: MISA_ENUM.TRACK_TYPE.ONLY_WARMING,
+                BankAccount: MISA_ENUM.TRACK_TYPE.ONLY_WARMING,
+                ProjectWork: MISA_ENUM.TRACK_TYPE.ONLY_WARMING,
+                SaleContract: MISA_ENUM.TRACK_TYPE.ONLY_WARMING,
+                ExpenseItem: MISA_ENUM.TRACK_TYPE.ONLY_WARMING,
+                Item: MISA_ENUM.TRACK_TYPE.ONLY_WARMING,
+                Grade: state.gradeAccountSelected ? state.gradeAccountSelected + 1 : 1,
             };
         }
 
@@ -282,7 +284,7 @@ const docKeyDown = (e) => {
     }
 
     // Đóng form với phím tắt ESC
-    if (e.keyCode === MISA_ENUM.KEY_CODE.ESCAPE) {
+    if (e.keyCode === MISA_ENUM.KEY_CODE.ESCAPE && !isOpenError.value) {
         handleCloseForm();
     }
 };
@@ -436,6 +438,7 @@ const changeCheckboxForeignCurrencyAccounting = () => {
                                 account.Type = $event.optionId;
                                 account.TypeName = $event.optionName;
                             "
+                            @changeValue="error.Type.status = $event"
                         />
                     </div>
                 </div>
@@ -548,8 +551,8 @@ const changeCheckboxForeignCurrencyAccounting = () => {
             <m-pop-up-error
                 :title="'Lỗi'"
                 :text-error="
-                    error.AccountName.textError ||
                     error.AccountNumber.textError ||
+                    error.AccountName.textError ||
                     error.Type.textError
                 "
                 @closeError="isOpenError = !isOpenError"

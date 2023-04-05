@@ -78,6 +78,11 @@ export const handleSetStatusForm = () => {
             status: false,
         };
 
+        error.PaymentDetails = {
+            textError: "",
+            status: false,
+        };
+
         paymentDetailErrors.splice(0, paymentDetailErrors.length);
         error.status = false;
     } catch (error) {

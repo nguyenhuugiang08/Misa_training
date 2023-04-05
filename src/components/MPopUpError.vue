@@ -1,6 +1,6 @@
 <script setup>
 import { MISA_ENUM } from "../base/enum";
-import { onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 
 // Định nghĩa các props nhận vào
 const props = defineProps({
@@ -10,6 +10,7 @@ const props = defineProps({
 
 // Định nghĩa các hàm được emit ra ngoài
 const emit = defineEmits(["closeError"]);
+const refCloseBtn = ref(null); // Tham chiếu tới button close
 
 /**
  * Xử lý đóng pop up error
@@ -41,6 +42,9 @@ const docKeyDown = (e) => {
  */
 onMounted(() => {
     document.addEventListener("keydown", docKeyDown, false);
+    if (refCloseBtn.value) {
+        refCloseBtn.value.focus();
+    }
 });
 
 /**
@@ -80,7 +84,9 @@ onUnmounted(() => {
             <div class="modal-confirm__content-text">{{ textError }}</div>
         </div>
         <div class="modal-footer modal-confirm__footer modal-footer--error">
-            <button class="btn btn-primary" @click="handleClosePopUp">Đóng</button>
+            <button ref="refCloseBtn" class="btn btn-primary" @click="handleClosePopUp">
+                Đóng
+            </button>
         </div>
     </div>
 </template>

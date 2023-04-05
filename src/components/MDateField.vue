@@ -138,15 +138,14 @@ const handleDatepicker = () => {
     }
 };
 
-// /**
-//  * Theo dõi giá trị biến date -> emit giá trị ra ngoài
-//  * Created by: NHGiang
-//  */
+/**
+ * Theo dõi giá trị biến date -> emit giá trị ra ngoài
+ * Created by: NHGiang
+ */
 watch(
     () => date.value,
     (newValue) => {
         try {
-            console.log(newValue);
             emit("dateField", newValue);
         } catch (error) {
             console.log(error);

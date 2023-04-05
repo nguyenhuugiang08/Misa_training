@@ -3,7 +3,14 @@ import MPagination from "../components/MPagination.vue";
 import MAccountForm from "../components/MAccountForm.vue";
 import MFeatureDetail from "../components/MFeatureDetail.vue";
 import MLoading from "../components/MLoading.vue";
-import { DxTreeList, DxColumn, DxPaging, DxPager, DxScrolling } from "devextreme-vue/tree-list";
+import {
+    DxTreeList,
+    DxColumn,
+    DxPaging,
+    DxPager,
+    DxScrolling,
+    DxSelection,
+} from "devextreme-vue/tree-list";
 import { ref, inject, watch, onMounted, onUnmounted, watchEffect } from "vue";
 import { useAccount } from "../composable/useAccount";
 import { useRouter, useRoute } from "vue-router";
@@ -110,6 +117,10 @@ const toogleExpanded = () => {
 const debounceSearch = async (value) => {
     try {
         await getAccountsByFilter(value, pageSize.value, 1);
+        router.push({
+            path: "/account-system",
+            query: { pageSize: pageSize.value, pageNumber: MISA_ENUM.PAGENUMBER_DEFAULT },
+        });
     } catch (error) {
         console.log(error);
     }
@@ -272,6 +283,7 @@ onUnmounted(() => {
                     :allowed-page-sizes="allowedPageSizes"
                     :show-info="true"
                 />
+                <DxSelection mode="single" />
                 <DxColumn :width="130" data-field="AccountNumber" caption="Số tài khoản" />
                 <DxColumn :width="250" data-field="AccountName" caption="Tên tài khoản" />
                 <DxColumn :width="150" data-field="Type" caption="Tính chất" />
@@ -389,5 +401,14 @@ onUnmounted(() => {
 
 .dx-treelist .dx-header-row {
     background-color: #e5e8ec;
+}
+
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused) > td {
+    background-color: var(--table-bg-color) !important;
+}
+
+.dx-treelist-content .dx-treelist-table .dx-row > td,
+.dx-treelist-content .dx-treelist-table .dx-row > tr > td {
+    vertical-align: middle;
 }
 </style>

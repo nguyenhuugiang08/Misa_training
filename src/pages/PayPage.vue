@@ -460,6 +460,7 @@ onUnmounted(() => {
 .pay-bulk-delete--active {
     border: 1px solid #3b3c3f;
     color: #111;
+    cursor: pointer;
 }
 
 .btn-pay {

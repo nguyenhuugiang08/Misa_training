@@ -300,6 +300,25 @@ const handleEditPayment = async (identityButton) => {
                     }
 
                     if (identityButton === MISA_ENUM.STATUS_SAVE_PAYMENT.SAVE_ADD) {
+                        await getNewRefNo();
+                        payment.Address = "";
+                        payment.Attachment = "";
+                        payment.EmployeeId = MISA_RESOURCE.GUID_EMPTY;
+                        payment.ObjectCode = "";
+                        payment.ObjectId = MISA_RESOURCE.GUID_EMPTY;
+                        payment.ObjectName = "";
+                        payment.PostedDate = new Date();
+                        payment.Reason = MISA_RESOURCE.REASON_PAYMENT_DEFAULT;
+                        payment.ReasonType = 6;
+                        payment.Receiver = "";
+                        payment.RefDate = new Date();
+                        payment.RefNo = state.newRefNo;
+                        payment.TotalAmount = 0;
+
+                        await setPaymentDetailsDefault();
+                        setObjectSelected({});
+                        setPaymentDetailDefault();
+                        isOpenError.value = false;
                     }
                 }
             })
@@ -372,8 +391,15 @@ const docKeyDown = (e) => {
 
     // xóa dòng với phím ctrl + delete
     if (e.ctrlKey && e.keyCode === MISA_ENUM.KEY_CODE.DELETE) {
-        if (!state.editable) deletePaymentDetails(state.paymentDetails.length - 1);
-        if (state.paymentDetails.length - 1 === -1) {
+        const paymentDetailsLength = state.paymentDetails.length - 1;
+        if (!state.editable) {
+            deletePaymentDetails(state.indexRowEditable);
+            if (state.indexRowEditable >= paymentDetailsLength) {
+                setIndexRowEditable(state.indexRowEditable - 1);
+            }
+        }
+
+        if (paymentDetailsLength === -1) {
             setPaymentDetailDefault();
         }
     }
@@ -453,7 +479,12 @@ const handleAddRowDetail = () => {
             ...state.paymentDetails[totalPaymentDetail - 1],
             PaymentDetailId: MISA_RESOURCE.GUID_EMPTY,
         };
-        if (!state.editable) addPaymentDetails(newPaymentDetail);
+        if (!state.editable) {
+            if (state.indexRowEditable === -1) {
+                setIndexRowEditable(0);
+            }
+            addPaymentDetails(newPaymentDetail);
+        }
     } catch (error) {
         console.log(error);
     }
@@ -482,14 +513,14 @@ watchEffect(() => {
  * Hàm đối trạng thái form thêm -> sửa
  * Created by: NHGiang - (26/03/23)
  */
-const handleChangeStatsForm = () => {
+const handleChangeStatsForm = async () => {
     try {
-        refObjectCode.value.handleFocusCombobox();
         setIdentityForm(MISA_ENUM.FORM_MODE.EDIT);
         setIndexRowEditable(0);
         setIsEditButton(false);
-        setIsClickRow(false);
         setEditable(false);
+        await setIsClickRow(false);
+        refObjectCode.value.handleFocusCombobox();
     } catch (error) {
         console.log(error);
     }
@@ -935,5 +966,9 @@ const handleDeleteAllRows = () => {
 
 .btn-disable-payment:hover {
     background: 0 0;
+}
+
+.btn-cancel--disable {
+    background-color: #afafaf;
 }
 </style>

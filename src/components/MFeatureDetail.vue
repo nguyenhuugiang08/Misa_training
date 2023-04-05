@@ -24,7 +24,8 @@ const props = defineProps({
 
 const route = useRoute();
 
-const { state, setIsForm, setTitleForm, setIdentityForm } = inject("diy");
+const { state, setIsForm, setTitleForm, setIdentityForm, setParentId, setGradeAccountSelected } =
+    inject("diy");
 const {
     getAccountById,
     deleteAccount,
@@ -137,15 +138,31 @@ const handleDeleteAccount = async (accountId, parentId) => {
     try {
         isShowPopup.value = false;
         if (parentId) {
+            /**
+             * Trường hợp tài khoản bậc lớn hơn 1
+             * - kiểm tra xem tài khoản đã phát sinh dữ liệu => thông báo
+             * - Chưa phát sinh dữ liệu => thực hiện xóa
+             */
             const paymentDetails = await getPaymentDetailsByAccountId(accountId);
             if (paymentDetails.length) {
                 isShowWarning.value = true;
             } else {
                 await deleteAccountChild(accountId, parentId);
+                if (accountId === state.parentId) {
+                    setParentId(MISA_RESOURCE.GUID_EMPTY);
+                    setGradeAccountSelected(0);
+                }
                 await getAccountsByFilter(state.keyword, pageSize.value, pageNumber.value);
             }
         } else {
+            /**
+             * Trường hợp tài khoản bậc 1
+             * */
             await deleteAccount(accountId);
+            if (accountId === state.parentId) {
+                setParentId(MISA_RESOURCE.GUID_EMPTY);
+                setGradeAccountSelected(0);
+            }
             await getAccountsByFilter(state.keyword, pageSize.value, pageNumber.value);
         }
     } catch (error) {
@@ -184,7 +201,7 @@ const handleActiveAccount = async (accountId, isActive, isParent, hasActiveChild
             await updateIsActiveAccount([accountId], !isActive);
         }
         isShowPopup.value = false;
-        await getAccountsByFilter(state.keyword, pageSize.value, pageNumber.value);
+        await getAccountsByFilter(state.keyword, route.query.pageSize, route.query.pageNumber);
     } catch (error) {
         console.log(error);
     }

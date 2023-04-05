@@ -82,6 +82,7 @@ const handleShowSelectedValue = (option, index) => {
             optionAddress: option.optionAddress,
             optionCode: option.optionCode,
         });
+        emit("changeValue", false);
     } catch (error) {
         console.log(error);
     }
@@ -114,9 +115,8 @@ watchEffect(() => {
     try {
         if (props.default || props.default === 0) {
             const defaultValue = handleDefaultValue(props.default);
-            if (props.default === MISA_RESOURCE.GUID_EMPTY && count.value < 1) {
+            if (props.default === MISA_RESOURCE.GUID_EMPTY) {
                 selected.value = null;
-                count.value++;
             }
 
             if (defaultValue && count.value < 1) {
@@ -156,7 +156,7 @@ const handleClickOutside = () => {
  */
 const handleSearchOption = (keyword) => {
     try {
-        emit("changeValue", true);
+        emit("changeValue", false);
         indexOptionSelected.value = 0;
         isOpen.value = true;
         selected.value = keyword;
@@ -405,10 +405,7 @@ defineExpose({ refList, refItem, handleFocusCombobox });
             marginBottom: bottom ? `${bottom}` : '0',
             marginRight: marginRight,
         }"
-        @focus="
-            isFocus = status ? false : true;
-            emit('changeValue', true);
-        "
+        @focus="isFocus = status ? false : true"
         @blur="isFocus = false"
         @input="handleSearchOption($event.target.value)"
         autocomplete="off"
